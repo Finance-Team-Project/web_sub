@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STJ 금융뉴스 이해 플랫폼</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            scroll-behavior: smooth;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f7fa;
+            overflow: hidden;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #003675;
+            padding: 0 40px;
+            color: white;
+            z-index: 1000;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .menu {
+            display: flex;
+            gap: 20px;
+            position: relative;
+        }
+        .menu-item {
+            position: relative;
+        }
+        .menu-item > a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 20px 10px;
+            display: block;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            color: #333;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            min-width: 200px;
+            z-index: 100;
+        }
+        .dropdown h4 {
+            margin-bottom: 10px;
+            color: #003675;
+        }
+        .dropdown ul {
+            list-style: none;
+            padding: 0;
+        }
+        .dropdown ul li {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+        .dropdown ul li a {
+            text-decoration: none;
+            color: #333;
+        }
+        .menu-item:hover .dropdown {
+            display: block;
+        }
+        #fullpage {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        /* Chrome, Safari 등 webkit 기반 브라우저용 */
+        #fullpage::-webkit-scrollbar {
+            display: none;
+        }
+        section {
+            scroll-snap-align: start;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 80px;
+        }
+        .home-hero {
+            background: linear-gradient(135deg, #003675 30%, #0057a0 100%);
+            color: white;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .home-hero h1 {
+            font-size: 3.2rem;
+            margin-bottom: 20px;
+        }
+        .home-hero p {
+            font-size: 1.3rem;
+            max-width: 700px;
+        }
+        .search-bar {
+            margin-top: 40px;
+        }
+        .search-bar input {
+            padding: 12px 20px;
+            width: 300px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1rem;
+        }
+        .section-wrapper {
+            background-color: #ffffff;
+            width: 100%;
+            padding: 60px 20px;
+            box-sizing: border-box;
+        }
+        .section-wrapper h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #003675;
+            text-align: center;
+        }
+        .tab-menu {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab-menu button {
+            background: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+        .tab-menu button.active {
+            background: #003675;
+            color: white;
+        }
+        .issue-tab {
+            display: none;
+            min-height: 300px;
+        }
+        .issue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .issue-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .issue-card h3 {
+            font-size: 1.1rem;
+            color: #222;
+            margin-bottom: 10px;
+        }
+        .issue-card p {
+            font-size: 0.95rem;
+            color: #555;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #001f3f;
+            color: white;
+            font-size: 0.9rem;
+        }
+        .indicator {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+        .indicator button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            background-color: #ccc;
+            cursor: pointer;
+        }
+        .indicator button.active {
+            background-color: #003675;
+        }
+
+        .news-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-content.news-style {
+            background: white;
+            padding: 30px 35px;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            width: 600px;
+            font-family: 'Noto Sans KR', sans-serif;
+            animation: fadeUp 0.5s ease forwards;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .news-meta {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .news-body {
+            font-size: 1.05rem;
+            color: #333;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 18px;
+            right: 24px;
+            border: none;
+            background: none;
+            font-size: 1.1rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .news-body mark {
+            background-color: #e0f3ff;
+            color: #0057a0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+
+        .news-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .news-body {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #333;
+            white-space: pre-line;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .news-modal {
+            animation: fadeInBg 0.5s ease;
+        }
+
+        .modal-content {
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInBg {
+            from { background-color: rgba(0,0,0,0); }
+            to { background-color: rgba(0,0,0,0.4); }
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .auth-buttons button {
+            background: #003675;
+            color: white;
+            border: 1px solid #fff;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .auth-buttons button:hover {
+            background: #fff;
+            color: #003675;
+            border: 1px solid #003675;
+        }
+
+    </style>
+    <script>
+        function toggleIssueTab(tabName) {
+            const issues = document.querySelectorAll('.issue-tab');
+            issues.forEach(tab => tab.style.display = 'none');
+            document.getElementById(tabName).style.display = 'grid';
+            document.querySelectorAll('.tab-menu button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-menu button[data-tab="${tabName}"]`).classList.add('active');
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            toggleIssueTab('issue-tab-finance');
+            loadTodayNews(); // 이 부분 꼭 추가
+
+            const sections = document.querySelectorAll('section');
+            const indicators = document.querySelectorAll('.indicator button');
+            document.getElementById('fullpage').addEventListener('scroll', () => {
+                let scrollTop = document.getElementById('fullpage').scrollTop;
+                let index = Math.round(scrollTop / window.innerHeight);
+                indicators.forEach((btn, i) => {
+                    btn.classList.toggle('active', i === index);
+                });
+            });
+        });
+
+        function scrollToSection(i) {
+            document.getElementById('fullpage').scrollTo({
+                top: i * window.innerHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        async function loadTodayNews() {
+            const response = await fetch('/api/news');
+            const newsList = await response.json();
+
+            const container = document.getElementById('issue-tab-finance');
+            container.innerHTML = '';
+
+            newsList.forEach(news => {
+                const card = document.createElement('div');
+                card.className = 'issue-card';
+                card.innerHTML = `
+                    <h3 onclick="loadNewsDetail(${news.id})">${news.title}</h3>
+                    <p>${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function loadNewsDetail(newsId) {
+            const response = await fetch(`/api/news/${newsId}`);
+            const news = await response.json();
+
+            const modal = document.createElement('div');
+            modal.className = 'news-modal';modal.innerHTML = `
+              <div class="modal-content news-style">
+                <button class="close-btn" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
+                <h2>${news.title}</h2>
+                <div class="news-meta">${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</div>
+                <div class="news-body">${news.content}</div>
+              </div>
+            `;
+            document.body.appendChild(modal);
+
+            // 강조된 단어 클릭 이벤트 추가
+            document.querySelectorAll('.news-body mark').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', () => showTermPopup(el.innerText));
+            });
+        }
+        async function showTermPopup(term) {
+            // 이전에 열려 있던 용어 모달이 있다면 제거
+            const existingTermModal = document.getElementById('term-modal');
+            if (existingTermModal) {
+                document.body.removeChild(existingTermModal);
+            }
+
+            try {
+                const response = await fetch(`/api/terms/${encodeURIComponent(term)}`);
+                if (!response.ok) throw new Error("Not found");
+
+                const data = await response.json();
+
+                const modal = document.createElement('div');
+                modal.className = 'news-modal';
+                modal.id = 'term-modal'; // ✅ 용어 전용 모달 ID
+                modal.innerHTML = `
+                  <div class="modal-content news-style">
+                    <button class="close-btn" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
+                    <h2>📘 용어 해설: ${data.term}</h2>
+                    <div class="news-body">${data.description}</div>
+                    ${data.example ? `<div class="term-extra"><strong>예시:</strong> ${data.example}</div>` : ''}
+                  </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (e) {
+                // 실패 시도에도 이전 용어 모달 제거
+                const existingErrorModal = document.getElementById('term-modal');
+                if (existingErrorModal) {
+                    document.body.removeChild(existingErrorModal);
+                }
+
+                const modal = document.createElement('div');
+                modal.className = 'news-modal';
+                modal.id = 'term-modal';
+                modal.innerHTML = `
+                  <div class="modal-content news-style">
+                    <button class="close-btn" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
+                    <h2>❗ 용어 정보를 찾을 수 없습니다.</h2>
+                    <div class="news-body">"${term}"에 대한 설명이 없습니다.</div>
+                  </div>
+                `;
+                document.body.appendChild(modal);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // 우선 term-modal이 있으면 그것만 닫는다
+                const termModal = document.getElementById('term-modal');
+                if (termModal) {
+                    document.body.removeChild(termModal);
+                    return; // ❗뉴스 모달은 유지
+                }
+
+                // term-modal이 없고, 뉴스 모달이 있을 때만 닫는다
+                const newsModal = document.querySelector('.news-modal');
+                if (newsModal) {
+                    document.body.removeChild(newsModal);
+                }
+            }
+        });
+
+    </script>
+</head>
+<body>
+<header>
+    <div class="navbar">
+        <div class="logo">STJ</div>
+        <div class="menu">
+            <div class="menu-item">
+                <a href="#">뉴스 보기</a>
+                <div class="dropdown">
+                    <h4>뉴스 보기</h4>
+                    <ul>
+                        <li><a href="#">최신 뉴스</a></li>
+                        <li><a href="#">오늘의 이슈</a></li>
+                        <li><a href="#">오늘의 키워드</a></li>
+                        <li><a href="#">뉴스 상세 검색</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-item">
+                <a href="#">AI 해설</a>
+                <div class="dropdown">
+                    <h4>AI 요약 / 해설</h4>
+                    <ul>
+                        <li><a href="#">뉴스 요약 보기</a></li>
+                        <li><a href="#">경제 용어 해설</a></li>
+                        <li><a href="#">문맥 기반 해설</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-item">
+                <a href="#">단어 학습</a>
+                <div class="dropdown">
+                    <h4>금융 단어 학습</h4>
+                    <ul>
+                        <li><a href="#">단어장</a></li>
+                        <li><a href="#">자주 나오는 키워드</a></li>
+                        <li><a href="#">단어 랭킹</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-item">
+                <a href="#">퀴즈</a>
+                <div class="dropdown">
+                    <h4>금융 퀴즈</h4>
+                    <ul>
+                        <li><a href="#">단어 퀴즈</a></li>
+                        <li><a href="#">뉴스 기반 퀴즈</a></li>
+                        <li><a href="#">랭킹</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-item">
+                <a href="#">플랫폼 안내</a>
+                <div class="dropdown">
+                    <h4>STJ 소개</h4>
+                    <ul>
+                        <li><a href="#">플랫폼 소개</a></li>
+                        <li><a href="#">팀 소개</a></li>
+                        <li><a href="#">이용 가이드</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="auth-buttons">
+            <button onclick="location.href='/login'">로그인</button>
+        </div>
+    </div>
+</header>
+
+<div id="fullpage">
+    <section class="home-hero">
+        <h1>뉴스를 쉽고 빠르게 이해하는 금융 플랫폼</h1>
+        <p>경제 용어도, 뉴스 문맥도 AI가 도와드립니다. 지금 바로 금융 리터러시를 높여보세요!</p>
+        <div class="search-bar">
+            <input type="text" placeholder="관심 있는 키워드를 입력하세요">
+        </div>
+    </section>
+
+    <section class="section-wrapper">
+        <h2>오늘의 이슈</h2>
+        <div class="tab-menu">
+            <button class="active" onclick="toggleIssueTab('issue-tab-finance')" data-tab="issue-tab-finance">이슈별</button>
+            <button onclick="toggleIssueTab('issue-tab-interest')" data-tab="issue-tab-interest">나의 관심 뉴스</button>
+        </div>
+        <div class="issue-grid issue-tab" id="issue-tab-finance">
+            <div class="issue-card">
+                <h3>기준금리 동결 발표, 금융시장 안정 신호</h3>
+                <p>경제 | 관련 뉴스 54건</p>
+            </div>
+            <div class="issue-card">
+                <h3>코스피 소폭 반등, 외국인 순매수 지속</h3>
+                <p>금융 | 관련 뉴스 39건</p>
+            </div>
+            <div class="issue-card">
+                <h3>물가 상승률 둔화… 인플레이션 우려 완화</h3>
+                <p>경제 | 관련 뉴스 44건</p>
+            </div>
+        </div>
+        <div class="issue-grid issue-tab" id="issue-tab-interest">
+            <div class="issue-card">
+                <h3>디지털 금융 플랫폼 경쟁 심화</h3>
+                <p>IT/금융 | 관련 뉴스 21건</p>
+            </div>
+            <div class="issue-card">
+                <h3>가상화폐 시장 하락세 지속</h3>
+                <p>금융 | 관련 뉴스 18건</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="footer">
+        &copy; 2025 STJ Team. All rights reserved.
+    </section>
+</div>
+
+<div class="indicator">
+    <button class="active" onclick="scrollToSection(0)"></button>
+    <button onclick="scrollToSection(1)"></button>
+    <button onclick="scrollToSection(2)"></button>
+</div>
+</body>
+</html>

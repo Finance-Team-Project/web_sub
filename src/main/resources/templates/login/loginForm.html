@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 - STJ 금융뉴스 이해 플랫폼</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+        html, body {
+            height: 100%;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #003675 0%, #0057a0 50%, #b2d8f7 100%);
+            min-height: 100vh;
+        }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.25);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            padding: 48px 36px 36px 36px;
+            width: 370px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 2.4rem;
+            font-weight: bold;
+            color: #003675;
+            margin-bottom: 36px;
+            letter-spacing: 2px;
+        }
+        .logo .material-icons {
+            font-size: 2.6rem;
+            color: #0057a0;
+            filter: drop-shadow(0 2px 8px #b2d8f7);
+        }
+        .login-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+        }
+        .login-form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            width: 100%;
+            max-width: 100%;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,87,160,0.04);
+            padding: 2px 10px 2px 0;
+        }
+        .login-form label {
+            font-size: 1.1rem;
+            color: #003675;
+            font-weight: 600;
+            width: 54px;
+            min-width: 54px;
+            margin-bottom: 0;
+            text-align: left;
+            padding-left: 10px;
+        }
+        .login-form input {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.08rem;
+            outline: none;
+            background: transparent;
+            color: #003675;
+            transition: box-shadow 0.2s, border 0.2s;
+            box-shadow: none;
+        }
+        .login-form input:focus {
+            box-shadow: 0 0 0 2px #0057a0;
+            background: #f0f7ff;
+        }
+        .field-error {
+            color: #dc3545;
+            font-size: 0.92rem;
+            margin-top: -6px;
+            margin-bottom: 6px;
+            text-align: left;
+            width: 100%;
+        }
+        .login-btn, .signup-btn {
+            width: 100%;
+            padding: 14px 0;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            box-shadow: 0 2px 8px rgba(0,54,117,0.08);
+        }
+        .login-btn {
+            background: linear-gradient(90deg, #003675 0%, #0057a0 100%);
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .login-btn:hover {
+            background: linear-gradient(90deg, #0057a0 0%, #003675 100%);
+            box-shadow: 0 4px 16px #0057a055;
+        }
+        .signup-btn {
+            background: rgba(255,255,255,0.7);
+            color: #003675;
+            border: 1.5px solid #003675;
+        }
+        .signup-btn:hover {
+            background: #003675;
+            color: #fff;
+            box-shadow: 0 4px 16px #00367533;
+        }
+        .login-footer {
+            margin-top: 24px;
+            color: #003675;
+            font-size: 0.98rem;
+            opacity: 0.7;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-box">
+        <div class="logo">
+            <span class="material-icons">account_balance</span>
+            STJ
+        </div>
+        <form th:action="@{/login}" th:object="${loginForm}" method="post" class="login-form">
+            <!-- 전체 오류 메시지 -->
+            <div th:if="${#fields.hasGlobalErrors()}">
+                <p class="field-error" th:each="err : ${#fields.globalErrors()}"
+                   th:text="${err}">전체 오류</p>
+            </div>
+            <!-- 아이디 -->
+            <div class="login-form-row">
+                <label for="loginId"><span class="material-icons" style="vertical-align:middle;font-size:1.2em;">person</span></label>
+                <input type="text" id="loginId" th:field="*{loginId}" placeholder="아이디를 입력하세요">
+            </div>
+            <div class="field-error" th:errors="*{loginId}"></div>
+            <!-- 비밀번호 -->
+            <div class="login-form-row">
+                <label for="password"><span class="material-icons" style="vertical-align:middle;font-size:1.2em;">lock</span></label>
+                <input type="password" id="password" th:field="*{password}" placeholder="비밀번호를 입력하세요">
+            </div>
+            <div class="field-error" th:errors="*{password}"></div>
+            <button type="submit" class="login-btn">로그인</button>
+        </form>
+        <form method="get" action="/users/add" style="width:100%; margin-top:10px;">
+            <button type="submit" class="signup-btn">회원가입</button>
+        </form>
+        <div class="login-footer">
+            &copy; 2025 STJ 금융뉴스 이해 플랫폼
+        </div>
+    </div>
+</div>
+</body>
+</html>
