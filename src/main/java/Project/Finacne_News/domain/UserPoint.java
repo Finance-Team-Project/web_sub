@@ -26,5 +26,7 @@ public class UserPoint {
 
     @Column(name = "timestamp")
     private Timestamp timestamp;
+
+    private int totalPoint;
 }
 

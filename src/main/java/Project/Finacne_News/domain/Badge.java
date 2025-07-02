@@ -18,9 +18,15 @@ public class Badge {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    private BadgeType type;
+
     private String description;
 
     // 역방향 매핑 (UserBadge → Badge)
     @OneToMany(mappedBy = "badge")
     private List<UserBadge> userBadges;
+
+    private int conditionValue;
+
 }
