@@ -1,4 +1,4 @@
-package Project.Finacne_News.service.news;
+package Project.Finacne_News.service.quiz;
 import Project.Finacne_News.domain.*;
 import Project.Finacne_News.dto.QuizDto;
 import Project.Finacne_News.dto.QuizItemDto;

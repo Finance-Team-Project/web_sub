@@ -3,7 +3,7 @@ package Project.Finacne_News.controller;
 import Project.Finacne_News.dto.QuizDto;
 import Project.Finacne_News.dto.QuizResultDto;
 import Project.Finacne_News.dto.QuizSubmitRequest;
-import Project.Finacne_News.service.news.QuizService;
+import Project.Finacne_News.service.quiz.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

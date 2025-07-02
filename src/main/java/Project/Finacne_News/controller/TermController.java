@@ -35,14 +35,15 @@ public class TermController {
             @ApiResponse(responseCode = "404", description = "해당 용어가 존재하지 않음")
     })
     @GetMapping("/api/terms/{term}")
-    public ResponseEntity<Map<String, String>> getTermInfo(
+    public ResponseEntity<Map<String, Object>> getTermInfo(
             @Parameter(description = "설명을 조회할 금융 용어", required = true)
             @PathVariable String term
     ) {
         Term result = termRepository.findByTerm(term)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Term not found"));
 
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", result.getId());
         response.put("term", result.getTerm());
         response.put("description", result.getDescription());
 

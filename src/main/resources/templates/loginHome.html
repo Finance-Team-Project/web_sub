@@ -427,6 +427,46 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .add-to-vocab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            padding: 10px 22px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+        }
+        .add-to-vocab-btn:hover {
+            background: linear-gradient(90deg, #1565c0 0%, #64b5f6 100%);
+            box-shadow: 0 4px 16px rgba(25, 118, 210, 0.15);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .add-to-vocab-btn .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #fff;
+            border-top: 2px solid #42a5f5;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .add-to-vocab-btn .checkmark {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            color: #fff;
+            font-size: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -650,9 +690,52 @@
                 <h2>📘 용어 해설: ${data.term}</h2>
                 <div class="news-body">${data.description}</div>
                 ${data.example ? `<div class="term-extra"><strong>예시:</strong> ${data.example}</div>` : ''}
+                <button id="addToVocabBtn" class="add-to-vocab-btn" style="margin-top:16px;">
+                  <span class="btn-label">단어장에 추가</span>
+                </button>
               </div>
             `;
             document.body.appendChild(modal);
+            document.getElementById('addToVocabBtn').onclick = async function() {
+                if (!window.userId) {
+                    alert('로그인 후 이용 가능합니다.');
+                    return;
+                }
+                const btn = this;
+                const label = btn.querySelector('.btn-label');
+                label.style.display = 'none';
+                let spinner = document.createElement('span');
+                spinner.className = 'spinner';
+                btn.appendChild(spinner);
+                btn.disabled = true;
+                const res = await fetch('/vocabulary/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ termId: data.id })
+                });
+                const result = await res.json();
+                btn.removeChild(spinner);
+                if (result.success) {
+                    let check = document.createElement('span');
+                    check.className = 'checkmark';
+                    check.innerHTML = '✔';
+                    btn.appendChild(check);
+                    label.textContent = '추가 완료!';
+                    label.style.display = 'inline';
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.removeChild(check);
+                        label.textContent = '단어장에 추가';
+                    }, 1500);
+                } else {
+                    label.textContent = result.message || '추가에 실패했습니다.';
+                    label.style.display = 'inline';
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        label.textContent = '단어장에 추가';
+                    }, 1800);
+                }
+            };
         } catch (e) {
             const existingErrorModal = document.getElementById('term-modal');
             if (existingErrorModal) {
