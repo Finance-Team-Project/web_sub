@@ -52,7 +52,6 @@ public class NewsController {
         news.setContent(newsRequest.getContent());
         news.setPublisher(newsRequest.getPublisher());
         news.setPublishedAt(newsRequest.getPublishedAt());
-        news.setUrl(newsRequest.getUrl());
 
         Long savedId = newsService.saveNews(news);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedId);
@@ -69,7 +68,6 @@ public class NewsController {
                         .content(news.getContent())
                         .publisher(news.getPublisher())
                         .publishedAt(news.getPublishedAt())
-                        .url(news.getUrl())
                         .build())
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responseDtos);
@@ -87,7 +85,6 @@ public class NewsController {
                     .content(news.getContent()) // 강조된 콘텐츠 포함
                     .publisher(news.getPublisher())
                     .publishedAt(news.getPublishedAt())
-                    .url(news.getUrl())
                     .build();
 
             return ResponseEntity.ok(responseDto);

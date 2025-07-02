@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.security.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -18,7 +18,10 @@ public class Quiz {
     private Long id;
 
     @Column(name = "created_at", nullable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private String type; // "short_answer", "crossword" 등 퀴즈 타입 구분
 
     // === 연관 관계 ===
 

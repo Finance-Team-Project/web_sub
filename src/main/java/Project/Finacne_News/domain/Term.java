@@ -30,6 +30,7 @@ public class Term {
     private LocalDateTime lastUpdated;  // 마지막 업데이트 시간
 
     // === 연관관계 === //
+
     @OneToMany(mappedBy = "term", cascade = CascadeType.ALL)
     private List<Glossary> glossaries;
 

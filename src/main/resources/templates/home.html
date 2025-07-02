@@ -311,27 +311,6 @@
             to { background-color: rgba(0,0,0,0.4); }
         }
 
-        .auth-buttons {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .auth-buttons button {
-            background: #003675;
-            color: white;
-            border: 1px solid #fff;
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-        .auth-buttons button:hover {
-            background: #fff;
-            color: #003675;
-            border: 1px solid #003675;
-        }
-
     </style>
     <script>
         function toggleIssueTab(tabName) {
@@ -465,6 +444,8 @@
             }
         });
 
+
+
     </script>
 </head>
 <body>
@@ -511,7 +492,7 @@
                 <div class="dropdown">
                     <h4>금융 퀴즈</h4>
                     <ul>
-                        <li><a href="#">단어 퀴즈</a></li>
+                        <li><a href="#" onclick="openShortAnswerQuiz()">단어 퀴즈</a></li>
                         <li><a href="#">뉴스 기반 퀴즈</a></li>
                         <li><a href="#">랭킹</a></li>
                     </ul>
@@ -528,9 +509,6 @@
                     </ul>
                 </div>
             </div>
-        </div>
-        <div class="auth-buttons">
-            <button onclick="location.href='/login'">로그인</button>
         </div>
     </div>
 </header>
@@ -586,5 +564,7 @@
     <button onclick="scrollToSection(1)"></button>
     <button onclick="scrollToSection(2)"></button>
 </div>
+
+<script src="/quiz.js"></script>
 </body>
 </html>

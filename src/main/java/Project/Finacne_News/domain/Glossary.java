@@ -25,4 +25,5 @@ public class Glossary {
 
     @Column(name = "example_usage", columnDefinition = "TEXT")
     private String exampleUsage;
+
 }
