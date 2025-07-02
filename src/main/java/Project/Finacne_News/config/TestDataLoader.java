@@ -30,10 +30,10 @@ public class TestDataLoader implements CommandLineRunner {
         // 1. 테스트 사용자 생성
         User user = new User();
         user.setEmail("tester@quiz.com");
-        user.setPasswordHash("test1234"); // 실환경에서는 암호화 필요
+        user.setPassword("test1234"); // 실환경에서는 암호화 필요
         user.setNickname("QuizTester");
         user.setRole("USER");
-        user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        //user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         userRepository.save(user);
 
         // 2. Term + 다수의 Glossary + UserVocabulary

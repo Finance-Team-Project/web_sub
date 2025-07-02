@@ -3,6 +3,7 @@ package Project.Finacne_News.service.summary;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  * HyperCLOVA Summarization API 연동을 위한 클라이언트 클래스
  */
 @Service
+@Component
 public class HyperClovaClient {
 
     private WebClient webClient = WebClient.builder()

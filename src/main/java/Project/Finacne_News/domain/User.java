@@ -17,18 +17,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    private String loginId;
+    private String name;
 
     private String nickname;
 
     private String role;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Timestamp createdAt;
+    private String job;
+    private String goal;
+
 
     // User - UserVocabulary
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
