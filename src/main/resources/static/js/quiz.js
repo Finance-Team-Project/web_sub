@@ -1,4 +1,5 @@
 async function openShortAnswerQuiz() {
+<<<<<<< HEAD
   console.log("퀴즈 함수 실행됨");
 
   try {
@@ -10,6 +11,19 @@ async function openShortAnswerQuiz() {
       const modal = document.createElement('div');
       modal.className = 'news-modal';
       modal.innerHTML = `
+=======
+    console.log("퀴즈 함수 실행됨");
+
+    try {
+        const response = await fetch('/api/quiz/short-answer?userId=1');
+        const quiz = await response.json();
+
+        console.log('quiz 응답:', quiz);
+
+        const modal = document.createElement('div');
+        modal.className = 'news-modal';
+        modal.innerHTML = `
+>>>>>>> junwon
         <div class="modal-content news-style">
           <button class="close-btn" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
           <h2>📋 단어 퀴즈</h2>
@@ -25,6 +39,7 @@ async function openShortAnswerQuiz() {
         </div>
       `;
 
+<<<<<<< HEAD
       document.body.appendChild(modal);
   } catch (err) {
       alert("퀴즈를 불러오는 데 실패했습니다.");
@@ -50,4 +65,31 @@ async function submitQuiz(event, quizId) {
   const result = await response.json();
   alert(`퀴즈 결과: ${result.score}점`);
   document.querySelector('.news-modal').remove();
+=======
+        document.body.appendChild(modal);
+    } catch (err) {
+        alert("퀴즈를 불러오는 데 실패했습니다.");
+        console.error(err);
+    }
+}
+
+async function submitQuiz(event, quizId) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const answers = {};
+    for (let [key, value] of formData.entries()) {
+        answers[key.replace('answer_', '')] = value.trim();
+    }
+
+    const response = await fetch(`/api/quiz/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quizId, userId: 1, answers })
+    });
+
+    const result = await response.json();
+    alert(`퀴즈 결과: ${result.score}점`);
+    document.querySelector('.news-modal').remove();
+>>>>>>> junwon
 }
