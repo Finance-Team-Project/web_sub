@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - STJ 금융뉴스 이해 플랫폼</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        html, body {
+            height: 100%;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #e3ecfa 0%, #c9e7ff 50%, #eaf6ff 100%);
+            min-height: 100vh;
+        }
+        .signup-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .signup-box {
+            background: rgba(255,255,255,0.98);
+            border-radius: 22px;
+            box-shadow: 0 10px 32px 0 rgba(0,54,117,0.13), 0 2px 4px 0 rgba(0,0,0,0.04);
+            padding: 48px 38px 36px 38px;
+            width: 410px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1.5px solid #e3eaf5;
+            backdrop-filter: blur(2px);
+        }
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #003675;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            position: relative;
+        }
+        .logo::after {
+            content: '';
+            display: block;
+            width: 38px;
+            height: 4px;
+            background: linear-gradient(90deg, #003675 60%, #0057a0 100%);
+            border-radius: 2px;
+            margin: 8px auto 0 auto;
+        }
+        .signup-title {
+            font-size: 1.25rem;
+            color: #0057a0;
+            margin-bottom: 28px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .signup-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+        }
+        .signup-form-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: #f5f7fa;
+            border-radius: 10px;
+            border: 1.5px solid #e3eaf5;
+            padding: 0 14px;
+            transition: border 0.2s;
+            box-sizing: border-box;
+            margin-bottom: 0;
+        }
+        .signup-form-row:focus-within {
+            border: 1.5px solid #0057a0;
+            background: #f0f7ff;
+        }
+        .signup-form-row i {
+            color: #8bb6e2;
+            font-size: 1.1rem;
+            margin-right: 10px;
+            min-width: 22px;
+            text-align: center;
+        }
+        .signup-form label {
+            display: none;
+        }
+        .signup-form input {
+            flex: 1;
+            padding: 13px 0 13px 0;
+            border: none;
+            background: transparent;
+            font-size: 1.07rem;
+            outline: none;
+            color: #003675;
+        }
+        .signup-form input::placeholder {
+            color: #b0b8c1;
+            font-size: 0.98rem;
+        }
+        .signup-btn {
+            width: 100%;
+            padding: 13px 0;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.13rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            background: linear-gradient(90deg, #003675 60%, #0057a0 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px 0 rgba(0,54,117,0.08);
+            transition: transform 0.13s, box-shadow 0.13s, background 0.2s;
+        }
+        .signup-btn:hover {
+            background: linear-gradient(90deg, #0057a0 60%, #003675 100%);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 18px 0 rgba(0,54,117,0.13);
+        }
+        .login-link {
+            margin-top: 22px;
+            color: #003675;
+            font-size: 1.01rem;
+            text-align: center;
+        }
+        .login-link a {
+            color: #0057a0;
+            text-decoration: underline;
+            font-weight: bold;
+            margin-left: 4px;
+            transition: color 0.18s;
+        }
+        .login-link a:hover {
+            color: #003675;
+        }
+        @media (max-width: 500px) {
+            .signup-box { width: 98vw; padding: 28px 4vw 24px 4vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-box">
+            <div class="logo">STJ</div>
+            <div class="signup-title">회원가입</div>
+
+            <!-- 🔽 th:object를 통해 User 객체와 바인딩 -->
+            <form class="signup-form" th:action="@{/users/add}" th:object="${user}" method="post">
+
+                <!-- 아이디 -->
+                <div class="signup-form-row">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" th:field="*{loginId}" placeholder="아이디 (필수)" />
+                </div>
+                <div th:if="${#fields.hasErrors('loginId')}" th:errors="*{loginId}" style="color:red; font-size: 0.85rem;"></div>
+
+                <!-- 이름 -->
+                <div class="signup-form-row">
+                    <i class="fa-solid fa-id-card"></i>
+                    <input type="text" th:field="*{name}" placeholder="이름 (필수)" />
+                </div>
+                <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red; font-size: 0.85rem;"></div>
+
+                <!-- 비밀번호 -->
+                <div class="signup-form-row">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" th:field="*{password}" placeholder="비밀번호 (필수)" />
+                </div>
+                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red; font-size: 0.85rem;"></div>
+
+                <!-- 닉네임 -->
+                <div class="signup-form-row">
+                    <i class="fa-solid fa-smile"></i>
+                    <input type="text" th:field="*{nickname}" placeholder="닉네임 (선택)" />
+                </div>
+                <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:red; font-size: 0.85rem;"></div>
+
+                <!-- 제출 버튼 -->
+                <button type="submit" class="signup-btn">회원가입</button>
+            </form>
+
+            <div class="login-link">
+                이미 계정이 있으신가요?
+                <a th:href="@{/login}">로그인</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
