@@ -12,7 +12,7 @@ async function openShortAnswerQuiz() {
         modal.innerHTML = `
         <div class="modal-content news-style">
           <button class="close-btn" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
-          <h2>📋 단어 퀴즈</h2>
+          <h2>📋 단답형 단어 퀴즈</h2>
           <form onsubmit="submitQuiz(event, ${quiz.quizId})">
             ${quiz.items.map(qt => `
               <div class="quiz-item">
