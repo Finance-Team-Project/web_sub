@@ -28,4 +28,7 @@ public class UserVocabulary {
 
     @Column(name = "last_seen")
     private LocalDate lastSeen;
+
+    @Column(name = "starred", nullable = false)
+    private boolean starred = false;
 }

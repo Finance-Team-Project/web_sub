@@ -2,7 +2,12 @@ async function openShortAnswerQuiz() {
     console.log("퀴즈 함수 실행됨");
 
     try {
-        const response = await fetch('/api/quiz/short-answer?userId=1');
+        if (!window.userId) {
+            alert('로그인 후 이용 가능합니다.');
+            window.location.href = '/login';
+            return;
+        }
+        const response = await fetch(`/api/quiz/short-answer?userId=${window.userId}`);
         const quiz = await response.json();
 
         console.log('quiz 응답:', quiz);
@@ -44,7 +49,7 @@ async function submitQuiz(event, quizId) {
     const response = await fetch(`/api/quiz/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quizId, userId: 1, answers })
+        body: JSON.stringify({ quizId, userId: window.userId, answers })
     });
 
     const result = await response.json();

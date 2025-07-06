@@ -1,16 +1,24 @@
 package Project.Finance_News;
 
+import Project.Finance_News.domain.Term;
 import Project.Finance_News.domain.User;
+import Project.Finance_News.domain.UserVocabulary;
+import Project.Finance_News.repository.TermRepository;
 import Project.Finance_News.repository.UserRepository;
+import Project.Finance_News.repository.UserVocabularyRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class TestDataInit {
 
     private final UserRepository userRepository;
+    private final TermRepository termRepository;
+    private final UserVocabularyRepository userVocabularyRepository;
 
     /**
      * 테스트용 데이터 추가
@@ -36,5 +44,15 @@ public class TestDataInit {
 
         userRepository.save(user1);
         userRepository.save(user2);
+
+        List<Term> allTerms = termRepository.findAll();
+
+        for(Term term : allTerms){
+            UserVocabulary userVocabulary = new UserVocabulary();
+            userVocabulary.setUser(user1);
+            userVocabulary.setTerm(term);
+
+            userVocabularyRepository.save(userVocabulary);
+        }
     }
 }

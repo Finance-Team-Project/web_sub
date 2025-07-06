@@ -14,4 +14,6 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
 
     // user와 term으로 중복 체크
     boolean existsByUserAndTerm(User user, Term term);
+
+    UserVocabulary user(User user);
 }
