@@ -22,7 +22,6 @@ public class TestDataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (userRepository.findByEmail("tester@quiz.com").isPresent()) return;
-        String str = "test";
         // 1. 테스트 사용자 생성
         User user = new User();
         user.setEmail("tester@quiz.com");
