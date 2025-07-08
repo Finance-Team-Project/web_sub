@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter @Setter
 @Table(name = "glossaries")
@@ -25,5 +27,8 @@ public class Glossary {
 
     @Column(name = "example_usage", columnDefinition = "TEXT")
     private String exampleUsage;
+
+    @Column(name = "created_at")
+    private LocalDateTime lastUpdated;  // 마지막 업데이트 시간
 
 }

@@ -1,3 +1,14 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 종속 테이블 먼저 삭제
+DELETE FROM user_vocabulary;
+DELETE FROM quiz_term;
+DELETE FROM glossaries;
+DELETE FROM terms;
+
+-- 다시 제약 복원
+SET FOREIGN_KEY_CHECKS = 1;
+
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('지주회사', '다른 회사를 지배하는 것을 목적으로 하는 회사', NOW());
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('우선주', '보통주보다 배당에 우선권이 있는 주식', NOW());
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('채권', '정부나 기업이 자금을 조달하기 위해 발행하는 유가증권', NOW());
@@ -105,6 +116,327 @@ INSERT IGNORE INTO terms (term, description, created_at) VALUES ('지분', '기�
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('출자', '자금을 투자하는 행위', NOW());
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('모회사', '다른 회사를 지배하는 상위 회사', NOW());
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('자회사', '다른 회사에 의해 지배되는 회사', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_term_id FROM terms WHERE term = '지주회사'), '다른 회사를 지배하는 것을 목적으로 하는 회사', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '우선주'), '보통주보다 배당에 우선권이 있는 주식', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '채권'), '정부나 기업이 자금을 조달하기 위해 발행하는 유가증권', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '금리'), '자금의 대여에 따른 이자의 비율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'PER'), '주가를 주당순이익으로 나눈 지표', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'PBR'), '주가를 주당순자산으로 나눈 지표', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'GDP'), '국내총생산, 일정 기간 한 나라의 경제활동 총량', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '코스피'), '한국 증권거래소의 대표 주가지수', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '코스닥'), '벤처 및 중소기업 중심의 주식시장', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '환율'), '서로 다른 통화 간의 교환 비율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '통화정책'), '중앙은행이 통화를 조절하여 경제를 안정시키는 정책', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '기준금리'), '중앙은행이 시중은행에 적용하는 기본 금리', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '물가상승률'), '상품 및 서비스 가격이 전반적으로 상승하는 비율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '디플레이션'), '일반적인 물가 수준이 지속적으로 하락하는 현상', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '인플레이션'), '전반적인 물가 수준이 지속적으로 상승하는 현상', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '양적완화'), '중앙은행이 통화량을 증가시켜 경기 부양을 유도하는 정책', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '유동성'), '자산을 손실 없이 현금으로 바꿀 수 있는 정도', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '매출'), '기업이 상품이나 서비스를 팔아서 벌어들인 총액', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '영업이익'), '매출에서 영업비용을 뺀 이익', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '순이익'), '모든 비용과 세금을 제외한 최종 이익', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '자산'), '개인이나 기업이 소유한 모든 경제적 가치의 총합', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '부채'), '갚아야 할 돈이나 빚', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '자본'), '자산에서 부채를 뺀 순수한 자기 돈', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'ROE'), '자기자본이익률, 자본 대비 순이익 비율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'ROA'), '총자산이익률, 자산 대비 순이익 비율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'EBITDA'), '세전 이자 및 감가상각 전 이익', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '시가총액'), '기업의 현재 주식 가격 × 발행 주식 수', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '배당금'), '기업이 이익을 주주에게 분배하는 금액', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '우량주'), '안정적 수익과 성장성이 있는 주식', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '테마주'), '특정 이슈나 테마로 주목받는 주식', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '공매도'), '없는 주식을 빌려서 파는 투자 기법', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '매수'), '주식을 사는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '매도'), '주식을 파는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '호가'), '주식 매매 시 제시하는 가격', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '스프레드'), '매수호가와 매도호가의 차이', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'IPO'), '기업공개, 주식을 일반에 처음으로 판매하는 것', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '상장'), '기업이 주식시장에서 주식을 거래할 수 있게 되는 것', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '비상장주식'), '증권거래소에 상장되지 않은 주식', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '선물'), '미래의 일정 시점에 상품을 약정된 가격에 사고파는 계약', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '옵션'), '특정 자산을 정해진 가격에 사거나 팔 수 있는 권리', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'ETF'), '지수 추종형 상장지수펀드', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '펀드'), '여러 투자자로부터 자금을 모아 운용하는 투자 상품', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '헤지'), '위험 회피를 위한 금융 기법', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '변동성'), '가격이 일정 기간 내 얼마나 변화했는지의 정도', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '공시'), '기업이 투자자에게 경영정보를 알리는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '감자'), '주식 수를 줄여 자본금을 감소시키는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '증자'), '자본금을 늘리기 위해 주식을 추가 발행하는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '유상증자'), '새로운 주식을 발행하고 주주에게 돈을 받는 방식', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '무상증자'), '기존 주주에게 공짜로 주식을 나눠주는 방식', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '기초자산'), '파생상품의 가치 평가 기준이 되는 자산', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '레버리지'), '차입을 이용해 투자 수익을 극대화하는 전략', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '금융위기'), '금융 시스템이 마비되는 심각한 경제 위기 상황', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '재무제표'), '기업의 재무 상태를 나타내는 공식 문서', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '포트폴리오'), '다양한 자산에 분산 투자한 구성', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '리스크'), '투자에서 손실이 발생할 가능성', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '채무불이행'), '빚을 제때 갚지 못하는 상황', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '신용등급'), '채무자가 빚을 갚을 능력을 평가한 등급', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '경상이익'), '기업의 일상적인 영업 활동에서 발생하는 이익', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '단기금융'), '1년 이내 만기의 금융 상품', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '장기금융'), '1년 이상 만기의 금융 상품', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '예금'), '금융기관에 돈을 맡겨 두는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '대출'), '금융기관에서 돈을 빌리는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '무역수지'), '수출과 수입의 차액', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '경상수지'), '상품·서비스·소득의 수출입 차이', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '외환보유액'), '중앙은행이 보유한 외국 통화 및 자산', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '기준환율'), '은행에서 외화를 사고파는 기준이 되는 환율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '외환시장'), '외국 통화를 사고파는 시장', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '자산운용사'), '투자자의 자산을 대신 관리·운용하는 회사', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '상환'), '빌린 돈을 갚는 것', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '리보금리'), '국제 금융시장에서 은행 간 적용되는 금리', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '국공채'), '정부가 발행하는 채권', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'CD'), '양도성예금증서, 단기 금융상품', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'CP'), '기업어음, 기업이 발행하는 단기 채권', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '기업가치'), '기업의 시장 평가 가치', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'NAV'), '순자산가치, 펀드의 단위당 자산 가치', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '채무조정'), '빚 부담을 줄이기 위한 조건 조정', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '부실채권'), '회수가 어려운 채권', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '신탁'), '재산을 대신 관리해주는 계약', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '연금'), '노후를 위해 적립한 자금을 일정 기간 지급하는 제도', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '퇴직연금'), '직장인이 퇴직 후 받는 연금 제도', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = 'ISA'), '개인종합자산관리계좌, 세제 혜택을 주는 통합계좌', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '개인사업자대출'), '개인이 운영하는 사업체 대상 대출', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '스탁론'), '주식담보대출의 일종', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '차입'), '다른 사람이나 기관에서 돈을 빌리는 것', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '매출채권'), '상품을 팔고 아직 받지 못한 외상금', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '매입채무'), '물건을 사고 아직 돈을 지불하지 않은 상태', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '외화예금'), '외국 통화로 된 예금', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '무형자산'), '특허권, 상표권 등 물리적 실체가 없는 자산', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '실물자산'), '토지, 건물 등 실체가 있는 자산', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '예비비'), '예기치 않은 지출을 대비한 자금', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '계정과목'), '회계 기록 항목 구분을 위한 분류', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '시장가치'), '시장 참여자들이 판단하는 자산의 가치', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '순운전자본'), '유동자산에서 유동부채를 뺀 금액', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '총부채비율'), '부채 총액을 자본으로 나눈 비율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '현금흐름표'), '현금의 유입과 유출을 나타낸 재무제표', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '손익계산서'), '수익과 비용을 기록해 순이익을 보여주는 재무제표', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '재무상태표'), '자산, 부채, 자본을 한눈에 보여주는 표', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '계정'), '거래를 기록하는 단위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '일반회계'), '정부나 기업의 기본 회계', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '특별회계'), '특정 목적을 위한 회계', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '회계연도'), '회계를 기준으로 정한 1년 단위 기간', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '세전이익'), '세금 부과 전의 이익', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '법인세'), '기업의 이익에 부과되는 세금', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '지분'), '기업에 대한 소유권 비율', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '출자'), '자금을 투자하는 행위', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '모회사'), '다른 회사를 지배하는 상위 회사', NOW());
+
+INSERT INTO glossaries (term_term_id, short_def, created_at)
+VALUES ((SELECT term_id FROM terms WHERE term = '자회사'), '다른 회사에 의해 지배되는 회사', NOW());
 
 
 INSERT IGNORE INTO news (title, content, publisher, published_at) VALUES

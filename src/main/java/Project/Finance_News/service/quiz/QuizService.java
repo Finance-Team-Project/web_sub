@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,11 +32,16 @@ public class QuizService {
     private final UserRepository userRepository;
 
 
+
+
     // 1) 단답형 퀴즈 출제
     @Transactional
     public QuizDto generateShortAnswerQuiz(Long userId) {
         // 1. 퀴즈 생성
         Quiz quiz = new Quiz();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        quiz.setUser(user);
         quiz.setCreatedAt(LocalDateTime.now());
         quiz.setType("short_answer");
         quizRepository.save(quiz);
@@ -44,10 +50,24 @@ public class QuizService {
         List<UserVocabulary> userVocabularies = userVocabularyRepository.findByUserId(userId);
         List<QuizTerm> quizTerms = new ArrayList<>();
 
+        System.out.println("▶ userVocabularies 개수: " + userVocabularies.size());
+
         for (UserVocabulary uv : userVocabularies) {
             Term term = uv.getTerm();
+            System.out.println("✔ Term: " + term.getTerm());
 
-            // 3. QuizTerm 생성
+            List<Glossary> glossaries = term.getGlossaries();
+            System.out.println("→ 연결된 Glossary 수: " + glossaries.size());
+            for (Glossary g : glossaries) {
+                System.out.println("   - Glossary: " + g.getShortDefinition());
+            }
+
+            if (glossaries.isEmpty()) {
+                System.out.println("⚠ Glossary가 연결되지 않아 이 Term은 건너뜀");
+                continue;
+            }
+
+            // QuizTerm 생성
             QuizTerm qt = new QuizTerm();
             qt.setQuiz(quiz);
             qt.setTerm(term);
@@ -59,7 +79,7 @@ public class QuizService {
         quizTermRepository.saveAll(quizTerms);
         quiz.setQuizTerms(quizTerms);
 
-        // 3. QuizDto로 변환
+        // QuizDto로 변환
         List<QuizItemDto> itemDtos = quizTerms.stream().map(qt -> {
             QuizItemDto item = new QuizItemDto();
             String question = qt.getTerm().getGlossaries().stream()
@@ -76,6 +96,7 @@ public class QuizService {
         dto.setItems(itemDtos);
         return dto;
     }
+
 
 
     // 2) 가로세로 낱말 퀴즈 출제
