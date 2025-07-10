@@ -22,13 +22,7 @@ public class Glossary {
     @Column(name = "short_def", columnDefinition = "TEXT")
     private String shortDefinition;
 
-    @Column(name = "full_expl", columnDefinition = "TEXT")
-    private String fullExplanation;
-
-    @Column(name = "example_usage", columnDefinition = "TEXT")
-    private String exampleUsage;
-
     @Column(name = "created_at")
-    private LocalDateTime lastUpdated;  // 마지막 업데이트 시간
+    private LocalDateTime createdAt;  // 마지막 업데이트 시간
 
 }

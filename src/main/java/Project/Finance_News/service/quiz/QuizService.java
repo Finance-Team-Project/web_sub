@@ -10,12 +10,14 @@ import Project.Finance_News.dto.QuizDto;
 import Project.Finance_News.dto.QuizItemDto;
 import Project.Finance_News.dto.QuizResultDto;
 import Project.Finance_News.repository.*;
+import Project.Finance_News.util.Normalizer;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -50,20 +52,12 @@ public class QuizService {
         List<UserVocabulary> userVocabularies = userVocabularyRepository.findByUserId(userId);
         List<QuizTerm> quizTerms = new ArrayList<>();
 
-        System.out.println("▶ userVocabularies 개수: " + userVocabularies.size());
-
         for (UserVocabulary uv : userVocabularies) {
             Term term = uv.getTerm();
-            System.out.println("✔ Term: " + term.getTerm());
 
             List<Glossary> glossaries = term.getGlossaries();
-            System.out.println("→ 연결된 Glossary 수: " + glossaries.size());
-            for (Glossary g : glossaries) {
-                System.out.println("   - Glossary: " + g.getShortDefinition());
-            }
 
             if (glossaries.isEmpty()) {
-                System.out.println("⚠ Glossary가 연결되지 않아 이 Term은 건너뜀");
                 continue;
             }
 
@@ -87,6 +81,8 @@ public class QuizService {
                     .collect(Collectors.joining(" / "));
             item.setQuestion(question);
             item.setTermId(qt.getTerm().getId());
+            item.setInitialHint(qt.getInitialHint());
+            item.setLevel(qt.getTerm().getFrequency() != null ? qt.getTerm().getFrequency() : 1);
             return item;
         }).toList();
 
@@ -108,14 +104,21 @@ public class QuizService {
                 .orElseThrow(() -> new IllegalArgumentException("Quiz not found"));
 
         int score = 0;
+        Map<Long, Boolean> correctMap = new HashMap<>();
+
 
         for (QuizTerm qt : quiz.getQuizTerms()) {
-            String userAnswer = answers.get(qt.getId());
+            Long termId = qt.getTerm().getId();
+            String userAnswer = answers.get(termId); // 이건 quiz_term의 ID임
             String correctAnswer = qt.getTerm().getTerm();
 
-            if (userAnswer != null && userAnswer.equalsIgnoreCase(correctAnswer)) {
-                score+=10;
-            }
+            String normalizedUser = Normalizer.normalize(userAnswer);
+            String normalizedCorrect = Normalizer.normalize(correctAnswer);
+
+            boolean correct = userAnswer != null && normalizedUser.equals(normalizedCorrect);
+
+            if (correct) score += 10;
+            correctMap.put(termId, correct); // 여기 주의! qt.getId()가 아니라 termId
         }
 
         // 결과 저장
@@ -125,7 +128,6 @@ public class QuizService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         result.setUser(user);
-
         result.setScore(score);
         result.setTakenAt(LocalDateTime.now());
         quizResultRepository.save(result);
@@ -134,7 +136,10 @@ public class QuizService {
                 quiz.getId(),
                 user.getId(),
                 score,
-                result.getTakenAt()
+                result.getTakenAt(),
+                correctMap
         );
     }
+
+
 }

@@ -7,4 +7,6 @@ import lombok.Setter;
 public class QuizItemDto {
     private Long termId;
     private String question; // 여러 해설이 하나의 문제로 제공
+    private String initialHint;
+    private int level;
 }
