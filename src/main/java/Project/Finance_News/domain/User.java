@@ -21,7 +21,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "login_id", nullable = false, unique = true)
     private String loginId;
+
     private String name;
 
     private String nickname;

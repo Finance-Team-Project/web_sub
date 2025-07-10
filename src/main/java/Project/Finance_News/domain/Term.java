@@ -23,14 +23,13 @@ public class Term {
 
     private String category;
 
-    @Column(length = 2000)
-    private String description;  // 용어 설명
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
     @Column(name = "created_at")
     private LocalDateTime lastUpdated;  // 마지막 업데이트 시간
 
     // === 연관관계 === //
-
     @OneToMany(mappedBy = "term", cascade = CascadeType.ALL)
     private List<Glossary> glossaries;
 

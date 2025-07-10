@@ -11,26 +11,33 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Comparator;
 import java.util.stream.Collectors;
+import Project.Finance_News.repository.NewsRepository;
+import Project.Finance_News.domain.News;
+import Project.Finance_News.service.news.SentenceExtractor;
 
-@Controller
-@RequestMapping("/vocabulary")
-public class UserVocabularyController {
-
+@RestController
+@RequestMapping("/api/vocabulary")
+public class VocabularyApiController {
     @Autowired
     private UserVocabularyRepository userVocabularyRepository;
     @Autowired
     private TermRepository termRepository;
+    @Autowired
+    private NewsRepository newsRepository;
 
     @PostMapping("/add")
     @ResponseBody
-    public Map<String, Object> addToVocabulary(@RequestBody Map<String, Long> payload, HttpSession session) {
+    public Map<String, Object> addToVocabulary(@RequestBody Map<String, Object> payload, HttpSession session) {
+        System.out.println("[단어장추가] payload: " + payload);
         Map<String, Object> response = new HashMap<>();
         User user = (User) session.getAttribute(SessionConst.LOGIN_USER);
-        Long termId = payload.get("termId");
+        Long termId = ((Number)payload.get("termId")).longValue();
+        Long newsId = payload.get("newsId") != null ? ((Number)payload.get("newsId")).longValue() : null;
+        System.out.println("[단어장추가] newsId: " + newsId);
+        String newsTitle = (String) payload.getOrDefault("newsTitle", "");
+        String newsUrl = (String) payload.getOrDefault("newsUrl", "");
         Term term = termRepository.findById(termId).orElse(null);
         if (term == null) {
             response.put("success", false);
@@ -43,17 +50,28 @@ public class UserVocabularyController {
             response.put("message", "이미 추가된 단어입니다.");
             return response;
         }
+        String contextSentence = "";
+        if (newsId != null) {
+            News news = newsRepository.findById(newsId).orElse(null);
+            if (news != null) {
+                // 로그 추가: 실제 본문과 용어 값 확인
+                System.out.println("[단어장추가] 뉴스 본문: " + news.getContent());
+                System.out.println("[단어장추가] 용어: " + term.getTerm());
+                contextSentence = SentenceExtractor.extractSentenceWithWord(news.getContent(), term.getTerm());
+                System.out.println("추출된 문장" + contextSentence);
+            }
+        }
+
+        System.out.println("추출된 문장" + contextSentence);
         UserVocabulary vocab = new UserVocabulary();
         vocab.setUser(user);
         vocab.setTerm(term);
+        vocab.setContextSentence(contextSentence);
+        vocab.setNewsTitle(newsTitle);
+        vocab.setNewsUrl(newsUrl);
         userVocabularyRepository.save(vocab);
         response.put("success", true);
         return response;
-    }
-
-    @GetMapping("")
-    public String vocabularyPage() {
-        return "vocabulary";
     }
 
     @GetMapping("/list")
@@ -101,6 +119,7 @@ public class UserVocabularyController {
         vocabDetail.put("id", uv.getId());
         vocabDetail.put("term", uv.getTerm().getTerm());
         vocabDetail.put("description", uv.getTerm().getDescription());
+        vocabDetail.put("contextSentence", uv.getContextSentence());
         response.put("success", true);
         response.put("vocabulary", vocabDetail);
         return response;

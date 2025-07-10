@@ -31,4 +31,13 @@ public class UserVocabulary {
 
     @Column(name = "starred", nullable = false)
     private boolean starred = false;
+
+    @Column(name = "context_sentence", length = 1000)
+    private String contextSentence;
+
+    @Column(name = "news_title")
+    private String newsTitle;
+
+    @Column(name = "news_url")
+    private String newsUrl;
 }

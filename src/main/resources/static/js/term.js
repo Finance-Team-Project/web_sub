@@ -1,5 +1,6 @@
 // 용어(단어장) 팝업 및 추가 관련 함수만 분리
-async function showTermPopup(term) {
+async function showTermPopup(term, newsInfo = {}) {
+    console.log('[showTermPopup] newsInfo:', newsInfo);
     const existingTermModal = document.getElementById('term-modal');
     if (existingTermModal) {
         document.body.removeChild(existingTermModal);
@@ -36,10 +37,14 @@ async function showTermPopup(term) {
             spinner.className = 'spinner';
             btn.appendChild(spinner);
             btn.disabled = true;
-            const res = await fetch('/vocabulary/add', {
+            const payload = {
+                termId: data.id,
+                ...newsInfo
+            };
+            const res = await fetch('/api/vocabulary/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ termId: data.id })
+                body: JSON.stringify(payload)
             });
             const result = await res.json();
             btn.removeChild(spinner);

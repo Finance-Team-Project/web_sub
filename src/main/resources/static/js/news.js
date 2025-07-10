@@ -1,3 +1,4 @@
+console.log('news.js loaded');
 // 뉴스/섹션/탭/indicator 관련 함수만 분리
 function toggleIssueTab(tabName) {
     const issues = document.querySelectorAll('.issue-tab');
@@ -25,26 +26,76 @@ function scrollToSection(i) {
         behavior: 'smooth'
     });
 }
-async function loadTodayNews() {
+async function loadTodayNews(page = 0, size = 8) { // Changed default size from 10 to 8
     if (!window.userId) {
         console.log('로그인되지 않은 사용자');
         return;
     }
-    const response = await fetch('/api/news');
-    const newsList = await response.json();
-    const container = document.getElementById('issue-tab-finance');
-    container.innerHTML = '';
-    newsList.forEach(news => {
+    // Find or create the section wrapper
+    let sectionWrapper = document.querySelector('.news-section-wrapper');
+    if (!sectionWrapper) {
+        sectionWrapper = document.createElement('div');
+        sectionWrapper.className = 'news-section-wrapper';
+        const container = document.getElementById('issue-tab-finance');
+        container.parentNode.replaceChild(sectionWrapper, container);
+        // Create news-list and pagination-container
+        const newsList = document.createElement('div');
+        newsList.className = 'news-list';
+        newsList.id = 'issue-tab-finance';
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'pagination-container';
+        sectionWrapper.appendChild(newsList);
+        sectionWrapper.appendChild(paginationContainer);
+    }
+    const newsList = sectionWrapper.querySelector('.news-list');
+    const paginationContainer = sectionWrapper.querySelector('.pagination-container');
+    // Fetch news
+    const response = await fetch(`/api/news?page=${page}&size=${size}`);
+    const newsPage = await response.json();
+    const newsListData = newsPage.content;
+    const totalPages = newsPage.totalPages;
+    // Render news cards
+    newsList.innerHTML = '';
+    newsListData.forEach(news => {
         const card = document.createElement('div');
         card.className = 'issue-card';
         card.innerHTML = `
             <h3 onclick='loadNewsDetail(${news.id})'>${news.title}</h3>
             <p>${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
         `;
-        container.appendChild(card);
+        newsList.appendChild(card);
     });
+    // Render pagination
+    paginationContainer.innerHTML = '';
+    const pagination = document.createElement('div');
+    pagination.className = 'pagination';
+    // Add previous arrow
+    if (page > 0) {
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'arrow';
+        prevBtn.innerHTML = '‹';
+        prevBtn.onclick = () => loadTodayNews(page - 1, 8);
+        pagination.appendChild(prevBtn);
+    }
+    for (let i = 0; i < totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i + 1;
+        btn.className = (i === page) ? 'active' : '';
+        btn.onclick = () => loadTodayNews(i, 8); // Always use 8 per page
+        pagination.appendChild(btn);
+    }
+    // Add next arrow
+    if (page < totalPages - 1) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'arrow';
+        nextBtn.innerHTML = '›';
+        nextBtn.onclick = () => loadTodayNews(page + 1, 8);
+        pagination.appendChild(nextBtn);
+    }
+    paginationContainer.appendChild(pagination);
 }
 async function loadNewsDetail(newsId) {
+    console.log('loadNewsDetail called', newsId);
     // AI 요약, 용어 팝업 등은 별도 파일에서 구현
     const response = await fetch(`/api/news/${newsId}`);
     const news = await response.json();
@@ -68,8 +119,28 @@ async function loadNewsDetail(newsId) {
         '<div id="ai-summary-result"></div>' +
     '</div>';
     document.body.appendChild(modal);
-    document.querySelectorAll('.news-body mark').forEach(el => {
-        el.style.cursor = 'pointer';
-        el.addEventListener('click', () => showTermPopup(el.innerText));
+
+    // 진단: .news-body와 mark 태그 개수 출력
+    const newsBody = document.querySelector('.news-body');
+    console.log('[진단] .news-body:', newsBody);
+    console.log('[진단] .news-body 내 mark 개수:', newsBody ? newsBody.querySelectorAll('mark').length : 0);
+
+    // .news-body 교체 및 이벤트 위임 등록
+    const newNewsBody = newsBody.cloneNode(true);
+    newsBody.parentNode.replaceChild(newNewsBody, newsBody);
+    newNewsBody.addEventListener('click', function(e) {
+        console.log('[진단] .news-body 클릭됨, e.target:', e.target);
+        if (e.target.tagName === 'MARK') {
+            console.log('mark clicked', {
+                newsId: news.id,
+                newsTitle: news.title,
+                newsUrl: news.url
+            });
+            showTermPopup(e.target.innerText, {
+                newsId: news.id,
+                newsTitle: news.title,
+                newsUrl: news.url
+            });
+        }
     });
 } 

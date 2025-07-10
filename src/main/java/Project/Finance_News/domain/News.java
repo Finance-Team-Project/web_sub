@@ -30,6 +30,9 @@ public class News {
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
+    @Column(nullable = false, length = 512, unique = true)
+    private String url;
+
     // 연관 관계 매핑
     @OneToMany(mappedBy = "news")
     private List<UserNewsLog> userNewsLogs;

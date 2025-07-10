@@ -10,6 +10,7 @@ public class    WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginCheckInterceptor())
                 .addPathPatterns("/vocabulary/**", "/api/**") // API 경로도 추가
-                .excludePathPatterns("/", "/login", "/logout", "/css/**", "/js/**", "/static/**");
+                .excludePathPatterns("/", "/login", "/logout", "/css/**", "/js/**", "/static/**",
+                                     "/vocabulary/add");
     }
 } 

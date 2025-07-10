@@ -14,6 +14,8 @@ import Project.Finance_News.domain.Term;
 import Project.Finance_News.repository.NewsRepository;
 import Project.Finance_News.repository.TermRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,11 @@ public class NewsService {
     private final TermRepository termRepository;
 
     public Long saveNews(News news) {
+        // 중복 뉴스 체크: url이 같은 뉴스가 있으면 저장하지 않음
+        if (newsRepository.existsByUrl(news.getUrl())) {
+            // 이미 존재하면 null 또는 -1 등으로 반환 (원하는 방식으로 처리 가능)
+            return null;
+        }
         News savedNews = newsRepository.save(news);
         return savedNews.getId();
     }
@@ -38,6 +45,11 @@ public class NewsService {
     @Transactional(readOnly = true)
     public List<News> getAllNews() {
         return newsRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<News> getNewsPaged(Pageable pageable) {
+        return newsRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -77,6 +89,14 @@ public class NewsService {
         return content;
     }
 
+    public void saveOrUpdateTerm(String term, String description) {
+        if (!termRepository.existsByTerm(term)) {
+            Term newTerm = new Term();
+            newTerm.setTerm(term);
+            newTerm.setDescription(description);
+            termRepository.save(newTerm);
+        }
+    }
 
 
 }

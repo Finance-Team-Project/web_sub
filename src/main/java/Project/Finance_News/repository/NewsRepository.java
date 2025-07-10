@@ -13,6 +13,10 @@ import Project.Finance_News.domain.News;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository
 public interface NewsRepository extends JpaRepository<News, Long> {
+    boolean existsByTitleAndPublishedAt(String title, LocalDateTime publishedAt);
+    boolean existsByUrl(String url);
 }

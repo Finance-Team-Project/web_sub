@@ -14,7 +14,9 @@ package Project.Finance_News.controller;
 import Project.Finance_News.domain.News;
 import Project.Finance_News.dto.NewsRequestDto;
 import Project.Finance_News.dto.NewsResponseDto;
+import Project.Finance_News.dto.NewsUploadRequestDto;
 import Project.Finance_News.service.news.NewsService;
+import Project.Finance_News.service.news.PythonCrawlingRestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,6 +27,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -37,6 +43,7 @@ import java.util.stream.Collectors;
 public class NewsController {
 
     private final NewsService newsService;
+    private final PythonCrawlingRestService pythonCrawlingRestService;
 
     @Operation(summary = "뉴스 등록", description = "새로운 뉴스 기사를 등록합니다.")
     @ApiResponses(value = {
@@ -58,18 +65,19 @@ public class NewsController {
 
     @Operation(summary = "뉴스 전체 조회", description = "모든 뉴스 기사를 조회합니다.")
     @GetMapping("/api/news")
-    public ResponseEntity<List<NewsResponseDto>> getAllNews() {
-        List<News> newsList = newsService.getAllNews();
-        List<NewsResponseDto> responseDtos = newsList.stream()
-                .map(news -> NewsResponseDto.builder()
-                        .id(news.getId())
-                        .title(news.getTitle())
-                        .content(news.getContent())
-                        .publisher(news.getPublisher())
-                        .publishedAt(news.getPublishedAt())
-                        .build())
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responseDtos);
+    public ResponseEntity<Page<NewsResponseDto>> getNewsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size) { // Changed from 10 to 8
+        Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
+        Page<News> newsPage = newsService.getNewsPaged(pageable);
+        Page<NewsResponseDto> dtoPage = newsPage.map(news -> NewsResponseDto.builder()
+                .id(news.getId())
+                .title(news.getTitle())
+                .content(news.getContent())
+                .publisher(news.getPublisher())
+                .publishedAt(news.getPublishedAt())
+                .build());
+        return ResponseEntity.ok(dtoPage);
     }
 
     @Operation(summary = "뉴스 상세 조회", description = "특정 ID의 뉴스 기사를 조회하며, 본문 내 금융 용어는 강조되어 반환됩니다.")
@@ -92,5 +100,33 @@ public class NewsController {
         }
     }
 
+    @PostMapping("/crawl-python-rest")
+    public ResponseEntity<String> crawlNewsWithPythonRest() {
+        try {
+            String result = pythonCrawlingRestService.crawlNewsViaRest();
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("크롤링 실패: " + e.getMessage());
+        }
+    }
 
+    @PostMapping("/news/upload")
+    public ResponseEntity<String> uploadNewsFromPython(@RequestBody NewsUploadRequestDto request) {
+        // 1. News 엔티티 생성 및 저장
+        News news = new News();
+        news.setTitle(request.getTitle());
+        news.setContent(request.getContent());
+        news.setUrl(request.getUrl()); // Set the url from the DTO
+        // imageUrl은 News 엔티티에 필드가 있으면 set, 없으면 무시
+        Long newsId = newsService.saveNews(news);
+
+        // 2. 용어 저장 (중복 방지)
+        if (request.getTerms() != null) {
+            for (NewsUploadRequestDto.TermDto termDto : request.getTerms()) {
+                newsService.saveOrUpdateTerm(termDto.getTerm(), termDto.getDescription());
+                // 필요시 News와 Term의 연관관계(예: NewsKeyword)도 저장
+            }
+        }
+        return ResponseEntity.ok("success");
+    }
 }

@@ -213,10 +213,50 @@
         }
         .news-modal {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            max-width: 700px;
+            width: 90vw;
+            max-height: 80vh;
+            overflow: auto;
+            padding: 0;
+            animation: fadeInModal 0.25s;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: translate(-50%, -40%);}
+            to { opacity: 1; transform: translate(-50%, -50%);}
+        }
+        .news-modal .modal-content {
+            padding: 32px 28px 24px 28px;
+            max-height: 80vh;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .news-body {
+            margin-top: 18px;
+            font-size: 1.08rem;
+            line-height: 1.7;
+            color: #222;
+            overflow-y: auto;
+            max-height: 45vh;
+            scroll-behavior: smooth;
+            padding-right: 8px;
+        }
+        .news-body::-webkit-scrollbar {
+            width: 7px;
+        }
+        .news-body::-webkit-scrollbar-thumb {
+            background: #e0e7ef;
+            border-radius: 4px;
+        }
+        .news-body::-webkit-scrollbar-track {
+            background: transparent;
         }
         .modal-content.news-style {
             background: white;
@@ -466,6 +506,86 @@
             height: 18px;
             color: #fff;
             font-size: 1.2em;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 0;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            border: none;
+            background: #f3f6fa;
+            color: #003675;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            outline: none;
+        }
+        .pagination button:hover,
+        .pagination button:focus {
+            background: #2563eb;
+            color: #fff;
+            transform: translateY(-2px) scale(1.07);
+        }
+        .pagination button.active {
+            background: linear-gradient(90deg, #003675 0%, #2563eb 100%);
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.12);
+            transform: scale(1.12);
+            border: none;
+        }
+        .pagination .arrow {
+            font-size: 1.2em;
+            background: none;
+            color: #003675;
+            padding: 8px 10px;
+            border-radius: 50%;
+            border: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .pagination .arrow:hover {
+            background: #e0e7ef;
+            color: #2563eb;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
+            width: 100%;
+        }
+        .news-section-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            min-height: 500px;
+            width: 100%;
+        }
+        .news-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 16px;
+            min-height: 400px;
+            width: 100%;
+        }
+        .issue-card {
+            height: 180px;
+            min-width: 0;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 18px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
     </style>
 </head>

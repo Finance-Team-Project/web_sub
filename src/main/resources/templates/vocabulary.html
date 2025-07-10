@@ -138,7 +138,7 @@ function getInitialConsonant(kor) {
 }
 
 async function fetchVocabularyList(search = "") {
-    const res = await fetch('/vocabulary/list' + (search ? ('?search=' + encodeURIComponent(search)) : ''));
+    const res = await fetch('/api/vocabulary/list' + (search ? ('?search=' + encodeURIComponent(search)) : ''));
     const data = await res.json();
     const list = document.getElementById('vocabList');
     const emptyMsg = document.getElementById('emptyMsg');
@@ -174,7 +174,7 @@ async function fetchVocabularyList(search = "") {
             star.style.marginRight = '8px';
             star.style.color = vocab.starred ? '#FFD600' : '#bbb';
             star.onclick = async () => {
-                const res = await fetch(`/vocabulary/star/${vocab.id}`, { method: 'POST' });
+                const res = await fetch(`/api/vocabulary/star/${vocab.id}`, { method: 'POST' });
                 const result = await res.json();
                 if (result.success) fetchVocabularyList(document.getElementById('searchInput').value);
             };
@@ -201,39 +201,38 @@ document.getElementById('searchInput').addEventListener('input', function() {
 });
 
 async function showTermDetail(id) {
-    const res = await fetch(`/vocabulary/${id}`);
-    const data = await res.json();
+    const response = await fetch(`/api/vocabulary/${id}`);
+    const data = await response.json();
     if (!data.success) {
         alert(data.message || '단어 정보를 불러올 수 없습니다.');
         return;
     }
     const vocab = data.vocabulary;
+    // 모달 생성
     const modalBg = document.createElement('div');
     modalBg.className = 'modal-bg';
-    modalBg.onclick = e => { if (e.target === modalBg) document.body.removeChild(modalBg); };
     const modalBox = document.createElement('div');
     modalBox.className = 'modal-box';
     modalBox.innerHTML = `
-        <button class="modal-close" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
-        <h3>단어: ${vocab.term}</h3>
-        <div>${vocab.description || '설명이 없습니다.'}</div>
+        <button class="modal-close" onclick="document.body.removeChild(this.parentNode.parentNode)">&times;</button>
+        <h3>📘 ${vocab.term}</h3>
+        <div style="margin-bottom:18px; color:#223a5e; font-weight:500;">${vocab.description || '설명이 없습니다.'}</div>
+        ${vocab.contextSentence ? `<div style="background:#f4f6fa;border-left:4px solid #223a5e;padding:14px 18px;margin:12px 0 0 0;border-radius:8px; color:#333; font-style:italic; display:flex; align-items:flex-start;"><span style='font-size:1.5em;margin-right:10px;'>💬</span><span>${vocab.contextSentence}</span></div>` : ''}
     `;
     modalBg.appendChild(modalBox);
     document.body.appendChild(modalBg);
 }
 
 async function deleteVocabulary(id) {
-    if (!confirm('정말 이 단어를 삭제하시겠습니까?')) return;
-    const res = await fetch(`/vocabulary/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) {
-        fetchVocabularyList();
-    } else {
-        alert(data.message || '삭제에 실패했습니다.');
-    }
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    const res = await fetch(`/api/vocabulary/${id}`, { method: 'DELETE' });
+    const result = await res.json();
+    if (result.success) fetchVocabularyList(document.getElementById('searchInput').value);
 }
 
-fetchVocabularyList();
+window.addEventListener('DOMContentLoaded', () => {
+    fetchVocabularyList();
+});
 </script>
 </body>
 </html> 

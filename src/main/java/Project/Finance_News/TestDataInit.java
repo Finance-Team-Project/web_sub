@@ -45,17 +45,12 @@ public class TestDataInit {
         user2.setJob("자영업자");
         user2.setGoal("자영업을 하고 있는 사업자 인데, 이 뉴스가 경제에 어떤 영향을 끼칠지 분석하기 위한 목적이 있습니다.");
 
-        userRepository.save(user1);
-        userRepository.save(user2);
-
-        List<Term> allTerms = termRepository.findAll();
-
-        for(Term term : allTerms){
-            UserVocabulary userVocabulary = new UserVocabulary();
-            userVocabulary.setUser(user1);
-            userVocabulary.setTerm(term);
-
-            userVocabularyRepository.save(userVocabulary);
+        if (!userRepository.existsByLoginId(user1.getLoginId())) {
+            userRepository.save(user1);
         }
+        if (!userRepository.existsByLoginId(user2.getLoginId())) {
+            userRepository.save(user2);
+        }
+        
     }
 }
