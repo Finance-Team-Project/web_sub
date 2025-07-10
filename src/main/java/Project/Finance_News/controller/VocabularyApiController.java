@@ -160,4 +160,4 @@ public class VocabularyApiController {
         response.put("starred", uv.isStarred());
         return response;
     }
-} 
+}

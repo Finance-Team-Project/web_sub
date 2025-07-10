@@ -8,10 +8,7 @@ import Project.Finance_News.repository.UserRepository;
 import Project.Finance_News.repository.UserVocabularyRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.Vocabulary;
-import org.antlr.v4.runtime.VocabularyImpl;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.List;
 

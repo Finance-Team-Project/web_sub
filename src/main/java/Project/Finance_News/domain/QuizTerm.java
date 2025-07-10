@@ -19,4 +19,7 @@ public class QuizTerm {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "term_id")
     private Term term;
+
+    @Column(name = "initial_hint")
+    private String initialHint;
 }

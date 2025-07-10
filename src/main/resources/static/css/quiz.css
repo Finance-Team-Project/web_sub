@@ -1,0 +1,101 @@
+body {
+    background-color: #f9f9f9;
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+}
+
+.quiz-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s;
+    position: relative;
+}
+
+.quiz-card:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.quiz-card p {
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.quiz-card input[type="text"] {
+    width: calc(100% - 150px);
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    margin-right: 10px;
+}
+
+.quiz-card button {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.quiz-card button:hover {
+    background-color: #0056b3;
+}
+
+.hint {
+    margin-top: 10px;
+    color: #555;
+    font-style: italic;
+    background-color: #f1f1f1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.correct {
+    background-color: #e0f0ff !important; /* 파란색 톤 */
+    border: 2px solid #007bff;
+}
+
+.incorrect {
+    background-color: #ffe0e0 !important; /* 붉은색 톤 */
+    border: 2px solid #ff4d4f;
+}
+
+.quiz-level-box {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    background-color: #f1f1f1;
+    border-radius: 20px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    border: 1px solid #ccc;
+}
+
+.level-box.correct::after {
+    content: ' ✔';
+    color: #007bff;
+}
+
+.level-box.incorrect::after {
+    content: ' ✖';
+    color: #ff4d4f;
+}
+
+.result-icon {
+    font-size: 16px;
+    margin-left: 4px;
+}
+

@@ -106,6 +106,326 @@ INSERT IGNORE INTO terms (term, description, created_at) VALUES ('출자', '자�
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('모회사', '다른 회사를 지배하는 상위 회사', NOW());
 INSERT IGNORE INTO terms (term, description, created_at) VALUES ('자회사', '다른 회사에 의해 지배되는 회사', NOW());
 
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '지주회사';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '우선주';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '채권';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '금리';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'PER';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'PBR';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'GDP';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '코스피';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '코스닥';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '환율';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '통화정책';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '기준금리';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '물가상승률';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '디플레이션';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '인플레이션';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '양적완화';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '유동성';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '매출';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '영업이익';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '순이익';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '자산';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '부채';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '자본';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'ROE';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'ROA';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'EBITDA';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '시가총액';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '배당금';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '우량주';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '테마주';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '공매도';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '매수';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '매도';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '호가';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '스프레드';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'IPO';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '상장';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '비상장주식';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '선물';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '옵션';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'ETF';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '펀드';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '헤지';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '변동성';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '공시';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '감자';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '증자';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '유상증자';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '무상증자';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '기초자산';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '레버리지';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '금융위기';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '재무제표';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '포트폴리오';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '리스크';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '채무불이행';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '신용등급';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '경상이익';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '단기금융';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '장기금융';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '예금';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '대출';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '무역수지';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '경상수지';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '외환보유액';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '기준환율';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '외환시장';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '자산운용사';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '상환';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '리보금리';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '국공채';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'CD';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'CP';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '기업가치';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'NAV';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '채무조정';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '부실채권';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '신탁';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '연금';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '퇴직연금';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = 'ISA';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '개인사업자대출';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '스탁론';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '차입';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '매출채권';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '매입채무';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '외화예금';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '무형자산';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '실물자산';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '예비비';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '계정과목';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '시장가치';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '순운전자본';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '총부채비율';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '현금흐름표';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '손익계산서';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '재무상태표';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '계정';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '일반회계';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '특별회계';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '회계연도';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '세전이익';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '법인세';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '지분';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '출자';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '모회사';
+
+INSERT INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, description, NOW() FROM terms WHERE term = '자회사';
 
 INSERT IGNORE INTO news (title, content, publisher, published_at) VALUES
 ('한국은행, 가계부채 우려 속 금리 추가 인하 검토',

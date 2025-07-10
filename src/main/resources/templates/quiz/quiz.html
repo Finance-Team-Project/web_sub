@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>단답형 퀴즈</title>
+    <link rel="stylesheet" href="/css/quiz.css">
+
+    <!-- userId를 JS에서 사용할 수 있게 설정 -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.userId = [[${userId}]];
+        window.userNickname = [[${userNickname}]];
+        /*]]>*/
+    </script>
+</head>
+<body style="margin: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #f5f5f5;">
+<div style="display: flex; height: 100vh;">
+
+    <!-- 좌측: 퀴즈 영역 -->
+    <div style="flex: 2; padding: 40px;">
+        <h1>📋 단답형 단어 퀴즈</h1>
+        <form id="quizForm">
+            <div id="quizList">
+                <!-- JS로 채워짐 -->
+            </div>
+            <button type="submit" style="margin-top: 20px;">제출하기</button>
+        </form>
+    </div>
+
+    <!-- 우측: 유저 뱃지 자리 -->
+    <div style="flex: 1; padding: 20px; background-color: #e9f0f8;">
+        <h3>🏅 나의 뱃지</h3>
+        <p>※ 추후 구현 예정</p>
+    </div>
+</div>
+
+<script>
+    window.onload = async function () {
+        if (!window.userId) {
+            alert('로그인 후 이용해주세요.');
+            location.href = '/login';
+            return;
+        }
+
+        const response = await fetch(`/api/quiz/short-answer?userId=${window.userId}`);
+        const quiz = await response.json();
+        console.log("서버로부터 받은 퀴즈 데이터:", quiz);  // 👈 추가
+
+
+        const quizList = document.getElementById("quizList");
+        quiz.items.forEach((item, index) => {
+            const div = document.createElement("div");
+            div.className = "quiz-card";
+            div.id = `quiz_card_${index}`;
+            div.setAttribute("data-term-id", item.termId);
+
+            div.innerHTML = `
+        <div class="quiz-level-box">
+            <span class="level-text">Lv.${item.level}</span>
+            <span class="result-icon" id="result_${item.termId}"></span>
+        </div>
+        <p><strong>Q${index + 1}. 해설:</strong> ${item.question}</p>
+        <input type="text" name="answer_${item.termId}" placeholder="정답 입력">
+        <button type="button" onclick="
+            document.getElementById('hint_${index}').style.display = 'block';
+            this.style.display = 'none';
+        ">초성 힌트 보기</button>
+        <div id="hint_${index}" class="hint" style="display: none;">
+            <em>초성 힌트:</em> ${item.initialHint}
+        </div>
+    `;
+            quizList.appendChild(div);
+        });
+
+        document.getElementById("quizForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const answers = {};
+            for (let [key, value] of formData.entries()) {
+                answers[key.replace("answer_", "")] = value.trim();
+            }
+
+            const res = await fetch("/api/quiz/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ quizId: quiz.quizId, userId: window.userId, answers })
+            });
+
+            const result = await res.json();
+
+            // 제출 후 채점 결과 적용
+            Object.entries(result.correctMap).forEach(([termId, isCorrect]) => {
+                const card = document.querySelector(`.quiz-card[data-term-id="${termId}"]`);
+                const icon = document.getElementById(`result_${termId}`);
+                if (card && icon) {
+                    card.classList.add(isCorrect ? "correct" : "incorrect");
+                    icon.innerText = isCorrect ? "✔" : "✖";
+                    icon.style.color = isCorrect ? "#007bff" : "#ff4d4f";
+                }
+            });
+
+
+
+            alert(`퀴즈 결과: ${result.score}점\n틀린 문제를 확인해보세요!`);
+        });
+
+    };
+</script>
+</body>
+</html>

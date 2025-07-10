@@ -27,7 +27,7 @@ public class Term {
     private String description;
 
     @Column(name = "created_at")
-    private LocalDateTime lastUpdated;  // 마지막 업데이트 시간
+    private LocalDateTime createdAt;  // 마지막 업데이트 시간
 
     // === 연관관계 === //
     @OneToMany(mappedBy = "term", cascade = CascadeType.ALL)

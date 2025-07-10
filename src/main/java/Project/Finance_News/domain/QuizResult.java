@@ -27,5 +27,7 @@ public class QuizResult {
 
     @Column(name = "taken_at")
     private LocalDateTime takenAt;
+
+    private boolean isCorrect;
 }
 

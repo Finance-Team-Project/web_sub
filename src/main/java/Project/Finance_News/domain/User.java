@@ -42,6 +42,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserNewsLog> newsLogs;
 
+    // User - Quiz
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Quiz> quizzes;
+
     // User - QuizResult
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuizResult> quizResults;
@@ -57,5 +61,7 @@ public class User {
     // User - UserInterestCategory
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserInterestCategory> interestCategories;
+
+
 
 }
