@@ -33,6 +33,8 @@ public class News {
     @Column(nullable = false, length = 512, unique = true)
     private String url;
 
+    private String imageUrl;
+
     // 연관 관계 매핑
     @OneToMany(mappedBy = "news")
     private List<UserNewsLog> userNewsLogs;

@@ -17,6 +17,8 @@ public class NewsUploadRequestDto {
     @Setter
     public static class TermDto {
         private String term;
-        private String description;
+        private String desc1;
+        private String desc2;
+        private String desc3;
     }
 } 

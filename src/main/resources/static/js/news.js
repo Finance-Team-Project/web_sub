@@ -19,6 +19,7 @@ window.addEventListener('DOMContentLoaded', () => {
             btn.classList.toggle('active', i === index);
         });
     });
+    document.querySelector('button[data-tab="issue-tab-interest"]').addEventListener('click', () => loadInterestNews());
 });
 function scrollToSection(i) {
     document.getElementById('fullpage').scrollTo({
@@ -60,8 +61,10 @@ async function loadTodayNews(page = 0, size = 8) { // Changed default size from 
         const card = document.createElement('div');
         card.className = 'issue-card';
         card.innerHTML = `
+            ${news.imageUrl ? `<img src="${news.imageUrl}" alt="뉴스 이미지" class="news-thumb">` : ''}
             <h3 onclick='loadNewsDetail(${news.id})'>${news.title}</h3>
             <p>${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
+            <a href="${news.url}" target="_blank" class="news-link">기사 원문</a>
         `;
         newsList.appendChild(card);
     });
@@ -93,6 +96,35 @@ async function loadTodayNews(page = 0, size = 8) { // Changed default size from 
         pagination.appendChild(nextBtn);
     }
     paginationContainer.appendChild(pagination);
+}
+async function loadInterestNews(limit = 5) {
+    if (!window.userId) {
+        console.log('로그인되지 않은 사용자');
+        return;
+    }
+    const container = document.getElementById('issue-tab-interest');
+    container.innerHTML = '';
+    const response = await fetch(`/api/news/interest?limit=${limit}`);
+    if (!response.ok) {
+        container.innerHTML = '<p>관심 뉴스가 없습니다.</p>';
+        return;
+    }
+    const newsList = await response.json();
+    if (newsList.length === 0) {
+        container.innerHTML = '<p>관심 뉴스가 없습니다.</p>';
+        return;
+    }
+    newsList.forEach(news => {
+        const card = document.createElement('div');
+        card.className = 'issue-card';
+        card.innerHTML = `
+            ${news.imageUrl ? `<img src="${news.imageUrl}" alt="뉴스 이미지" class="news-thumb">` : ''}
+            <h3 onclick='loadNewsDetail(${news.id})'>${news.title}</h3>
+            <p>${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
+            <a href="${news.url}" target="_blank" class="news-link">기사 원문</a>
+        `;
+        container.appendChild(card);
+    });
 }
 async function loadNewsDetail(newsId) {
     console.log('loadNewsDetail called', newsId);

@@ -12,6 +12,8 @@
 package Project.Finance_News.controller;
 
 import Project.Finance_News.domain.News;
+import Project.Finance_News.domain.User;
+import Project.Finance_News.domain.session.SessionConst;
 import Project.Finance_News.dto.NewsRequestDto;
 import Project.Finance_News.dto.NewsResponseDto;
 import Project.Finance_News.dto.NewsUploadRequestDto;
@@ -35,6 +37,8 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpSession;
+import Project.Finance_News.dto.TermDto;
 
 @RestController
 @RequestMapping
@@ -76,6 +80,8 @@ public class NewsController {
                 .content(news.getContent())
                 .publisher(news.getPublisher())
                 .publishedAt(news.getPublishedAt())
+                .imageUrl(news.getImageUrl())
+                .url(news.getUrl())
                 .build());
         return ResponseEntity.ok(dtoPage);
     }
@@ -92,6 +98,8 @@ public class NewsController {
                     .content(news.getContent()) // 강조된 콘텐츠 포함
                     .publisher(news.getPublisher())
                     .publishedAt(news.getPublishedAt())
+                    .imageUrl(news.getImageUrl())
+                    .url(news.getUrl())
                     .build();
 
             return ResponseEntity.ok(responseDto);
@@ -112,21 +120,49 @@ public class NewsController {
 
     @PostMapping("/news/upload")
     public ResponseEntity<String> uploadNewsFromPython(@RequestBody NewsUploadRequestDto request) {
-        // 1. News 엔티티 생성 및 저장
+        // 1. 뉴스 저장
         News news = new News();
         news.setTitle(request.getTitle());
         news.setContent(request.getContent());
-        news.setUrl(request.getUrl()); // Set the url from the DTO
-        // imageUrl은 News 엔티티에 필드가 있으면 set, 없으면 무시
+        news.setUrl(request.getUrl());
         Long newsId = newsService.saveNews(news);
 
-        // 2. 용어 저장 (중복 방지)
+        // 2. 용어 저장 (여러 설명 지원)
         if (request.getTerms() != null) {
-            for (NewsUploadRequestDto.TermDto termDto : request.getTerms()) {
-                newsService.saveOrUpdateTerm(termDto.getTerm(), termDto.getDescription());
-                // 필요시 News와 Term의 연관관계(예: NewsKeyword)도 저장
-            }
+            // (기존) for (NewsUploadRequestDto.TermDto termDto : request.getTerms()) { ... }
+            // (변경) 아래처럼 여러 설명을 처리하는 서비스 메서드로 전달
+            List<TermDto> termDtoList = request.getTerms().stream().map(t -> {
+                TermDto dto = new TermDto();
+                dto.setTerm(t.getTerm());
+                dto.setDesc1(t.getDesc1());
+                dto.setDesc2(t.getDesc2());
+                dto.setDesc3(t.getDesc3()); // 이 부분은 추가된 부분
+                return dto;
+            }).collect(Collectors.toList());
+            newsService.saveTermsAndGlossaries(termDtoList);
         }
         return ResponseEntity.ok("success");
+    }
+
+    @Operation(summary = "나의 관심 뉴스(클릭수 기준)", description = "사용자별로 많이 클릭한 뉴스 리스트를 반환합니다.")
+    @GetMapping("/api/news/interest")
+    public ResponseEntity<List<NewsResponseDto>> getUserInterestNewsByClickCount(
+            @RequestParam(defaultValue = "5") int limit,
+            HttpSession session) {
+        User user = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<News> newsList = newsService.getUserInterestNewsByClickCount(user, limit);
+        List<NewsResponseDto> dtoList = newsList.stream().map(news -> NewsResponseDto.builder()
+                .id(news.getId())
+                .title(news.getTitle())
+                .content(news.getContent())
+                .publisher(news.getPublisher())
+                .publishedAt(news.getPublishedAt())
+                .imageUrl(news.getImageUrl())
+                .url(news.getUrl())
+                .build()).toList();
+        return ResponseEntity.ok(dtoList);
     }
 }

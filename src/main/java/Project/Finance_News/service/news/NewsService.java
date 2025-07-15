@@ -9,10 +9,14 @@
 
 package Project.Finance_News.service.news;
 
+import Project.Finance_News.domain.Glossary;
 import Project.Finance_News.domain.News;
 import Project.Finance_News.domain.Term;
+import Project.Finance_News.domain.User;
+import Project.Finance_News.repository.GlossaryRepository;
 import Project.Finance_News.repository.NewsRepository;
 import Project.Finance_News.repository.TermRepository;
+import Project.Finance_News.repository.UserNewsLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import Project.Finance_News.dto.TermDto;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +36,8 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final TermRepository termRepository;
+    private final UserNewsLogRepository userNewsLogRepository;
+    private final GlossaryRepository glossaryRepository;
 
     public Long saveNews(News news) {
         // 중복 뉴스 체크: url이 같은 뉴스가 있으면 저장하지 않음
@@ -98,5 +105,77 @@ public class NewsService {
         }
     }
 
+    /**
+     * 파이썬 서버에서 받은 terms 배열을 저장 (각 desc1~desc3을 Glossary로 생성)
+     */
+    public void saveTermsAndGlossaries(List<TermDto> terms) {
+        for (TermDto termDto : terms) {
+            // 1. term이 DB에 없으면 생성, 있으면 가져옴
+            Term term = termRepository.findByTerm(termDto.getTerm())
+                    .orElseGet(() -> {
+                        Term t = new Term();
+                        t.setTerm(termDto.getTerm());
+                        return termRepository.save(t);
+                    });
+
+            // --- description 조합 및 저장 ---
+            StringBuilder descBuilder = new StringBuilder();
+            int idx = 1;
+            if (termDto.getDesc1() != null && !termDto.getDesc1().isBlank()) {
+                descBuilder.append(idx++).append(". ").append(termDto.getDesc1()).append("\n");
+            }
+            if (termDto.getDesc2() != null && !termDto.getDesc2().isBlank()) {
+                descBuilder.append(idx++).append(". ").append(termDto.getDesc2()).append("\n");
+            }
+            if (termDto.getDesc3() != null && !termDto.getDesc3().isBlank()) {
+                descBuilder.append(idx++).append(". ").append(termDto.getDesc3()).append("\n");
+            }
+            String descResult = descBuilder.toString().trim();
+            if (!descResult.isEmpty()) {
+                term.setDescription(descResult);
+                termRepository.save(term); // 업데이트 반영
+            }
+
+            // 2. desc1~desc3(빈 값 제외) 각각 Glossary 생성, term과 연결
+            if (termDto.getDesc1() != null && !termDto.getDesc1().isBlank()) {
+                if (!glossaryRepository.existsByTermAndShortDefinition(term, termDto.getDesc1())) {
+                    Glossary glossary1 = new Glossary();
+                    glossary1.setTerm(term);
+                    glossary1.setShortDefinition(termDto.getDesc1());
+                    glossaryRepository.save(glossary1);
+                }
+            }
+            if (termDto.getDesc2() != null && !termDto.getDesc2().isBlank()) {
+                if (!glossaryRepository.existsByTermAndShortDefinition(term, termDto.getDesc2())) {
+                    Glossary glossary2 = new Glossary();
+                    glossary2.setTerm(term);
+                    glossary2.setShortDefinition(termDto.getDesc2());
+                    glossaryRepository.save(glossary2);
+                }
+            }
+            if (termDto.getDesc3() != null && !termDto.getDesc3().isBlank()) {
+                if (!glossaryRepository.existsByTermAndShortDefinition(term, termDto.getDesc3())) {
+                    Glossary glossary3 = new Glossary();
+                    glossary3.setTerm(term);
+                    glossary3.setShortDefinition(termDto.getDesc3());
+                    glossaryRepository.save(glossary3);
+                }
+            }
+        }
+    }
+
+    /**
+     * 사용자별 뉴스 클릭수(내림차순)로 뉴스 리스트 반환
+     */
+    @Transactional(readOnly = true)
+    public List<News> getUserInterestNewsByClickCount(User user, int limit) {
+        List<Object[]> result = userNewsLogRepository.findNewsClickCountByUser(user);
+        List<Long> newsIds = result.stream()
+                .map(obj -> (Long) obj[0])
+                .limit(limit)
+                .toList();
+        if (newsIds.isEmpty()) return List.of();
+        return newsRepository.findAllById(newsIds);
+    }
 
 }
