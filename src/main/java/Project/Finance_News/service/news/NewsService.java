@@ -11,9 +11,11 @@ package Project.Finance_News.service.news;
 
 import Project.Finance_News.domain.Glossary;
 import Project.Finance_News.domain.News;
+import Project.Finance_News.domain.NewsKeyword;
 import Project.Finance_News.domain.Term;
 import Project.Finance_News.domain.User;
 import Project.Finance_News.repository.GlossaryRepository;
+import Project.Finance_News.repository.NewsKeywordRepository;
 import Project.Finance_News.repository.NewsRepository;
 import Project.Finance_News.repository.TermRepository;
 import Project.Finance_News.repository.UserNewsLogRepository;
@@ -38,6 +40,7 @@ public class NewsService {
     private final TermRepository termRepository;
     private final UserNewsLogRepository userNewsLogRepository;
     private final GlossaryRepository glossaryRepository;
+    private final NewsKeywordRepository newsKeywordRepository;
 
     public Long saveNews(News news) {
         // 중복 뉴스 체크: url이 같은 뉴스가 있으면 저장하지 않음
@@ -47,6 +50,27 @@ public class NewsService {
         }
         News savedNews = newsRepository.save(news);
         return savedNews.getId();
+    }
+
+    /**
+     * 뉴스와 키워드 리스트를 함께 저장
+     */
+    public Long saveNewsWithKeywords(News news, List<String> keywords) {
+        Long newsId = saveNews(news);
+        if (newsId != null && keywords != null) {
+            News savedNews = newsRepository.findById(newsId).orElse(null);
+            if (savedNews != null) {
+                for (String keyword : keywords) {
+                    if (keyword != null && !keyword.isBlank()) {
+                        NewsKeyword newsKeyword = new NewsKeyword();
+                        newsKeyword.setNews(savedNews);
+                        newsKeyword.setKeyword(keyword);
+                        newsKeywordRepository.save(newsKeyword);
+                    }
+                }
+            }
+        }
+        return newsId;
     }
 
     @Transactional(readOnly = true)

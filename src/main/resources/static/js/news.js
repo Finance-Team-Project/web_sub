@@ -61,7 +61,6 @@ async function loadTodayNews(page = 0, size = 8) { // Changed default size from 
         const card = document.createElement('div');
         card.className = 'issue-card';
         card.innerHTML = `
-            ${news.imageUrl ? `<img src="${news.imageUrl}" alt="뉴스 이미지" class="news-thumb">` : ''}
             <h3 onclick='loadNewsDetail(${news.id})'>${news.title}</h3>
             <p>${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
             <a href="${news.url}" target="_blank" class="news-link">기사 원문</a>
@@ -118,7 +117,6 @@ async function loadInterestNews(limit = 5) {
         const card = document.createElement('div');
         card.className = 'issue-card';
         card.innerHTML = `
-            ${news.imageUrl ? `<img src="${news.imageUrl}" alt="뉴스 이미지" class="news-thumb">` : ''}
             <h3 onclick='loadNewsDetail(${news.id})'>${news.title}</h3>
             <p>${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
             <a href="${news.url}" target="_blank" class="news-link">기사 원문</a>
@@ -133,7 +131,7 @@ async function loadNewsDetail(newsId) {
     const news = await response.json();
     const modal = document.createElement('div');
     modal.className = 'news-modal';
-    modal.innerHTML = '<div class="modal-content news-style">' +
+    modal.innerHTML = '<div class="modal-content news-style" style="width:900px;max-width:95vw;padding:48px 48px 36px 48px;">' +
         '<button class="close-btn" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>' +
         '<h2>' + news.title + '</h2>' +
         '<div class="news-meta">' + news.publisher + ' | ' + new Date(news.publishedAt).toLocaleDateString() + '</div>' +
@@ -147,7 +145,10 @@ async function loadNewsDetail(newsId) {
                 '</div>' +
             '</div>' +
         '</div>' +
-        '<div class="news-body">' + news.content + '</div>' +
+        '<div class="news-body">' +
+            (news.imageUrl ? '<img src="' + news.imageUrl + '" alt="뉴스 이미지" class="news-thumb" style="display:block;max-width:100%;max-height:220px;width:auto;height:auto;margin:0 auto 18px auto;object-fit:contain;border-radius:10px;">' : '') +
+            news.content +
+        '</div>' +
         '<div id="ai-summary-result"></div>' +
     '</div>';
     document.body.appendChild(modal);
