@@ -27,4 +27,17 @@ public class QuizPageController {
 
         return "quiz/quiz"; // templates/quiz.html
     }
+
+    @GetMapping("/quiz/crossword")
+    public String showCrosswordQuizPage(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null) {
+            System.out.println("🚨 세션에 로그인된 유저 없음");
+            return "redirect:/login";
+        }
+        System.out.println("✅ 로그인 유저: " + user.getId() + ", " + user.getNickname());
+        model.addAttribute("userId", user.getId());
+        model.addAttribute("userNickname", user.getNickname());
+        return "quiz/crossword"; // templates/quiz/crossword.html
+    }
 }
