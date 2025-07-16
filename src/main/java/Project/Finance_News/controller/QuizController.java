@@ -19,6 +19,11 @@ public class QuizController {
         return quizService.generateShortAnswerQuiz(userId);
     }
 
+    @GetMapping("/crossword")
+    public QuizDto getCrosswordQuiz(@RequestParam Long userId) {
+        return quizService.generateCrosswordQuiz(userId);
+    }
+
     @PostMapping("/submit")
     public QuizResultDto submitQuiz(@RequestBody QuizSubmitRequest request) {
         return quizService.submitQuiz(request.getQuizId(), request.getUserId(), request.getAnswers());    }

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>가로세로 낱말 퀴즈</title>
+    <link rel="stylesheet" href="/css/quiz.css">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.userId = /*[[${userId}]]*/ 0;
+        window.userNickname = /*[['${userNickname}']]*/ '';
+        /*]]>*/
+    </script>
+</head>
+<body style="margin: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #f5f5f5;">
+<div style="display: flex; height: 100vh;">
+    <!-- 좌측: 퀴즈 영역 -->
+    <div style="flex: 2; padding: 40px;">
+        <h1>🧩 가로세로 낱말 퀴즈</h1>
+        <div id="crosswordBoard" style="margin-bottom: 30px;"></div>
+        <div id="clueSection"></div>
+    </div>
+    <!-- 우측: 유저 뱃지 자리 -->
+    <div style="flex: 1; padding: 20px; background-color: #e9f0f8;">
+        <h3>🏅 나의 뱃지</h3>
+        <p>※ 추후 구현 예정</p>
+    </div>
+</div>
+<script>
+window.onload = async function () {
+    if (!window.userId) {
+        alert('로그인 후 이용해주세요.');
+        location.href = '/login';
+        return;
+    }
+    // 가로세로 낱말 퀴즈 데이터 요청
+    const response = await fetch(`/api/quiz/crossword?userId=${window.userId}`);
+    const quiz = await response.json();
+    console.log("서버로부터 받은 가로세로 퀴즈 데이터:", quiz);
+
+    // 1. 2차원 보드 그리기
+    const width = 15, height = 15;
+    const board = Array.from({length: height}, () => Array(width).fill(null));
+    const numberMap = Array.from({length: height}, () => Array(width).fill(null));
+    quiz.items.forEach(item => {
+        let r = item.row, c = item.col;
+        for (let i = 0; i < item.length; i++) {
+            if (item.direction === "across") {
+                board[r][c+i] = { term: item.term, idx: i, number: i === 0 ? item.number : null };
+                if (i === 0) numberMap[r][c+i] = item.number;
+            } else {
+                board[r+i][c] = { term: item.term, idx: i, number: i === 0 ? item.number : null };
+                if (i === 0) numberMap[r+i][c] = item.number;
+            }
+        }
+    });
+    // 2. HTML 테이블로 렌더링
+    const boardDiv = document.getElementById("crosswordBoard");
+    const table = document.createElement("table");
+    table.style.borderCollapse = "collapse";
+    for (let r = 0; r < height; r++) {
+        const tr = document.createElement("tr");
+        for (let c = 0; c < width; c++) {
+            const td = document.createElement("td");
+            td.style.width = td.style.height = "32px";
+            td.style.border = "1px solid #bbb";
+            td.style.background = board[r][c] ? "#fff" : "#e0e0e0";
+            td.style.position = "relative";
+            if (board[r][c]) {
+                td.className = "crossword-cell";
+                if (numberMap[r][c]) {
+                    const num = document.createElement("span");
+                    num.innerText = numberMap[r][c];
+                    num.style.position = "absolute";
+                    num.style.top = "2px";
+                    num.style.left = "4px";
+                    num.style.fontSize = "11px";
+                    num.style.color = "#007bff";
+                    td.appendChild(num);
+                }
+                const input = document.createElement("input");
+                input.type = "text";
+                input.maxLength = 1;
+                input.style.width = "100%";
+                input.style.height = "100%";
+                input.style.textAlign = "center";
+                input.style.fontSize = "18px";
+                input.style.border = "none";
+                input.style.background = "transparent";
+                input.dataset.row = r;
+                input.dataset.col = c;
+                td.appendChild(input);
+            }
+            tr.appendChild(td);
+        }
+        table.appendChild(tr);
+    }
+    boardDiv.appendChild(table);
+
+    // 3. 하단에 문제별 해설/입력/제출 UI
+    const clueSection = document.getElementById("clueSection");
+    let currentIdx = 0;
+    function showClue(idx) {
+        const item = quiz.items[idx];
+        clueSection.innerHTML = `
+            <div style="margin-bottom: 10px;"><b>${item.number}. (${item.direction === 'across' ? '가로' : '세로'})</b> ${item.clue}</div>
+            <input type="text" id="answerInput" maxlength="${item.length}" style="font-size:18px; width:120px;"> 
+            <button id="submitBtn">제출</button>
+            <button id="hintBtn">초성 힌트</button>
+            <span id="hintText" style="display:none; margin-left:10px; color:#888;">${item.initialHint}</span>
+        `;
+        document.getElementById("answerInput").focus();
+        document.getElementById("submitBtn").onclick = function() {
+            const val = document.getElementById("answerInput").value.trim();
+            if (val === item.term) {
+                // 정답: 보드에 글자 채우기
+                let r = item.row, c = item.col;
+                for (let i = 0; i < item.length; i++) {
+                    let input;
+                    if (item.direction === "across") input = table.rows[r].cells[c+i].querySelector("input");
+                    else input = table.rows[r+i].cells[c].querySelector("input");
+                    if (input) input.value = item.term[i];
+                    input.style.background = "#e0f0ff";
+                    input.disabled = true;
+                }
+                currentIdx++;
+                if (currentIdx < quiz.items.length) showClue(currentIdx);
+                else clueSection.innerHTML = '<b>모든 문제를 맞췄습니다!</b>';
+            } else {
+                alert("오답입니다!");
+            }
+        };
+        document.getElementById("hintBtn").onclick = function() {
+            document.getElementById("hintText").style.display = "inline";
+        };
+    }
+    showClue(currentIdx);
+};
+</script>
+</body>
+</html> 

@@ -16,4 +16,13 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
     boolean existsByUserAndTerm(User user, Term term);
 
     UserVocabulary user(User user);
+
+    // 최근 등록된 7개 단어
+    List<UserVocabulary> findTop7ByUserIdOrderByCreatedAtDesc(Long userId);
+
+    // 최근 등록된 10개 단어
+    List<UserVocabulary> findTop10ByUserIdOrderByCreatedAtDesc(Long userId);
+
+    // 최근 등록된 5개 단어
+    List<UserVocabulary> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
 }

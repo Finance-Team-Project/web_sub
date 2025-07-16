@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -40,4 +41,7 @@ public class UserVocabulary {
 
     @Column(name = "news_url")
     private String newsUrl;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }

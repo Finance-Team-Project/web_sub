@@ -634,7 +634,7 @@
                     <h4>금융 퀴즈</h4>
                     <ul>
                         <li><a href="/quiz/short-answer">단어 퀴즈</a></li>
-                        <li><a href="#">가로 세로 낱말 퀴즈</a></li>
+                        <li><a href="#" onclick="openCrosswordQuiz()">가로세로 낱말 퀴즈</a></li>
                         <li><a href="#">랭킹</a></li>
                     </ul>
                 </div>
@@ -661,6 +661,9 @@
             // 사용자 정보를 전역 변수로 설정
             window.userId = /*[[${user.id}]]*/ null;
             window.userNickname = /*[[${user.nickname}]]*/ '';
+            function openCrosswordQuiz() {
+                window.location.href = '/quiz/crossword';
+            }
         </script>
     </div>
 </header>
