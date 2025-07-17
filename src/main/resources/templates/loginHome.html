@@ -158,7 +158,14 @@
         }
         .issue-tab {
             display: none;
-            min-height: 300px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .issue-tab.active {
+            display: flex !important;
         }
         .issue-grid {
             display: grid;
@@ -166,6 +173,8 @@
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
+            min-height: 400px;
+            width: 100%;
         }
         .issue-card {
             background-color: #fff;
@@ -692,6 +701,7 @@
             <!-- 동적으로 채워짐 -->
         </div>
         <div class="issue-grid issue-tab" id="issue-tab-interest">
+            <!-- 동적으로 채워짐 -->
         </div>
     </section>
     <section class="footer">
