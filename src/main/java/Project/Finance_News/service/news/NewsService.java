@@ -14,11 +14,13 @@ import Project.Finance_News.domain.News;
 import Project.Finance_News.domain.NewsKeyword;
 import Project.Finance_News.domain.Term;
 import Project.Finance_News.domain.User;
+import Project.Finance_News.domain.KeywordFrequency;
 import Project.Finance_News.repository.GlossaryRepository;
 import Project.Finance_News.repository.NewsKeywordRepository;
 import Project.Finance_News.repository.NewsRepository;
 import Project.Finance_News.repository.TermRepository;
 import Project.Finance_News.repository.UserNewsLogRepository;
+import Project.Finance_News.repository.KeywordFrequencyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +43,7 @@ public class NewsService {
     private final UserNewsLogRepository userNewsLogRepository;
     private final GlossaryRepository glossaryRepository;
     private final NewsKeywordRepository newsKeywordRepository;
+    private final KeywordFrequencyRepository keywordFrequencyRepository;
 
     public Long saveNews(News news) {
         // 중복 뉴스 체크: url이 같은 뉴스가 있으면 저장하지 않음
@@ -68,6 +71,8 @@ public class NewsService {
                         newsKeywordRepository.save(newsKeyword);
                     }
                 }
+                // 키워드 빈도 증가
+                increaseKeywordFrequency(keywords);
             }
         }
         return newsId;
@@ -200,6 +205,29 @@ public class NewsService {
                 .toList();
         if (newsIds.isEmpty()) return List.of();
         return newsRepository.findAllById(newsIds);
+    }
+
+    public void increaseKeywordFrequency(List<String> keywords) {
+        for (String keyword : keywords) {
+            KeywordFrequency kf = keywordFrequencyRepository.findById(keyword)
+                .orElse(new KeywordFrequency());
+            kf.setKeyword(keyword);
+            kf.setFrequency(kf.getFrequency() + 1);
+            keywordFrequencyRepository.save(kf);
+        }
+    }
+
+    public void decreaseKeywordFrequency(List<String> keywords) {
+        for (String keyword : keywords) {
+            keywordFrequencyRepository.findById(keyword).ifPresent(kf -> {
+                kf.setFrequency(Math.max(0, kf.getFrequency() - 1));
+                keywordFrequencyRepository.save(kf);
+            });
+        }
+    }
+
+    public List<KeywordFrequency> getTopKeywords(int n) {
+        return keywordFrequencyRepository.findAll(org.springframework.data.domain.PageRequest.of(0, n, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "frequency"))).getContent();
     }
 
 }

@@ -19,7 +19,7 @@ public class loginController {
     private final loginService loginService;
 
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute("loginForm")loginForm form){
+    public String loginForm(@ModelAttribute("loginForm") loginForm form){
         return "login/loginForm";
     }
 

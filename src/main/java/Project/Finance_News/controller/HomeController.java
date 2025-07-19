@@ -23,4 +23,9 @@ public class HomeController {
         }
         return "home";
     }
+
+    @GetMapping("/keyword-cloud")
+    public String keywordCloudPage() {
+        return "keywordCloud";
+    }
 }

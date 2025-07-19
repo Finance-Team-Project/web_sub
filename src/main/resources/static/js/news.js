@@ -9,6 +9,17 @@ function toggleIssueTab(tabName) {
     document.getElementById(tabName).style.display = 'grid';
     document.querySelectorAll('.tab-menu button').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`.tab-menu button[data-tab="${tabName}"]`).classList.add('active');
+
+    // 페이지네이션 토글
+    const paginationFinance = document.getElementById('pagination-finance');
+    const paginationInterest = document.getElementById('pagination-interest');
+    if (tabName === 'issue-tab-finance') {
+        if (paginationFinance) paginationFinance.style.display = 'flex';
+        if (paginationInterest) paginationInterest.style.display = 'none';
+    } else if (tabName === 'issue-tab-interest') {
+        if (paginationFinance) paginationFinance.style.display = 'none';
+        if (paginationInterest) paginationInterest.style.display = 'flex';
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -54,9 +65,9 @@ async function loadTodayNews(page = 0, size = 8) {
 
     // Finance 탭 내부만 초기화
     const newsList = document.getElementById('issue-tab-finance');
-    const paginationContainer = newsList.nextElementSibling; // 기존 구조 유지
+    const paginationContainer = document.getElementById('pagination-finance');
     newsList.innerHTML = '';
-    paginationContainer.innerHTML = '';
+    if (paginationContainer) paginationContainer.innerHTML = '';
 
     // Fetch news
     const response = await fetch(`/api/news?page=${page}&size=${size}`);
@@ -77,34 +88,36 @@ async function loadTodayNews(page = 0, size = 8) {
     });
 
     // Render pagination
-    const pagination = document.createElement('div');
-    pagination.className = 'pagination';
+    if (paginationContainer) {
+        const pagination = document.createElement('div');
+        pagination.className = 'pagination';
 
-    if (page > 0) {
-        const prevBtn = document.createElement('button');
-        prevBtn.className = 'arrow';
-        prevBtn.innerHTML = '‹';
-        prevBtn.onclick = () => loadTodayNews(page - 1, size);
-        pagination.appendChild(prevBtn);
+        if (page > 0) {
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'arrow';
+            prevBtn.innerHTML = '‹';
+            prevBtn.onclick = () => loadTodayNews(page - 1, size);
+            pagination.appendChild(prevBtn);
+        }
+
+        for (let i = 0; i < totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.textContent = i + 1;
+            btn.className = (i === page) ? 'active' : '';
+            btn.onclick = () => loadTodayNews(i, size);
+            pagination.appendChild(btn);
+        }
+
+        if (page < totalPages - 1) {
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'arrow';
+            nextBtn.innerHTML = '›';
+            nextBtn.onclick = () => loadTodayNews(page + 1, size);
+            pagination.appendChild(nextBtn);
+        }
+
+        paginationContainer.appendChild(pagination);
     }
-
-    for (let i = 0; i < totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i + 1;
-        btn.className = (i === page) ? 'active' : '';
-        btn.onclick = () => loadTodayNews(i, size);
-        pagination.appendChild(btn);
-    }
-
-    if (page < totalPages - 1) {
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'arrow';
-        nextBtn.innerHTML = '›';
-        nextBtn.onclick = () => loadTodayNews(page + 1, size);
-        pagination.appendChild(nextBtn);
-    }
-
-    paginationContainer.appendChild(pagination);
 }
 
 async function loadInterestNews(limit = 5) {
@@ -117,16 +130,18 @@ async function loadInterestNews(limit = 5) {
     const container = document.getElementById('issue-tab-interest');
     container.innerHTML = '';
 
+    // 페이지네이션도 비우기
+    const paginationContainer = document.getElementById('pagination-interest');
+    if (paginationContainer) paginationContainer.innerHTML = '';
+
     // Fetch interest news
     const response = await fetch(`/api/news/interest?limit=${limit}`);
     if (!response.ok) {
-        // 안내 문구 삭제: 아무것도 하지 않음
         return;
     }
 
     const newsList = await response.json();
     if (newsList.length === 0) {
-        // 안내 문구 삭제: 아무것도 하지 않음
         return;
     }
 
