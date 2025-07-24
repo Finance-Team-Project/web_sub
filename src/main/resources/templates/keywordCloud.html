@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 키워드 - 워드클라우드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #e0e7ef 0%, #f5f7fa 100%);
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #223a5e;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 48px auto 0 auto;
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px #223a5e18;
+            padding: 40px 36px 36px 36px;
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .cloud-section {
+            flex: 2;
+            min-width: 400px;
+        }
+        .side-section {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .section-title {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #003675;
+        }
+        .desc {
+            color: #4b5c7a;
+            margin-bottom: 18px;
+            font-size: 1.08em;
+        }
+        #keyword-cloud {
+            width: 100%;
+            height: 420px;
+            min-height: 320px;
+            background: #f5f7fa;
+            border-radius: 18px;
+            box-shadow: 0 2px 12px #223a5e0a;
+        }
+        .stat-box {
+            background: #f4f8ff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px #223a5e11;
+        }
+        .stat-title {
+            font-size: 1.1em;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 1.7em;
+            font-weight: 700;
+            color: #003675;
+        }
+        .top-keywords {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 8px #223a5e11;
+        }
+        .top-keywords-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2563eb;
+        }
+        .top-keywords-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .top-keywords-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e3e8f0;
+            font-size: 1.08em;
+            cursor: pointer;
+            transition: background 0.13s;
+        }
+        .top-keywords-list li:last-child {
+            border-bottom: none;
+        }
+        .top-keywords-list li:hover {
+            background: #eaf2ff;
+        }
+        .trend-up { color: #1db954; font-size: 1.1em; margin-left: 6px; }
+        .trend-down { color: #e74c3c; font-size: 1.1em; margin-left: 6px; }
+        .search-box {
+            margin-bottom: 10px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #e3e8f0;
+            font-size: 1em;
+            margin-bottom: 4px;
+        }
+        .modal-bg {
+            position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.25); z-index: 9999; display: flex; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: #fff; border-radius: 16px; padding: 32px 36px 24px 36px; min-width: 320px; max-width: 90vw;
+            box-shadow: 0 8px 32px #223a5e22; position: relative;
+        }
+        .modal-close {
+            position: absolute; top: 18px; right: 24px; border: none; background: none; font-size: 1.5em; color: #aaa; cursor: pointer;
+        }
+        .modal-close:hover { color: #003675; }
+        @media (max-width: 900px) {
+            .container { flex-direction: column; gap: 24px; padding: 18px 6vw; }
+            .cloud-section, .side-section { min-width: 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="cloud-section">
+        <div class="section-title">오늘의 키워드</div>
+        <div class="desc">최근 뉴스에서 많이 등장한 키워드를 워드클라우드로 시각화합니다.<br>키워드를 클릭하면 상세 설명을 볼 수 있습니다.</div>
+        <div id="keyword-cloud"></div>
+    </div>
+    <div class="side-section">
+        <div class="stat-box">
+            <div class="stat-title">전체 키워드 수</div>
+            <div class="stat-value" id="total-keywords">-</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-title">오늘의 총 키워드 빈도</div>
+            <div class="stat-value" id="total-frequency">-</div>
+        </div>
+        <div class="search-box">
+            <input type="text" class="search-input" id="keywordSearch" placeholder="키워드 검색...">
+        </div>
+        <div class="top-keywords">
+            <div class="top-keywords-title">인기 키워드 TOP 10</div>
+            <ul class="top-keywords-list" id="topKeywordsList"></ul>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2/dist/echarts-wordcloud.min.js"></script>
+<script>
+(function() {
+    const chartDom = document.getElementById('keyword-cloud');
+    const myChart = echarts.init(chartDom);
+    let allKeywords = [];
+    let trends = {}; // 추후 트렌드 데이터 연동 가능
+    let totalFrequency = 0;
+
+    function renderWordCloud(data) {
+        myChart.setOption({
+            tooltip: {
+                show: true,
+                formatter: function(params) {
+                    return params.name + ': ' + params.value;
+                }
+            },
+            series: [{
+                type: 'wordCloud',
+                shape: 'circle',
+                left: 'center',
+                top: 'center',
+                width: '100%',
+                height: '100%',
+                sizeRange: [18, 80],
+                rotationRange: [0, 0],
+                gridSize: 8,
+                drawOutOfBound: false,
+                textStyle: {
+                    color: function() {
+                        // 다양한 파스텔 계열 색상
+                        const colors = ['#5470C6', '#91CC75', '#FAC858', '#EE6666', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
+                        return colors[Math.floor(Math.random() * colors.length)];
+                    }
+                },
+                data: data
+            }]
+        });
+    }
+
+    function renderTopKeywords(data) {
+        const topList = document.getElementById('topKeywordsList');
+        topList.innerHTML = '';
+        data.slice(0, 10).forEach((item, idx) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span><b>${idx+1}.</b> <span class="kw-link">${item.name}</span></span> <span>${item.value}</span>`;
+            li.querySelector('.kw-link').onclick = () => showKeywordDetail(item.name);
+            topList.appendChild(li);
+        });
+    }
+
+    function updateStats(data) {
+        document.getElementById('total-keywords').textContent = data.length;
+        document.getElementById('total-frequency').textContent = totalFrequency;
+    }
+
+    function showKeywordDetail(keyword) {
+        // 키워드 설명 API 호출 (예시: /api/terms/{keyword})
+        fetch(`/api/terms/${encodeURIComponent(keyword)}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                let desc = data && data.description ? data.description : '설명이 없습니다.';
+                showModal(`<h3>🔍 ${keyword}</h3><div style='margin-top:12px;'>${desc}</div>`);
+            })
+            .catch(() => {
+                showModal(`<h3>🔍 ${keyword}</h3><div style='margin-top:12px;'>설명을 불러올 수 없습니다.</div>`);
+            });
+    }
+
+    function showModal(html) {
+        const modalBg = document.createElement('div');
+        modalBg.className = 'modal-bg';
+        const modalBox = document.createElement('div');
+        modalBox.className = 'modal-box';
+        modalBox.innerHTML = `<button class="modal-close" onclick="document.body.removeChild(this.parentNode.parentNode)">&times;</button>${html}`;
+        modalBg.appendChild(modalBox);
+        document.body.appendChild(modalBg);
+    }
+
+    // 워드클라우드 클릭 시 설명
+    myChart.on('click', function(params) {
+        showKeywordDetail(params.name);
+    });
+
+    // 키워드 검색 기능
+    document.getElementById('keywordSearch').addEventListener('input', function() {
+        const val = this.value.trim().toLowerCase();
+        if (!val) {
+            renderWordCloud(allKeywords);
+            renderTopKeywords(allKeywords);
+            return;
+        }
+        const filtered = allKeywords.filter(k => k.name.toLowerCase().includes(val));
+        renderWordCloud(filtered);
+        renderTopKeywords(filtered);
+    });
+
+    fetch('/api/keyword-frequency')
+        .then(res => res.json())
+        .then(json => {
+            allKeywords = json.data.map(k => ({ name: k.name, value: k.value }));
+            totalFrequency = allKeywords.reduce((sum, k) => sum + k.value, 0);
+            renderWordCloud(allKeywords);
+            renderTopKeywords(allKeywords);
+            updateStats(allKeywords);
+        });
+    window.addEventListener('resize', function() {
+        myChart.resize();
+    });
+})();
+</script>
+</body>
+</html> 

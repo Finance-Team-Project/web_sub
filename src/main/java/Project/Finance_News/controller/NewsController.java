@@ -125,7 +125,8 @@ public class NewsController {
         news.setTitle(request.getTitle());
         news.setContent(request.getContent());
         news.setUrl(request.getUrl());
-        Long newsId = newsService.saveNews(news);
+        news.setImageUrl(request.getImageUrl());
+        Long newsId = newsService.saveNewsWithKeywords(news, request.getKeywords());
 
         // 2. 용어 저장 (여러 설명 지원)
         if (request.getTerms() != null) {

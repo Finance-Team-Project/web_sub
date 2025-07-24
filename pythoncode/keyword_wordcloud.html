@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>키워드 워드클라우드</title>
+    <style>
+        #keyword-cloud {
+            width: 100vw;
+            height: 100vh;
+            min-height: 400px;
+        }
+        body { margin: 0; }
+    </style>
+</head>
+<body>
+    <div id="keyword-cloud"></div>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2/dist/echarts-wordcloud.min.js"></script>
+    <script>
+    (function() {
+        const chartDom = document.getElementById('keyword-cloud');
+        const myChart = echarts.init(chartDom);
+        fetch('/api/keyword-frequency')
+            .then(res => res.json())
+            .then(json => {
+                myChart.setOption({
+                    tooltip: {
+                        show: true,
+                        formatter: function(params) {
+                            return params.name + ': ' + params.value;
+                        }
+                    },
+                    series: [{
+                        type: 'wordCloud',
+                        shape: 'circle',
+                        left: 'center',
+                        top: 'center',
+                        width: '100%',
+                        height: '100%',
+                        sizeRange: [18, 80],
+                        rotationRange: [0, 0],
+                        gridSize: 8,
+                        drawOutOfBound: false,
+                        textStyle: {
+                            color: '#5470C6'
+                        },
+                        data: json.data
+                    }]
+                });
+            });
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    })();
+    </script>
+</body>
+</html> 
