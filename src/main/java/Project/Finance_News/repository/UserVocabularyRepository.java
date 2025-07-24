@@ -25,4 +25,6 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
 
     // 최근 등록된 5개 단어
     List<UserVocabulary> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
+
+    UserVocabulary findTopByUserIdOrderByCreatedAtDesc(Long userId);
 }

@@ -59,7 +59,7 @@
             <span class="level-text">Lv.${item.level}</span>
             <span class="result-icon" id="result_${item.termId}"></span>
         </div>
-        <p><strong>Q${index + 1}. 해설:</strong> ${item.question}</p>
+        <p><strong>Q${index + 1}. 해설:</strong> ${item.question.replace(/\\n/g, '<br>')}</p>
         <input type="text" name="answer_${item.termId}" placeholder="정답 입력">
         <button type="button" onclick="
             document.getElementById('hint_${index}').style.display = 'block';

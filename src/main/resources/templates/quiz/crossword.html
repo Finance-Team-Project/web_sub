@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>가로세로 낱말 퀴즈</title>
     <link rel="stylesheet" href="/css/quiz.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script th:inline="javascript">
         /*<![CDATA[*/
         window.userId = /*[[${userId}]]*/ 0;
@@ -13,18 +14,27 @@
 </head>
 <body style="margin: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #f5f5f5;">
 <div style="display: flex; height: 100vh;">
-    <!-- 좌측: 퀴즈 영역 -->
-    <div style="flex: 2; padding: 40px;">
-        <h1>🧩 가로세로 낱말 퀴즈</h1>
+    <!-- 좌측: 가로세로 보드 -->
+    <div style="flex: 1.5; padding: 40px; display: flex; flex-direction: column; align-items: center;">
+        <h1 style="margin-bottom: 24px; font-size: 28px;">🧩 가로세로 낱말 퀴즈</h1>
         <div id="crosswordBoard" style="margin-bottom: 30px;"></div>
-        <div id="clueSection"></div>
     </div>
-    <!-- 우측: 유저 뱃지 자리 -->
+
+    <!-- 우측: 문제 리스트 -->
+    <div style="flex: 1; padding: 24px 36px; background-color: #fff8fc; overflow-y: auto; box-shadow: -3px 0 8px rgba(0,0,0,0.05); border-radius: 30px 0 0 30px;">
+        <h2 style="color: #ff69b4; font-size: 20px; margin-bottom: 20px;">📜 문제 목록</h2>
+        <div id="clueSection" style="width: 100%;"></div>
+    </div>
+
+    <!-- 나의 뱃지 (비활성화 / 주석 처리) -->
+    <!--
     <div style="flex: 1; padding: 20px; background-color: #e9f0f8;">
         <h3>🏅 나의 뱃지</h3>
         <p>※ 추후 구현 예정</p>
     </div>
+    -->
 </div>
+
 <script>
 window.onload = async function () {
     if (!window.userId) {
@@ -32,51 +42,59 @@ window.onload = async function () {
         location.href = '/login';
         return;
     }
-    // 가로세로 낱말 퀴즈 데이터 요청
+
     const response = await fetch(`/api/quiz/crossword?userId=${window.userId}`);
     const quiz = await response.json();
-    console.log("서버로부터 받은 가로세로 퀴즈 데이터:", quiz);
 
-    // 1. 2차원 보드 그리기
     const width = 15, height = 15;
     const board = Array.from({length: height}, () => Array(width).fill(null));
     const numberMap = Array.from({length: height}, () => Array(width).fill(null));
+
     quiz.items.forEach(item => {
         let r = item.row, c = item.col;
         for (let i = 0; i < item.length; i++) {
             if (item.direction === "across") {
-                board[r][c+i] = { term: item.term, idx: i, number: i === 0 ? item.number : null };
+                board[r][c+i] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item) };
                 if (i === 0) numberMap[r][c+i] = item.number;
             } else {
-                board[r+i][c] = { term: item.term, idx: i, number: i === 0 ? item.number : null };
+                board[r+i][c] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item) };
                 if (i === 0) numberMap[r+i][c] = item.number;
             }
         }
     });
-    // 2. HTML 테이블로 렌더링
+
     const boardDiv = document.getElementById("crosswordBoard");
     const table = document.createElement("table");
     table.style.borderCollapse = "collapse";
+    table.style.margin = "0 auto";
+    table.style.background = "#fffafc";
+    table.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
+    table.style.borderRadius = "20px";
     for (let r = 0; r < height; r++) {
         const tr = document.createElement("tr");
         for (let c = 0; c < width; c++) {
             const td = document.createElement("td");
-            td.style.width = td.style.height = "32px";
-            td.style.border = "1px solid #bbb";
-            td.style.background = board[r][c] ? "#fff" : "#e0e0e0";
+            td.style.width = td.style.height = "36px";
+            td.style.border = "1.5px solid #d0d0d0";
+            td.style.background = board[r][c] ? "#fff" : "#f0f0f0";
             td.style.position = "relative";
+            td.style.borderRadius = "8px";
             if (board[r][c]) {
                 td.className = "crossword-cell";
+                td.dataset.row = r;
+                td.dataset.col = c;
+
                 if (numberMap[r][c]) {
                     const num = document.createElement("span");
                     num.innerText = numberMap[r][c];
                     num.style.position = "absolute";
                     num.style.top = "2px";
                     num.style.left = "4px";
-                    num.style.fontSize = "11px";
-                    num.style.color = "#007bff";
+                    num.style.fontSize = "10px";
+                    num.style.color = "#ff69b4";
                     td.appendChild(num);
                 }
+
                 const input = document.createElement("input");
                 input.type = "text";
                 input.maxLength = 1;
@@ -86,8 +104,11 @@ window.onload = async function () {
                 input.style.fontSize = "18px";
                 input.style.border = "none";
                 input.style.background = "transparent";
+                input.style.caretColor = "#ff69b4";
+                input.style.borderRadius = "8px";
                 input.dataset.row = r;
                 input.dataset.col = c;
+                input.readOnly = true;
                 td.appendChild(input);
             }
             tr.appendChild(td);
@@ -96,45 +117,82 @@ window.onload = async function () {
     }
     boardDiv.appendChild(table);
 
-    // 3. 하단에 문제별 해설/입력/제출 UI
     const clueSection = document.getElementById("clueSection");
-    let currentIdx = 0;
-    function showClue(idx) {
-        const item = quiz.items[idx];
-        clueSection.innerHTML = `
-            <div style="margin-bottom: 10px;"><b>${item.number}. (${item.direction === 'across' ? '가로' : '세로'})</b> ${item.clue}</div>
-            <input type="text" id="answerInput" maxlength="${item.length}" style="font-size:18px; width:120px;"> 
-            <button id="submitBtn">제출</button>
-            <button id="hintBtn">초성 힌트</button>
-            <span id="hintText" style="display:none; margin-left:10px; color:#888;">${item.initialHint}</span>
-        `;
-        document.getElementById("answerInput").focus();
-        document.getElementById("submitBtn").onclick = function() {
-            const val = document.getElementById("answerInput").value.trim();
-            if (val === item.term) {
-                // 정답: 보드에 글자 채우기
-                let r = item.row, c = item.col;
-                for (let i = 0; i < item.length; i++) {
-                    let input;
-                    if (item.direction === "across") input = table.rows[r].cells[c+i].querySelector("input");
-                    else input = table.rows[r+i].cells[c].querySelector("input");
-                    if (input) input.value = item.term[i];
-                    input.style.background = "#e0f0ff";
+    clueSection.innerHTML = quiz.items.map((item, idx) => `
+        <div class="crossword-quiz-row" id="quizRow_${idx}" style="display: flex; align-items: center; margin-bottom: 16px; background: #fff0fa; border-radius: 16px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+            <span style="font-weight:bold; color:#ff69b4; min-width:60px;">${item.number}. ${item.direction === 'across' ? '가로' : '세로'}</span>
+            <span style="margin-left:10px; flex:1; font-size:14px; color:#333;">${(item.clue || item.question).replace(/\n/g, '<br>')}</span>
+            <input type="text" id="answerInput_${idx}" maxlength="${item.length}" style="font-size:16px; width:90px; border-radius: 8px; border: 1px solid #ccc; padding: 4px 6px;">
+            <button id="submitBtn_${idx}" style="margin-left:6px; border:none; background:#ff69b4; color:white; border-radius:8px; padding:5px 8px;">제출</button>
+            <button id="hintBtn_${idx}" style="margin-left:6px; border:none; background:#ffccdc; color:#333; border-radius:8px; padding:5px 8px;">초성 힌트</button>
+            <span id="hintText_${idx}" style="display:none; margin-left:10px; color:#888;">${item.initialHint}</span>
+            <span id="resultIcon_${idx}" style="margin-left:12px; font-size:22px;"></span>
+        </div>
+    `).join("");
+
+    const cellToItems = {};
+    quiz.items.forEach((item, idx) => {
+        let r = item.row, c = item.col;
+        for (let i = 0; i < item.length; i++) {
+            let key = item.direction === "across" ? `${r},${c+i}` : `${r+i},${c}`;
+            if (!cellToItems[key]) cellToItems[key] = [];
+            cellToItems[key].push({itemIdx: idx, char: item.term[i]});
+        }
+    });
+
+    const correctMap = Array(quiz.items.length).fill(false);
+    quiz.items.forEach((item, idx) => {
+        document.getElementById(`submitBtn_${idx}`).onclick = function() {
+            const val = document.getElementById(`answerInput_${idx}`).value.trim();
+            const quizRow = document.getElementById(`quizRow_${idx}`);
+            const icon = document.getElementById(`resultIcon_${idx}`);
+            let isCorrect = (val === item.term);
+            correctMap[idx] = isCorrect;
+
+            let r = item.row, c = item.col;
+            for (let i = 0; i < item.length; i++) {
+                let rr = item.direction === "across" ? r : r+i;
+                let cc = item.direction === "across" ? c+i : c;
+                const input = table.rows[rr].cells[cc].querySelector("input");
+                const key = `${rr},${cc}`;
+                const isCross = cellToItems[key].length > 1;
+                const hasCorrect = cellToItems[key].some(ci => correctMap[ci.itemIdx]);
+
+                if (input) {
+                    if (isCorrect) {
+                        input.value = item.term[i];
+                        input.style.background = "#fff0fa";
+                        input.style.color = "#ff69b4";
+                        input.style.fontWeight = "bold";
+                    } else {
+                        if (hasCorrect) {
+                            let correctChar = cellToItems[key].find(ci => correctMap[ci.itemIdx]).char;
+                            input.value = correctChar;
+                            input.style.background = "#fff0fa";
+                            input.style.color = "#ff69b4";
+                        } else {
+                            input.value = '';
+                            input.style.background = "#ffe0e0";
+                            input.style.color = "#ff4d4f";
+                        }
+                        input.style.fontWeight = "bold";
+                    }
                     input.disabled = true;
                 }
-                currentIdx++;
-                if (currentIdx < quiz.items.length) showClue(currentIdx);
-                else clueSection.innerHTML = '<b>모든 문제를 맞췄습니다!</b>';
-            } else {
-                alert("오답입니다!");
             }
+
+            quizRow.style.background = isCorrect ? "#fff0fa" : "#ffe0e0";
+            quizRow.style.border = isCorrect ? "2px solid #ff69b4" : "2px solid #ff4d4f";
+            icon.innerHTML = isCorrect ? '<span style="color:#ff69b4;">✔</span>' : '<span style="color:#ff4d4f;">✖</span>';
+            document.getElementById(`answerInput_${idx}`).disabled = true;
+            document.getElementById(`submitBtn_${idx}`).disabled = true;
         };
-        document.getElementById("hintBtn").onclick = function() {
-            document.getElementById("hintText").style.display = "inline";
+
+        document.getElementById(`hintBtn_${idx}`).onclick = function() {
+            document.getElementById(`hintText_${idx}`).style.display = "inline";
         };
-    }
-    showClue(currentIdx);
+    });
 };
 </script>
 </body>
-</html> 
+</html>
