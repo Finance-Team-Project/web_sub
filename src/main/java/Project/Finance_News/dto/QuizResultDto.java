@@ -18,4 +18,6 @@ public class QuizResultDto {
     private Integer score;
     private LocalDateTime takenAt;
     private Map<Long, Boolean> correctMap;
+    // 제출 처리 후 서버 기준의 최신 총 포인트 (즉시 갱신용)
+    private Integer totalPoints;
 }

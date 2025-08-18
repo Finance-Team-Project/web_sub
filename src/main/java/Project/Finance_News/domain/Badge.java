@@ -23,6 +23,9 @@ public class Badge {
 
     private String description;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     // 역방향 매핑 (UserBadge → Badge)
     @OneToMany(mappedBy = "badge")
     private List<UserBadge> userBadges;

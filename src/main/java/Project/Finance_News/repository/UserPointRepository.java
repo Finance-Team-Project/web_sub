@@ -22,4 +22,12 @@ public class UserPointRepository {
                 .findFirst()
                 .orElse(null);
     }
+    
+    public void save(UserPoint userPoint) {
+        if (userPoint.getId() == null) {
+            em.persist(userPoint);
+        } else {
+            em.merge(userPoint);
+        }
+    }
 }

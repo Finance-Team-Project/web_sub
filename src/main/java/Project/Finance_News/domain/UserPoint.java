@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.security.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -22,10 +22,10 @@ public class UserPoint {
 
     private String reason;
 
-    private Integer amount;
+    private int amount;
 
     @Column(name = "timestamp")
-    private Timestamp timestamp;
+    private LocalDateTime timestamp;
 
     private int totalPoint;
 }

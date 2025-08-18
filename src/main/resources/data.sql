@@ -1,469 +1,602 @@
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('지주회사', '다른 회사를 지배하는 것을 목적으로 하는 회사', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('우선주', '보통주보다 배당에 우선권이 있는 주식', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('채권', '정부나 기업이 자금을 조달하기 위해 발행하는 유가증권', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('금리', '자금의 대여에 따른 이자의 비율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('PER', '주가를 주당순이익으로 나눈 지표', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('PBR', '주가를 주당순자산으로 나눈 지표', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('GDP', '국내총생산, 일정 기간 한 나라의 경제활동 총량', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('코스피', '한국 증권거래소의 대표 주가지수', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('코스닥', '벤처 및 중소기업 중심의 주식시장', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('환율', '서로 다른 통화 간의 교환 비율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('통화정책', '중앙은행이 통화를 조절하여 경제를 안정시키는 정책', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('기준금리', '중앙은행이 시중은행에 적용하는 기본 금리', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('물가상승률', '상품 및 서비스 가격이 전반적으로 상승하는 비율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('디플레이션', '일반적인 물가 수준이 지속적으로 하락하는 현상', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('인플레이션', '전반적인 물가 수준이 지속적으로 상승하는 현상', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('양적완화', '중앙은행이 통화량을 증가시켜 경기 부양을 유도하는 정책', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('유동성', '자산을 손실 없이 현금으로 바꿀 수 있는 정도', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('매출', '기업이 상품이나 서비스를 팔아서 벌어들인 총액', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('영업이익', '매출에서 영업비용을 뺀 이익', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('순이익', '모든 비용과 세금을 제외한 최종 이익', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('자산', '개인이나 기업이 소유한 모든 경제적 가치의 총합', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('부채', '갚아야 할 돈이나 빚', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('자본', '자산에서 부채를 뺀 순수한 자기 돈', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('ROE', '자기자본이익률, 자본 대비 순이익 비율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('ROA', '총자산이익률, 자산 대비 순이익 비율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('EBITDA', '세전 이자 및 감가상각 전 이익', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('시가총액', '기업의 현재 주식 가격 × 발행 주식 수', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('배당금', '기업이 이익을 주주에게 분배하는 금액', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('우량주', '안정적 수익과 성장성이 있는 주식', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('테마주', '특정 이슈나 테마로 주목받는 주식', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('공매도', '없는 주식을 빌려서 파는 투자 기법', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('매수', '주식을 사는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('매도', '주식을 파는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('호가', '주식 매매 시 제시하는 가격', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('스프레드', '매수호가와 매도호가의 차이', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('IPO', '기업공개, 주식을 일반에 처음으로 판매하는 것', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('상장', '기업이 주식시장에서 주식을 거래할 수 있게 되는 것', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('비상장주식', '증권거래소에 상장되지 않은 주식', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('선물', '미래의 일정 시점에 상품을 약정된 가격에 사고파는 계약', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('옵션', '특정 자산을 정해진 가격에 사거나 팔 수 있는 권리', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('ETF', '지수 추종형 상장지수펀드', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('펀드', '여러 투자자로부터 자금을 모아 운용하는 투자 상품', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('헤지', '위험 회피를 위한 금융 기법', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('변동성', '가격이 일정 기간 내 얼마나 변화했는지의 정도', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('공시', '기업이 투자자에게 경영정보를 알리는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('감자', '주식 수를 줄여 자본금을 감소시키는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('증자', '자본금을 늘리기 위해 주식을 추가 발행하는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('유상증자', '새로운 주식을 발행하고 주주에게 돈을 받는 방식', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('무상증자', '기존 주주에게 공짜로 주식을 나눠주는 방식', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('기초자산', '파생상품의 가치 평가 기준이 되는 자산', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('레버리지', '차입을 이용해 투자 수익을 극대화하는 전략', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('금융위기', '금융 시스템이 마비되는 심각한 경제 위기 상황', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('재무제표', '기업의 재무 상태를 나타내는 공식 문서', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('포트폴리오', '다양한 자산에 분산 투자한 구성', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('리스크', '투자에서 손실이 발생할 가능성', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('채무불이행', '빚을 제때 갚지 못하는 상황', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('신용등급', '채무자가 빚을 갚을 능력을 평가한 등급', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('경상이익', '기업의 일상적인 영업 활동에서 발생하는 이익', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('단기금융', '1년 이내 만기의 금융 상품', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('장기금융', '1년 이상 만기의 금융 상품', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('예금', '금융기관에 돈을 맡겨 두는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('대출', '금융기관에서 돈을 빌리는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('무역수지', '수출과 수입의 차액', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('경상수지', '상품·서비스·소득의 수출입 차이', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('외환보유액', '중앙은행이 보유한 외국 통화 및 자산', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('기준환율', '은행에서 외화를 사고파는 기준이 되는 환율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('외환시장', '외국 통화를 사고파는 시장', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('자산운용사', '투자자의 자산을 대신 관리·운용하는 회사', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('상환', '빌린 돈을 갚는 것', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('리보금리', '국제 금융시장에서 은행 간 적용되는 금리', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('국공채', '정부가 발행하는 채권', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('CD', '양도성예금증서, 단기 금융상품', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('CP', '기업어음, 기업이 발행하는 단기 채권', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('기업가치', '기업의 시장 평가 가치', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('NAV', '순자산가치, 펀드의 단위당 자산 가치', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('채무조정', '빚 부담을 줄이기 위한 조건 조정', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('부실채권', '회수가 어려운 채권', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('신탁', '재산을 대신 관리해주는 계약', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('연금', '노후를 위해 적립한 자금을 일정 기간 지급하는 제도', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('퇴직연금', '직장인이 퇴직 후 받는 연금 제도', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('ISA', '개인종합자산관리계좌, 세제 혜택을 주는 통합계좌', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('개인사업자대출', '개인이 운영하는 사업체 대상 대출', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('스탁론', '주식담보대출의 일종', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('차입', '다른 사람이나 기관에서 돈을 빌리는 것', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('매출채권', '상품을 팔고 아직 받지 못한 외상금', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('매입채무', '물건을 사고 아직 돈을 지불하지 않은 상태', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('외화예금', '외국 통화로 된 예금', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('무형자산', '특허권, 상표권 등 물리적 실체가 없는 자산', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('실물자산', '토지, 건물 등 실체가 있는 자산', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('예비비', '예기치 않은 지출을 대비한 자금', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('계정과목', '회계 기록 항목 구분을 위한 분류', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('시장가치', '시장 참여자들이 판단하는 자산의 가치', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('순운전자본', '유동자산에서 유동부채를 뺀 금액', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('총부채비율', '부채 총액을 자본으로 나눈 비율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('현금흐름표', '현금의 유입과 유출을 나타낸 재무제표', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('손익계산서', '수익과 비용을 기록해 순이익을 보여주는 재무제표', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('재무상태표', '자산, 부채, 자본을 한눈에 보여주는 표', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('계정', '거래를 기록하는 단위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('일반회계', '정부나 기업의 기본 회계', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('특별회계', '특정 목적을 위한 회계', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('회계연도', '회계를 기준으로 정한 1년 단위 기간', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('세전이익', '세금 부과 전의 이익', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('법인세', '기업의 이익에 부과되는 세금', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('지분', '기업에 대한 소유권 비율', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('출자', '자금을 투자하는 행위', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('모회사', '다른 회사를 지배하는 상위 회사', NOW());
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('자회사', '다른 회사에 의해 지배되는 회사', NOW());
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '지주회사';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '우선주';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '채권';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '금리';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'PER';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'PBR';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'GDP';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '코스피';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '코스닥';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '환율';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '통화정책';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '기준금리';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '물가상승률';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '디플레이션';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '인플레이션';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '양적완화';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '유동성';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '매출';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '영업이익';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '순이익';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '자산';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '부채';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '자본';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'ROE';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'ROA';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'EBITDA';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '시가총액';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '배당금';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '우량주';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '테마주';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '공매도';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '매수';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '매도';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '호가';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '스프레드';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'IPO';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '상장';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '비상장주식';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '선물';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '옵션';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'ETF';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '펀드';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '헤지';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '변동성';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '공시';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '감자';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '증자';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '유상증자';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '무상증자';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '기초자산';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '레버리지';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '금융위기';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '재무제표';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '포트폴리오';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '리스크';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '채무불이행';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '신용등급';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '경상이익';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '단기금융';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '장기금융';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '예금';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '대출';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '무역수지';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '경상수지';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '외환보유액';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '기준환율';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '외환시장';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '자산운용사';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '상환';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '리보금리';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '국공채';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'CD';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'CP';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '기업가치';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'NAV';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '채무조정';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '부실채권';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '신탁';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '연금';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '퇴직연금';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = 'ISA';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '개인사업자대출';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '스탁론';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '차입';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '매출채권';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '매입채무';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '외화예금';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '무형자산';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '실물자산';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '예비비';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '계정과목';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '시장가치';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '순운전자본';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '총부채비율';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '현금흐름표';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '손익계산서';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '재무상태표';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '계정';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '일반회계';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '특별회계';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '회계연도';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '세전이익';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '법인세';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '지분';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '출자';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '모회사';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '자회사';
-
--- 통화정책과 겹치는 단어 (정책금융)
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('정책금융', '정책적 목적을 위해 지원하는 금융', NOW());
-
--- 인플레이션과 겹치는 단어 (인플루언서)
-INSERT IGNORE INTO terms (term, description, created_at) VALUES ('인플루언서', '영향력을 행사하는 사람', NOW());
-
--- glossaries도 함께 추가
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '정책금융';
-
-INSERT INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, description, NOW() FROM terms WHERE term = '인플루언서';
-
-INSERT IGNORE INTO news (title, content, publisher, published_at, url) VALUES
-('이재명 정부, 30조원 규모 2차 추가경정예산안 발표',
-'6월 19일, 이재명 대통령은 30조5000억원 규모의 2차 추가경정예산안을 발표했다. 이번 예산은 보편지급 형태의 현금지원(총 10조3000억원), 건설·AI·중소기업 분야 지원, 소상공인 채무조정 등에 배정되었으며, 국채 발행 19조8000억원으로 재원을 마련한다. 올해 경제 성장률 전망치는 0.8%로 하향 조정되었고, 이번 추경을 통해 내수 활성화와 취약계층 보호를 목표로 하고 있다. 국회 제출일은 6월 23일이다.',
-'Reuters (via News)', '2025-06-19 09:35:00', 'https://example.com/news1');
-
-INSERT IGNORE INTO news (title, content, publisher, published_at, url) VALUES
-('한은, 기준금리 25bp 인하…''완화 기조'' 재확인',
-'5월 29일 한국은행 금융통화위원회는 기준금리를 2.75%에서 2.50%로 25bp 인하했다. 한은은 당초 FOMC와 통화정책 차별화를 피하기 위해 신중한 완화를 유지해왔으나, 미·중 무역 긴장 완화와 국내 소비부진, 정치 불안정 등이 겹치며 성장세가 둔화됨에 따라 금리 인하가 불가피하다고 설명했다. 한은은 2025년 GDP 성장률 전망을 기존 1.5%에서 0.8%로 대폭 하향했으며, 금리 인하와 함께 금융안정 리스크도 면밀히 모니터링하겠다고 밝혔다.',
-'AP News', '2025-05-29 03:11:00', 'https://example.com/news2');
-
-INSERT IGNORE INTO news (title, content, publisher, published_at, url) VALUES
-('미·한 무역 긴장 속 한은, 물가 하향 압력 주의',
-'6월 18일 발표된 한국은행 반기 물가 보고서에 따르면, 최근 미국의 강화된 무역관세로 인해 중국산 제품이 한국·일본 등 외국 시장으로 유입되며 국내 물가가 하향 압력을 받고 있다고 진단했다. 특히 서비스·식품 분야의 물가 상승 압력이 지속되고 있으나, 전체적인 헤드라인 인플레이션은 2% 목표치를 밑돌 가능성이 크다. 한은은 "통화정책 운용 시 환율과 수입 물가 변동을 종합적으로 고려해야 한다"고 지적했다.',
-'Reuters (via News)', '2025-06-18 07:41:00', 'https://example.com/news3');
-
-INSERT IGNORE INTO news (title, content, publisher, published_at, url) VALUES
-('韓 금융위, 스폿형 크립토 ETF 도입 로드맵 발표',
-'6월 20일, 금융위원회는 대통령직인수위원회에 가상자산 기반 스폿 ETF 도입 로드맵을 제출했다. 이는 2025년 하반기 내 출시를 목표로 한 것으로, 사용자 보호 장치 강화, 거래소 수수료 조사 및 신고제 도입 등 관련 인프라를 체계화하려는 계획이 포함되었다. 금융위는 "기존 ETF와 동일한 규율 아래 디지털 자산 ETF를 허용하되, 투자자 보호를 최우선으로 하겠다"고 언급했다.',
-'CCN', '2025-06-20 06:39:00', 'https://example.com/news4');
-
-INSERT IGNORE INTO news (title, content, publisher, published_at, url) VALUES
-('가계부채 과다 우려 속 한은, 완화정책 신중 유지',
-'6월 25일, 한국은행은 가계부채와 부동산 시장 과열에 대한 우려를 지속해서 표명하며, 통화정책 완화 속도 조절의 필요성을 강조했다. 한은 거시경제국 이창용 총재는 "금리 인하가 빠르면 대출 급증을 유발하고 자산가격 상승으로 이어질 수 있다"며 신중한 정책 운용을 당부했다. 한은은 올해 4분기까지 금리 동결 또는 완화 가능성을 열어두되, 시장 충격에 대한 대응을 준비 중이다.',
-'Business Times SG', '2025-06-25 10:00:00', 'https://example.com/news5');
-
-
-
+-- 1. 자산
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('자산', '기업이나 개인이 보유한 경제적 가치를 지닌 자원으로 미래에 현금흐름을 창출할 수 있는 항목.', 1, '재무회계', NOW());
+
+-- 2. 금리
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리', '자금의 대여·차입 시 적용되는 이자율로, 자본의 시간가치를 반영하는 가격.', 1, '거시/금융', NOW());
+
+-- 3. 시장
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('시장', '재화·서비스가 수요자와 공급자 간에 교환되는 제도적 장치 또는 공간.', 1, '미시/시장', NOW());
+
+-- 4. 환율
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('환율', '서로 다른 통화 간의 교환비율로, 한 단위 외국통화를 자국통화로 표시한 가격.', 1, '국제금융', NOW());
+
+-- 5. 수요
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('수요', '주어진 가격에서 소비자가 구매하고자 하는 재화·서비스의 수량.', 1, '미시/수요', NOW());
+
+-- 6. 자본
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('자본', '생산활동에 투입되는 재무적·물적 자원 또는 기업의 순투자자 지분.', 1, '재무/성장', NOW());
+
+-- 7. 부채
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('부채', '과거 사건으로 발생한 현재의무로, 미래에 경제적 자원 유출이 예상되는 항목.', 1, '재무회계', NOW());
+
+-- 8. 순자산
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('순자산', '자산에서 부채를 차감한 잔여가치로, 소유주 지분을 의미.', 1, '재무회계', NOW());
+
+-- 9. 이자
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('이자', '자본 사용의 대가로 지급되는 금액 또는 비율.', 1, '금융', NOW());
+
+-- 10. 실질금리
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('실질금리', '명목금리에서 기대 또는 실제 인플레이션을 차감한 이자율.', 1, '거시/통화', NOW());
+
+-- 11. 기준금리
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('기준금리', '중앙은행이 통화정책 수행을 위해 설정하는 대표적 단기 정책금리.', 1, '통화정책', NOW());
+
+-- 12. 주식시장
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('주식시장', '기업의 지분증권이 발행·유통되는 자본시장 부문.', 1, '자본시장', NOW());
+
+-- 13. 노동시장
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('노동시장', '노동력의 수요자(기업)와 공급자(가계)가 임금과 고용량을 결정하는 시장.', 1, '거시/노동', NOW());
+
+-- 14. 시장가치
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('시장가치', '자유로운 경쟁 시장에서 정상거래로 실현될 것으로 기대되는 자산의 가치.', 1, '재무/평가', NOW());
+
+-- 15. 통화
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('통화', '교환매개·가치저장·가치척도 기능을 수행하는 법정화폐 및 유사자산.', 1, '거시/통화체계', NOW());
+
+-- 16. 외환
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('외환', '대외 결제에 사용되는 외국통화, 예치금, 어음 등 국제지급수단.', 1, '국제금융', NOW());
+
+-- 17. 환리스크
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('환리스크', '환율 변동으로 인해 보유 외화자산·부채의 가치가 변동하는 위험.', 1, '금융/리스크', NOW());
+
+-- 18. 공급
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('공급', '생산자가 주어진 가격에서 시장에 제공하려는 재화·서비스의 수량.', 1, '미시/공급', NOW());
+
+-- 19. 수요곡선
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('수요곡선', '가격과 수요량의 역의 관계를 나타내는 그래프 또는 함수.', 1, '미시/수요', NOW());
+
+-- 20. 수요탄력성
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('수요탄력성', '가격 변동에 대한 수요량의 민감도를 측정한 지표(탄력성 계수).', 1, '미시/탄력성', NOW());
+
+-- 21. 금융
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융', '자금의 조달과 운용을 담당하는 경제활동의 한 분야.', 1, '금융', NOW());
+
+-- 22. 리스크
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('리스크', '투자나 사업에서 발생할 수 있는 손실의 가능성.', 1, '금융/리스크', NOW());
+
+-- 23. 금융권
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융권', '은행, 증권사, 보험사 등 금융기관들의 총칭.', 1, '금융', NOW());
+
+-- 24. 이자율
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('이자율', '자본 사용의 대가로 지급되는 비율.', 1, '금융', NOW());
+
+-- 25. 금융시장
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융시장', '자금의 수요자와 공급자가 만나 거래하는 시장.', 1, '금융', NOW());
+
+-- 26. 금융정책
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융정책', '통화공급량과 금리를 조절하는 정책.', 1, '통화정책', NOW());
+
+-- 27. 금융위기
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융위기', '금융시장의 불안정으로 인한 경제적 위기.', 1, '금융/위기', NOW());
+
+-- 28. 금융감독
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융감독', '금융기관의 건전성을 감시하는 활동.', 1, '금융/감독', NOW());
+
+-- 29. 금융개혁
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융개혁', '금융시스템을 개선하기 위한 제도적 변화.', 1, '금융/개혁', NOW());
+
+-- 30. 금융혁신
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융혁신', '새로운 금융상품이나 서비스를 개발하는 활동.', 1, '금융/혁신', NOW());
+
+-- 31. 금융자유화
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융자유화', '금융시장의 규제를 완화하는 정책.', 1, '금융/정책', NOW());
+
+-- 32. 금융안정
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융안정', '금융시장의 안정적인 운영 상태.', 1, '금융/안정', NOW());
+
+-- 33. 금융규제
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융규제', '금융기관의 활동을 제한하는 법규.', 1, '금융/규제', NOW());
+
+-- 34. 금융서비스
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융서비스', '금융기관이 제공하는 다양한 서비스.', 1, '금융/서비스', NOW());
+
+-- 35. 금융산업
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융산업', '금융 관련 경제활동의 총체.', 1, '금융/산업', NOW());
+
+-- 36. 금융기관
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융기관', '금융업무를 수행하는 기관.', 1, '금융/기관', NOW());
+
+-- 37. 금융상품
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융상품', '금융기관이 제공하는 상품.', 1, '금융/상품', NOW());
+
+-- 38. 금융거래
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융거래', '금융상품의 매매나 거래.', 1, '금융/거래', NOW());
+
+-- 39. 금융시스템
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융시스템', '금융활동을 지원하는 제도적 체계.', 1, '금융/시스템', NOW());
+
+-- 40. 금융환경
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금융환경', '금융활동이 이루어지는 환경.', 1, '금융/환경', NOW());
+
+-- 41. 금리정책 (리와 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리정책', '중앙은행의 금리 조절 정책.', 1, '통화정책', NOW());
+
+-- 42. 금리인상 (리와 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리인상', '금리를 올리는 정책 조치.', 1, '통화정책', NOW());
+
+-- 43. 금리인하 (리와 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리인하', '금리를 내리는 정책 조치.', 1, '통화정책', NOW());
+
+-- 44. 금리동결 (리와 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리동결', '금리를 현재 수준으로 유지하는 정책.', 1, '통화정책', NOW());
+
+-- 45. 금리상승 (리와 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리상승', '금리가 올라가는 현상.', 1, '금융/시장', NOW());
+
+-- 46. 금리하락 (리와 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리하락', '금리가 내려가는 현상.', 1, '금융/시장', NOW());
+
+-- 47. 금리변동 (리와 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('금리변동', '금리의 변화 현상.', 1, '금융/시장', NOW());
+
+-- 48. 부동산 (산과 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('부동산', '토지와 그 정착물.', 1, '부동산', NOW());
+
+-- 49. 자본시장 (장과 겹침)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('자본시장', '장기 자금의 수요와 공급이 이루어지는 시장.', 1, '자본시장', NOW());
+
+-- 이제 모든 terms가 삽입된 후 glossaries 삽입
+-- 1. 자산의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '경제적 효익을 제공하는 자원', NOW() FROM terms WHERE term = '자산';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '유형·무형으로 구분되는 재무상태표 항목', NOW() FROM terms WHERE term = '자산';
+
+-- 2. 금리의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '돈의 가격을 나타내는 비율', NOW() FROM terms WHERE term = '금리';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '명목·실질로 구분되는 이자율', NOW() FROM terms WHERE term = '금리';
+
+-- 3. 시장의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '거래가 이루어지는 메커니즘', NOW() FROM terms WHERE term = '시장';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '가격이 결정되는 집합적 장소', NOW() FROM terms WHERE term = '시장';
+
+-- 4. 환율의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '통화 간 교환비율', NOW() FROM terms WHERE term = '환율';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '수출입 가격과 자본흐름에 영향', NOW() FROM terms WHERE term = '환율';
+
+-- 5. 수요의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '가격에 따른 구매 의사·능력', NOW() FROM terms WHERE term = '수요';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '수요법칙: 가격↑→수요량↓(기타 불변)', NOW() FROM terms WHERE term = '수요';
+
+-- 6. 자본의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '생산요소로서의 축적된 자원', NOW() FROM terms WHERE term = '자본';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '자본금·잉여금 등 소유주 지분', NOW() FROM terms WHERE term = '자본';
+
+-- 7. 부채의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '상환 의무가 있는 채무', NOW() FROM terms WHERE term = '부채';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '유동·비유동 부채로 분류', NOW() FROM terms WHERE term = '부채';
+
+-- 8. 순자산의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '자본=자산-부채', NOW() FROM terms WHERE term = '순자산';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '기업의 청산가치 지표', NOW() FROM terms WHERE term = '순자산';
+
+-- 9. 이자의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '대부자본 사용료', NOW() FROM terms WHERE term = '이자';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '단리·복리 계산 가능', NOW() FROM terms WHERE term = '이자';
+
+-- 10. 실질금리의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '물가상승을 반영한 금리', NOW() FROM terms WHERE term = '실질금리';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '피셔 방정식: r≈i-π', NOW() FROM terms WHERE term = '실질금리';
+
+-- 11. 기준금리의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '중앙은행의 정책 신호금리', NOW() FROM terms WHERE term = '기준금리';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '시장금리와 대출·예금 금리에 파급', NOW() FROM terms WHERE term = '기준금리';
+
+-- 12. 주식시장의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, 'IPO와 거래소 유통시장 포함', NOW() FROM terms WHERE term = '주식시장';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '가격발견과 자금조달 기능', NOW() FROM terms WHERE term = '주식시장';
+
+-- 13. 노동시장의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '임금·고용이 결정되는 장', NOW() FROM terms WHERE term = '노동시장';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '마찰적·구조적 실업 존재', NOW() FROM terms WHERE term = '노동시장';
+
+-- 14. 시장가치의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '공정가치와 유사 개념', NOW() FROM terms WHERE term = '시장가치';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '수요·공급과 유동성의 함수', NOW() FROM terms WHERE term = '시장가치';
+
+-- 15. 통화의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '현금·예금 등 화폐공급 구성', NOW() FROM terms WHERE term = '통화';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '법정통화와 디지털화폐 포함 가능', NOW() FROM terms WHERE term = '통화';
+
+-- 16. 외환의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '외화표시 자산·부채', NOW() FROM terms WHERE term = '외환';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '외환시장 현물·선물 포함', NOW() FROM terms WHERE term = '외환';
+
+-- 17. 환리스크의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '거래·환산·경제적 노출 위험', NOW() FROM terms WHERE term = '환리스크';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '헤지: 선물·옵션·스왑 등', NOW() FROM terms WHERE term = '환리스크';
+
+-- 18. 공급의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '가격↑→공급량↑(기타 불변)', NOW() FROM terms WHERE term = '공급';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '생산비·기술이 좌우', NOW() FROM terms WHERE term = '공급';
+
+-- 19. 수요곡선의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '우하향 형태가 일반적', NOW() FROM terms WHERE term = '수요곡선';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '소득·기호 등 이동요인 존재', NOW() FROM terms WHERE term = '수요곡선';
+
+-- 20. 수요탄력성의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '탄력적(>1)·비탄력적(<1) 구분', NOW() FROM terms WHERE term = '수요탄력성';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '가격탄력성·소득탄력성 등 유형', NOW() FROM terms WHERE term = '수요탄력성';
+
+-- 21. 금융의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '자금의 융통과 신용 활동', NOW() FROM terms WHERE term = '금융';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '은행, 증권, 보험 등 포함', NOW() FROM terms WHERE term = '금융';
+
+-- 22. 리스크의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '손실 발생 가능성', NOW() FROM terms WHERE term = '리스크';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '시장·신용·유동성 리스크 등', NOW() FROM terms WHERE term = '리스크';
+
+-- 23. 금융권의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융기관들의 총칭', NOW() FROM terms WHERE term = '금융권';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '은행·증권·보험·카드사 등', NOW() FROM terms WHERE term = '금융권';
+
+-- 24. 이자율의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '이자의 비율 지표', NOW() FROM terms WHERE term = '이자율';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '명목·실질 이자율 구분', NOW() FROM terms WHERE term = '이자율';
+
+-- 25. 금융시장의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '자금 수요·공급 시장', NOW() FROM terms WHERE term = '금융시장';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '화폐·자본·외환시장 포함', NOW() FROM terms WHERE term = '금융시장';
+
+-- 26. 금융정책의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '통화공급량과 금리 조절', NOW() FROM terms WHERE term = '금융정책';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '중앙은행의 주요 정책수단', NOW() FROM terms WHERE term = '금융정책';
+
+-- 27. 금융위기의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융시장 불안정으로 인한 위기', NOW() FROM terms WHERE term = '금융위기';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '유동성 위기와 신용위기 포함', NOW() FROM terms WHERE term = '금융위기';
+
+-- 28. 금융감독의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융기관 건전성 감시', NOW() FROM terms WHERE term = '금융감독';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '규제와 감독 체계', NOW() FROM terms WHERE term = '금융감독';
+
+-- 29. 금융개혁의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융시스템 개선 변화', NOW() FROM terms WHERE term = '금융개혁';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '제도적 변화와 혁신', NOW() FROM terms WHERE term = '금융개혁';
+
+-- 30. 금융혁신의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '새로운 금융상품 개발', NOW() FROM terms WHERE term = '금융혁신';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '핀테크와 디지털 금융', NOW() FROM terms WHERE term = '금융혁신';
+
+-- 31. 금융자유화의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융규제 완화 정책', NOW() FROM terms WHERE term = '금융자유화';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '시장 개방과 경쟁 촉진', NOW() FROM terms WHERE term = '금융자유화';
+
+-- 32. 금융안정의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융시장 안정성', NOW() FROM terms WHERE term = '금융안정';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '위험 관리와 감독', NOW() FROM terms WHERE term = '금융안정';
+
+-- 33. 금융규제의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융기관 활동 제한', NOW() FROM terms WHERE term = '금융규제';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '법규와 감독 체계', NOW() FROM terms WHERE term = '금융규제';
+
+-- 34. 금융서비스의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융기관 제공 서비스', NOW() FROM terms WHERE term = '금융서비스';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '다양한 금융 상품', NOW() FROM terms WHERE term = '금융서비스';
+
+-- 35. 금융산업의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융 관련 경제활동', NOW() FROM terms WHERE term = '금융산업';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융 부문의 총체', NOW() FROM terms WHERE term = '금융산업';
+
+-- 36. 금융기관의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융업무 수행 기관', NOW() FROM terms WHERE term = '금융기관';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '은행, 증권, 보험사 등', NOW() FROM terms WHERE term = '금융기관';
+
+-- 37. 금융상품의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융기관 제공 상품', NOW() FROM terms WHERE term = '금융상품';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '다양한 금융 서비스', NOW() FROM terms WHERE term = '금융상품';
+
+-- 38. 금융거래의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융상품 매매 거래', NOW() FROM terms WHERE term = '금융거래';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융시장에서의 거래', NOW() FROM terms WHERE term = '금융거래';
+
+-- 39. 금융시스템의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융활동 지원 체계', NOW() FROM terms WHERE term = '금융시스템';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '제도적 금융 구조', NOW() FROM terms WHERE term = '금융시스템';
+
+-- 40. 금융환경의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융활동 환경', NOW() FROM terms WHERE term = '금융환경';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금융시장 여건', NOW() FROM terms WHERE term = '금융환경';
+
+-- 41. 금리정책의 glossaries (리와 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '중앙은행의 금리 조절 정책', NOW() FROM terms WHERE term = '금리정책';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '통화정책의 핵심 수단', NOW() FROM terms WHERE term = '금리정책';
+
+-- 42. 금리인상의 glossaries (리와 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금리를 올리는 정책 조치', NOW() FROM terms WHERE term = '금리인상';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '인플레이션 억제 목적', NOW() FROM terms WHERE term = '금리인상';
+
+-- 43. 금리인하의 glossaries (리와 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금리를 내리는 정책 조치', NOW() FROM terms WHERE term = '금리인하';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '경기 부양 목적', NOW() FROM terms WHERE term = '금리인하';
+
+-- 44. 금리동결의 glossaries (리와 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금리를 현재 수준으로 유지', NOW() FROM terms WHERE term = '금리동결';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '정책 방향성 유지', NOW() FROM terms WHERE term = '금리동결';
+
+-- 45. 금리상승의 glossaries (리와 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금리가 올라가는 현상', NOW() FROM terms WHERE term = '금리상승';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '시장 금리 변동', NOW() FROM terms WHERE term = '금리상승';
+
+-- 46. 금리하락의 glossaries (리와 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금리가 내려가는 현상', NOW() FROM terms WHERE term = '금리하락';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '시장 금리 변동', NOW() FROM terms WHERE term = '금리하락';
+
+-- 47. 금리변동의 glossaries (리와 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '금리의 변화 현상', NOW() FROM terms WHERE term = '금리변동';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '시장 금리 변동', NOW() FROM terms WHERE term = '금리변동';
+
+-- 48. 부동산의 glossaries (산과 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '토지와 그 정착물', NOW() FROM terms WHERE term = '부동산';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '부동산 투자', NOW() FROM terms WHERE term = '부동산';
+
+-- 49. 자본시장의 glossaries (장과 겹침)
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '장기 자금 시장', NOW() FROM terms WHERE term = '자본시장';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '주식·채권 시장', NOW() FROM terms WHERE term = '자본시장';
+
+-- 3글자 이상 단어들 추가 (새로운 후보군 설정 알고리즘 테스트용)
+
+-- 50. 인플레이션 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('인플레이션', '일반적인 물가수준의 지속적 상승 현상으로 화폐의 구매력이 하락하는 경제적 상황.', 1, '거시/물가', NOW());
+
+-- 51. 디플레이션 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('디플레이션', '일반적인 물가수준의 지속적 하락 현상으로 경제활동이 위축되는 상황.', 1, '거시/물가', NOW());
+
+-- 52. 스태그플레이션 (4글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('스태그플레이션', '경기침체와 물가상승이 동시에 발생하는 경제적 현상.', 1, '거시/경기', NOW());
+
+-- 53. 인플레이션의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '물가상승으로 화폐가치 하락', NOW() FROM terms WHERE term = '인플레이션';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '수요견인·비용상승 인플레이션', NOW() FROM terms WHERE term = '인플레이션';
+
+-- 54. 디플레이션의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '물가하락으로 경제위축', NOW() FROM terms WHERE term = '디플레이션';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '수요부족과 경기침체', NOW() FROM terms WHERE term = '디플레이션';
+
+-- 55. 스태그플레이션의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '경기침체와 물가상승 동시발생', NOW() FROM terms WHERE term = '스태그플레이션';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '정책 대응이 어려운 상황', NOW() FROM terms WHERE term = '스태그플레이션';
+
+-- 56. 통화정책 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('통화정책', '중앙은행이 통화공급량과 금리를 조절하여 경제안정을 도모하는 정책.', 1, '통화정책', NOW());
+
+-- 57. 재정정책 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('재정정책', '정부가 세입과 세출을 조절하여 경제안정과 성장을 도모하는 정책.', 1, '재정정책', NOW());
+
+-- 58. 통화정책의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '중앙은행의 금리·통화량 조절', NOW() FROM terms WHERE term = '통화정책';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '경기조절과 물가안정 목적', NOW() FROM terms WHERE term = '통화정책';
+
+-- 59. 재정정책의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '정부의 세입세출 조절', NOW() FROM terms WHERE term = '재정정책';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '경기부양과 소득재분배', NOW() FROM terms WHERE term = '재정정책';
+
+-- 60. 자본주의 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('자본주의', '사유재산제도와 자유시장경제를 기반으로 한 경제체제.', 1, '경제체제', NOW());
+
+-- 61. 사회주의 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('사회주의', '생산수단의 공유와 계획경제를 특징으로 하는 경제체제.', 1, '경제체제', NOW());
+
+-- 62. 자본주의의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '사유재산과 자유시장 경제', NOW() FROM terms WHERE term = '자본주의';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '경쟁과 이윤동기 중심', NOW() FROM terms WHERE term = '자본주의';
+
+-- 63. 사회주의의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '생산수단 공유와 계획경제', NOW() FROM terms WHERE term = '사회주의';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '평등과 공동체 중심', NOW() FROM terms WHERE term = '사회주의';
+
+-- 64. 경제성장 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('경제성장', '국민경제의 생산능력이 증가하여 실질국민소득이 증대하는 현상.', 1, '거시/성장', NOW());
+
+-- 65. 경제위기 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('경제위기', '경제활동이 급격히 위축되어 실업과 파산이 증가하는 상황.', 1, '거시/위기', NOW());
+
+-- 66. 경제성장의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '실질GDP 증가와 생산능력 확대', NOW() FROM terms WHERE term = '경제성장';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '자본축적과 기술진보가 핵심', NOW() FROM terms WHERE term = '경제성장';
+
+-- 67. 경제위기의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '경기침체와 경제활동 위축', NOW() FROM terms WHERE term = '경제위기';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '실업증가와 소득감소', NOW() FROM terms WHERE term = '경제위기';
+
+-- 68. 시장경제 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('시장경제', '수요와 공급의 자유로운 작동에 의해 가격과 생산량이 결정되는 경제체제.', 1, '경제체제', NOW());
+
+-- 69. 계획경제 (3글자)
+INSERT IGNORE INTO terms (term, description, frequency, category, created_at)
+VALUES ('계획경제', '정부가 중앙에서 경제활동을 계획하고 통제하는 경제체제.', 1, '경제체제', NOW());
+
+-- 70. 시장경제의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '수요공급에 의한 자유경쟁', NOW() FROM terms WHERE term = '시장경제';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '가격기구의 자동조절 기능', NOW() FROM terms WHERE term = '시장경제';
+
+-- 71. 계획경제의 glossaries
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '정부의 중앙집권적 계획', NOW() FROM terms WHERE term = '계획경제';
+INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
+SELECT term_id, '자원배분의 정부통제', NOW() FROM terms WHERE term = '계획경제';
