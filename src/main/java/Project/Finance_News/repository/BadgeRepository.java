@@ -26,4 +26,9 @@ public class BadgeRepository {
     public void save(Badge badge) {
         em.persist(badge);
     }
+    
+    public long count() {
+        return em.createQuery("SELECT COUNT(b) FROM Badge b", Long.class)
+                .getSingleResult();
+    }
 }

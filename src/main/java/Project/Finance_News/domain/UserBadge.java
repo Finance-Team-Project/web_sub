@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "user_badge")
 public class UserBadge {
     @Id
-    private Integer id;
+    @Column(name = "id")
+    private Integer id; // 수동 할당 전략 사용
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

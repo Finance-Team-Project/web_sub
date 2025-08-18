@@ -27,6 +27,21 @@ public class BadgeGrantService {
         User user = userRepository.findById(userId).orElseThrow();
         List<Badge> allBadges = badgeRepository.findAll();
 
+        // 안전장치: 주요 랭크 배지 임계값을 코드에서 정규화 (DB 초기값 불일치 보정)
+        for (Badge b : allBadges) {
+            if ("브론즈".equals(b.getName()) && b.getConditionValue() != 0) {
+                b.setConditionValue(0);
+            } else if ("실버".equals(b.getName()) && b.getConditionValue() != 100) {
+                b.setConditionValue(100);
+            }
+        }
+
+        // 0) 브론즈는 조건 없이 기본 지급
+        allBadges.stream()
+                .filter(b -> "브론즈".equals(b.getName()))
+                .findFirst()
+                .ifPresent(b -> grantBadgeIfNotGranted(user, b));
+
         for (Badge badge : allBadges) {
             if (badge.getType() == BadgeType.RANK_CORRECT || badge.getType() == BadgeType.RANK_POINT)
                 continue;

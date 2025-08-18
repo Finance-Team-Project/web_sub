@@ -26,8 +26,23 @@ public class UserBadgeRepository {
         return count != null && count > 0;
     }
 
-    // 새 UserBadge 저장
+    // 새 UserBadge 저장 (detached 방지: merge 사용)
     public void save(UserBadge userBadge) {
-        em.persist(userBadge);
+        if (userBadge.getId() == null) {
+            Integer nextId = em.createQuery("""
+                SELECT COALESCE(MAX(ub.id), 0) + 1 FROM UserBadge ub
+            """, Integer.class).getSingleResult();
+            userBadge.setId(nextId);
+        }
+        em.merge(userBadge);
+    }
+
+    // 특정 유저가 획득한 모든 뱃지 반환
+    public java.util.List<UserBadge> findByUser(User user) {
+        return em.createQuery("""
+            SELECT ub FROM UserBadge ub WHERE ub.user = :user
+        """, UserBadge.class)
+            .setParameter("user", user)
+            .getResultList();
     }
 }
