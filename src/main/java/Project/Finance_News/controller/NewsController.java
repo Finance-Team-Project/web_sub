@@ -4,7 +4,7 @@
  * - 주요 엔드포인트:
  *   - POST /api/news: 새 뉴스 등록
  *   - GET /api/news: 모든 뉴스 조회
- *   - GET /api/news/{id}: 특정 뉴스 조회
+ *   - GET  /api/news/{id}: 특정 뉴스 조회
  * - 각 API에 대한 상세한 설명과 응답 코드 문서화
  *
  * */
@@ -34,6 +34,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -61,7 +62,16 @@ public class NewsController {
         news.setTitle(newsRequest.getTitle());
         news.setContent(newsRequest.getContent());
         news.setPublisher(newsRequest.getPublisher());
-        news.setPublishedAt(newsRequest.getPublishedAt());
+        
+        // 날짜 처리: String이 있으면 String에서 변환, 없으면 LocalDateTime 사용
+        LocalDateTime publishedAt = newsRequest.getPublishedAtFromString();
+        if (publishedAt == null) {
+            publishedAt = newsRequest.getPublishedAt();
+        }
+        if (publishedAt == null) {
+            publishedAt = LocalDateTime.now(); // 기본값으로 현재 시간 사용
+        }
+        news.setPublishedAt(publishedAt);
 
         Long savedId = newsService.saveNews(news);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedId);
@@ -80,6 +90,7 @@ public class NewsController {
                 .content(news.getContent())
                 .publisher(news.getPublisher())
                 .publishedAt(news.getPublishedAt())
+                .press(news.getPress())
                 .imageUrl(news.getImageUrl())
                 .url(news.getUrl())
                 .build());
@@ -100,12 +111,31 @@ public class NewsController {
                     .publishedAt(news.getPublishedAt())
                     .imageUrl(news.getImageUrl())
                     .url(news.getUrl())
+                    .press(news.getPress())
                     .build();
 
             return ResponseEntity.ok(responseDto);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // 1. 뉴스별 키워드 조회
+    @GetMapping("/api/news/{id}/keywords")
+    public ResponseEntity<List<String>> getKeywords(@PathVariable Long id) {
+        List<String> keywords = newsService.getTopKeywords(id);
+        return ResponseEntity.ok(keywords);
+    }
+
+    // 2. 키워드로 뉴스 목록 조회 (페이징)
+    @GetMapping(value = "/api/news", params = "keyword")
+    public ResponseEntity<Page<NewsResponseDto>> getNewsByKeyword(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
+        Page<NewsResponseDto> newsPage = newsService.findByKeyword(keyword, pageable);
+        return ResponseEntity.ok(newsPage);
     }
 
     @PostMapping("/crawl-python-rest")
@@ -119,13 +149,25 @@ public class NewsController {
     }
 
     @PostMapping("/news/upload")
-    public ResponseEntity<String> uploadNewsFromPython(@RequestBody NewsUploadRequestDto request) {
+    public ResponseEntity<Object> uploadNewsFromPython(@RequestBody NewsUploadRequestDto request) {
         // 1. 뉴스 저장
         News news = new News();
         news.setTitle(request.getTitle());
         news.setContent(request.getContent());
         news.setUrl(request.getUrl());
-        news.setImageUrl(request.getImageUrl());
+        news.setImageUrl(request.getEffectiveImageUrl());
+        news.setPress(request.getEffectivePress());
+        
+        // 날짜 처리: String이 있으면 String에서 변환, 없으면 LocalDateTime 사용
+        LocalDateTime publishedAt = request.getPublishedAtFromString();
+        if (publishedAt == null) {
+            publishedAt = request.getPublishedAt();
+        }
+        if (publishedAt == null) {
+            publishedAt = LocalDateTime.now(); // 기본값으로 현재 시간 사용
+        }
+        news.setPublishedAt(publishedAt);
+
         Long newsId = newsService.saveNewsWithKeywords(news, request.getKeywords());
 
         // 2. 용어 저장 (여러 설명 지원)
@@ -142,7 +184,19 @@ public class NewsController {
             }).collect(Collectors.toList());
             newsService.saveTermsAndGlossaries(termDtoList);
         }
-        return ResponseEntity.ok("success");
+
+        if (newsId == null) {
+            // 중복 저장 시 기존 ID 반환할 수 있도록 URL로 조회
+            return ResponseEntity.status(HttpStatus.OK).body(java.util.Map.of(
+                    "status", "duplicate",
+                    "news_id", null
+            ));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(java.util.Map.of(
+                "news_id", newsId,
+                "status", "saved"
+        ));
     }
 
     @Operation(summary = "나의 관심 뉴스(클릭수 기준)", description = "사용자별로 많이 클릭한 뉴스 리스트를 반환합니다.")

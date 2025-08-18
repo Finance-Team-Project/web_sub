@@ -1,5 +1,6 @@
 package Project.Finance_News.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,9 @@ public class News {
     private String processedContent;  // 하이라이팅이 적용된 HTML 컨텐츠
 
     private String publisher;
+
+    @Column(name = "press")
+    private String press;
 
     @Column(name = "published_at")
     private LocalDateTime publishedAt;

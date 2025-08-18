@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import Project.Finance_News.dto.TermDto;
+import Project.Finance_News.dto.NewsResponseDto;
 
 @Service
 @RequiredArgsConstructor
@@ -46,10 +47,11 @@ public class NewsService {
     private final KeywordFrequencyRepository keywordFrequencyRepository;
 
     public Long saveNews(News news) {
-        // 중복 뉴스 체크: url이 같은 뉴스가 있으면 저장하지 않음
+        // 중복 뉴스 체크: url이 같은 뉴스가 있으면 기존 엔티티 ID 반환(멱등성)
         if (newsRepository.existsByUrl(news.getUrl())) {
-            // 이미 존재하면 null 또는 -1 등으로 반환 (원하는 방식으로 처리 가능)
-            return null;
+            return newsRepository.findByUrl(news.getUrl())
+                    .map(News::getId)
+                    .orElse(null);
         }
         News savedNews = newsRepository.save(news);
         return savedNews.getId();
@@ -228,6 +230,26 @@ public class NewsService {
 
     public List<KeywordFrequency> getTopKeywords(int n) {
         return keywordFrequencyRepository.findAll(org.springframework.data.domain.PageRequest.of(0, n, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "frequency"))).getContent();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getTopKeywords(Long newsId) {
+        return newsKeywordRepository.findKeywordsByNewsId(newsId)
+                .stream().limit(5).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NewsResponseDto> findByKeyword(String keyword, Pageable pageable) {
+        return newsRepository.findByKeyword(keyword, pageable)
+                .map(news -> NewsResponseDto.builder()
+                        .id(news.getId())
+                        .title(news.getTitle())
+                        .content(news.getContent())
+                        .publisher(news.getPublisher())
+                        .publishedAt(news.getPublishedAt())
+                        .imageUrl(news.getImageUrl())
+                        .url(news.getUrl())
+                        .build());
     }
 
 }

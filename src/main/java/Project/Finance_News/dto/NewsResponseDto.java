@@ -25,4 +25,5 @@ public class NewsResponseDto {
     private LocalDateTime publishedAt;
     private String imageUrl;
     private String url;
+    private String press;
 }
