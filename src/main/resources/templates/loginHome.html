@@ -158,7 +158,14 @@
         }
         .issue-tab {
             display: none;
-            min-height: 300px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .issue-tab.active {
+            display: flex !important;
         }
         .issue-grid {
             display: grid;
@@ -166,6 +173,8 @@
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
+            min-height: 400px;
+            width: 100%;
         }
         .issue-card {
             background-color: #fff;
@@ -260,10 +269,11 @@
         }
         .modal-content.news-style {
             background: white;
-            padding: 30px 35px;
+            padding: 48px 48px 36px 48px;
             border-radius: 16px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            width: 600px;
+            width: 900px;
+            max-width: 95vw;
             font-family: 'Noto Sans KR', sans-serif;
             animation: fadeUp 0.5s ease forwards;
             position: relative;
@@ -607,7 +617,7 @@
                     <ul>
                         <li><a href="#">최신 뉴스</a></li>
                         <li><a href="#">오늘의 이슈</a></li>
-                        <li><a href="#">오늘의 키워드</a></li>
+                        <li><a href="/keyword-cloud">오늘의 키워드</a></li>
                         <li><a href="#">뉴스 상세 검색</a></li>
                     </ul>
                 </div>
@@ -690,8 +700,11 @@
         <div class="issue-grid issue-tab" id="issue-tab-finance">
             <!-- 동적으로 채워짐 -->
         </div>
+        <div class="pagination-container" id="pagination-finance"></div>
         <div class="issue-grid issue-tab" id="issue-tab-interest">
+            <!-- 동적으로 채워짐 -->
         </div>
+        <div class="pagination-container" id="pagination-interest"></div>
     </section>
     <section class="footer">
         &copy; 2025 STJ Team. All rights reserved.
