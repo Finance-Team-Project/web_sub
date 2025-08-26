@@ -14,7 +14,9 @@ import Project.Finance_News.domain.News;
 import Project.Finance_News.domain.NewsKeyword;
 import Project.Finance_News.domain.Term;
 import Project.Finance_News.domain.User;
+import Project.Finance_News.domain.UserNewsLog;
 import Project.Finance_News.domain.KeywordFrequency;
+import java.time.LocalDateTime;
 import Project.Finance_News.repository.GlossaryRepository;
 import Project.Finance_News.repository.NewsKeywordRepository;
 import Project.Finance_News.repository.NewsRepository;
@@ -22,6 +24,8 @@ import Project.Finance_News.repository.TermRepository;
 import Project.Finance_News.repository.UserNewsLogRepository;
 import Project.Finance_News.repository.KeywordFrequencyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,6 +41,7 @@ import Project.Finance_News.dto.NewsResponseDto;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class NewsService {
 
     private final NewsRepository newsRepository;
@@ -217,6 +222,24 @@ public class NewsService {
             kf.setFrequency(kf.getFrequency() + 1);
             keywordFrequencyRepository.save(kf);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<News> findById(Long id) {
+        return newsRepository.findById(id);
+    }
+
+    /**
+     * 사용자의 뉴스 클릭을 로그에 기록
+     */
+    @Transactional
+    public void logNewsClick(User user, News news) {
+        UserNewsLog newsLog = new UserNewsLog();
+        newsLog.setUser(user);
+        newsLog.setNews(news);
+        newsLog.setViewedAt(LocalDateTime.now());
+        userNewsLogRepository.save(newsLog);
+        log.info("뉴스 클릭 로그 저장 - 사용자: {}, 뉴스: {}", user.getId(), news.getId());
     }
 
     public void decreaseKeywordFrequency(List<String> keywords) {

@@ -19,6 +19,9 @@ import Project.Finance_News.dto.NewsResponseDto;
 import Project.Finance_News.dto.NewsUploadRequestDto;
 import Project.Finance_News.service.news.NewsService;
 import Project.Finance_News.service.news.PythonCrawlingRestService;
+import Project.Finance_News.service.news.FastApiService;
+import java.util.concurrent.CompletableFuture;
+import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -44,11 +47,13 @@ import Project.Finance_News.dto.TermDto;
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "뉴스 API", description = "뉴스 관리를 위한 API")
 public class NewsController {
 
     private final NewsService newsService;
     private final PythonCrawlingRestService pythonCrawlingRestService;
+    private final FastApiService fastApiService;
 
     @Operation(summary = "뉴스 등록", description = "새로운 뉴스 기사를 등록합니다.")
     @ApiResponses(value = {
@@ -170,7 +175,19 @@ public class NewsController {
 
         Long newsId = newsService.saveNewsWithKeywords(news, request.getKeywords());
 
-        // 2. 용어 저장 (여러 설명 지원)
+        // 2. FastAPI 캐시 업데이트 (비동기로 처리)
+        if (newsId != null) {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    fastApiService.updateNewsCache(news);
+                    log.info("FastAPI 캐시 업데이트 성공 - 뉴스 ID: {}", newsId);
+                } catch (Exception e) {
+                    log.error("FastAPI 캐시 업데이트 실패 - 뉴스 ID: {}, 에러: {}", newsId, e.getMessage());
+                }
+            });
+        }
+
+        // 3. 용어 저장 (여러 설명 지원)
         if (request.getTerms() != null) {
             // (기존) for (NewsUploadRequestDto.TermDto termDto : request.getTerms()) { ... }
             // (변경) 아래처럼 여러 설명을 처리하는 서비스 메서드로 전달
@@ -197,6 +214,21 @@ public class NewsController {
                 "news_id", newsId,
                 "status", "saved"
         ));
+    }
+
+    /**
+     * 뉴스 클릭 로그 저장
+     */
+    @PostMapping("/api/news/{newsId}/click")
+    public ResponseEntity<Void> logNewsClick(
+            @PathVariable Long newsId,
+            @SessionAttribute(name = SessionConst.LOGIN_USER) User loginUser) {
+        News news = newsService.findById(newsId).orElse(null);
+        if (news == null) {
+            return ResponseEntity.notFound().build();
+        }
+        newsService.logNewsClick(loginUser, news);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "나의 관심 뉴스(클릭수 기준)", description = "사용자별로 많이 클릭한 뉴스 리스트를 반환합니다.")

@@ -114,12 +114,48 @@ async function loadTodayNews(page = 0, size = 8) {
             pagination.appendChild(prevBtn);
         }
 
-        for (let i = 0; i < totalPages; i++) {
+        // 페이지 번호 버튼 (최대 5개만 표시)
+        const maxVisiblePages = 5;
+        const startPage = Math.max(0, Math.min(page - Math.floor(maxVisiblePages / 2), totalPages - maxVisiblePages));
+        const endPage = Math.min(startPage + maxVisiblePages, totalPages);
+
+        // 첫 페이지
+        if (startPage > 0) {
+            const firstBtn = document.createElement('button');
+            firstBtn.textContent = '1';
+            firstBtn.onclick = () => loadTodayNews(0, size);
+            pagination.appendChild(firstBtn);
+
+            if (startPage > 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.className = 'ellipsis';
+                pagination.appendChild(ellipsis);
+            }
+        }
+
+        // 중간 페이지들
+        for (let i = startPage; i < endPage; i++) {
             const btn = document.createElement('button');
             btn.textContent = i + 1;
             btn.className = (i === page) ? 'active' : '';
             btn.onclick = () => loadTodayNews(i, size);
             pagination.appendChild(btn);
+        }
+
+        // 마지막 페이지
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.className = 'ellipsis';
+                pagination.appendChild(ellipsis);
+            }
+
+            const lastBtn = document.createElement('button');
+            lastBtn.textContent = totalPages;
+            lastBtn.onclick = () => loadTodayNews(totalPages - 1, size);
+            pagination.appendChild(lastBtn);
         }
 
         if (page < totalPages - 1) {
@@ -134,41 +170,121 @@ async function loadTodayNews(page = 0, size = 8) {
     }
 }
 
-async function loadInterestNews(limit = 5) {
+async function loadInterestNews(page = 0, size = 8) {
     if (!window.userId) {
         console.log('로그인되지 않은 사용자');
         return;
     }
 
-    // 오직 interest 탭 영역만 초기화
     const container = document.getElementById('issue-tab-interest');
-    container.innerHTML = '';
-
-    // 페이지네이션도 비우기
     const paginationContainer = document.getElementById('pagination-interest');
+    container.innerHTML = '<div class="loading">추천 뉴스를 불러오는 중...</div>';
     if (paginationContainer) paginationContainer.innerHTML = '';
 
-    // Fetch interest news
-    const response = await fetch(`/api/news/interest?limit=${limit}`);
-    if (!response.ok) {
-        return;
-    }
+    try {
+        // 추천 뉴스 요청
+        const recommendResponse = await fetch('/news/recommendations');
+        const recommendData = await recommendResponse.json();
+        
+        container.innerHTML = ''; // 로딩 메시지 제거
+        
+        if (recommendData.recommendations && recommendData.recommendations.length > 0) {
+            // 페이지네이션 적용
+            const totalNews = recommendData.recommendations;
+            const startIndex = page * size;
+            const endIndex = Math.min(startIndex + size, totalNews.length);
+            const pageNews = totalNews.slice(startIndex, endIndex);
+            const totalPages = Math.ceil(totalNews.length / size);
 
-    const newsList = await response.json();
-    if (newsList.length === 0) {
-        return;
-    }
+            // 뉴스 카드 표시
+            pageNews.forEach(news => {
+                const card = document.createElement('div');
+                card.className = 'issue-card';
+                card.innerHTML = `
+                    <h3 onclick='loadNewsDetail(${news.news_id})'>${news.title}</h3>
+                    <p class="keywords">매칭 키워드: ${news.matched_keywords.join(', ')}</p>
+                    <a href="${news.url}" target="_blank" class="news-link" 
+                       onclick="event.stopPropagation();">기사 원문</a>
+                `;
+                container.appendChild(card);
+            });
 
-    newsList.forEach(news => {
-        const card = document.createElement('div');
-        card.className = 'issue-card';
-        card.innerHTML = `
-            <h3 onclick='loadNewsDetail(${news.id})'>${news.title}</h3>
-            <p>${news.press} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
-            <a href="${news.url}" target="_blank" class="news-link">기사 원문</a>
-        `;
-        container.appendChild(card);
-    });
+            // 페이지네이션 UI 생성
+            if (paginationContainer && totalPages > 1) {
+                const pagination = document.createElement('div');
+                pagination.className = 'pagination';
+
+                // 이전 페이지 버튼
+                if (page > 0) {
+                    const prevBtn = document.createElement('button');
+                    prevBtn.className = 'arrow';
+                    prevBtn.innerHTML = '‹';
+                    prevBtn.onclick = () => loadInterestNews(page - 1, size);
+                    pagination.appendChild(prevBtn);
+                }
+
+                // 페이지 번호 버튼 (최대 5개만 표시)
+                const maxVisiblePages = 5;
+                const startPage = Math.max(0, Math.min(page - Math.floor(maxVisiblePages / 2), totalPages - maxVisiblePages));
+                const endPage = Math.min(startPage + maxVisiblePages, totalPages);
+
+                // 첫 페이지
+                if (startPage > 0) {
+                    const firstBtn = document.createElement('button');
+                    firstBtn.textContent = '1';
+                    firstBtn.onclick = () => loadInterestNews(0, size);
+                    pagination.appendChild(firstBtn);
+
+                    if (startPage > 1) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.textContent = '...';
+                        ellipsis.className = 'ellipsis';
+                        pagination.appendChild(ellipsis);
+                    }
+                }
+
+                // 중간 페이지들
+                for (let i = startPage; i < endPage; i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i + 1;
+                    btn.className = (i === page) ? 'active' : '';
+                    btn.onclick = () => loadInterestNews(i, size);
+                    pagination.appendChild(btn);
+                }
+
+                // 마지막 페이지
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        const ellipsis = document.createElement('span');
+                        ellipsis.textContent = '...';
+                        ellipsis.className = 'ellipsis';
+                        pagination.appendChild(ellipsis);
+                    }
+
+                    const lastBtn = document.createElement('button');
+                    lastBtn.textContent = totalPages;
+                    lastBtn.onclick = () => loadInterestNews(totalPages - 1, size);
+                    pagination.appendChild(lastBtn);
+                }
+
+                // 다음 페이지 버튼
+                if (page < totalPages - 1) {
+                    const nextBtn = document.createElement('button');
+                    nextBtn.className = 'arrow';
+                    nextBtn.innerHTML = '›';
+                    nextBtn.onclick = () => loadInterestNews(page + 1, size);
+                    pagination.appendChild(nextBtn);
+                }
+
+                paginationContainer.appendChild(pagination);
+            }
+        } else {
+            container.innerHTML = '<div class="no-news" style="text-align: center; padding: 20px;">추천할 뉴스가 없습니다. 더 많은 뉴스를 읽어보세요!</div>';
+        }
+    } catch (error) {
+        console.error('추천 뉴스 로딩 실패:', error);
+        container.innerHTML = '<div class="error" style="text-align: center; padding: 20px; color: #dc3545;">추천 뉴스를 불러오는데 실패했습니다.</div>';
+    }
 }
 
 async function loadNewsDetail(newsId) {
@@ -208,9 +324,10 @@ async function loadNewsDetail(newsId) {
     `;
     document.body.appendChild(modal);
 
-    // 뷰 이벤트 전송 (간단한 1건 배치 형태)
+    // 뷰 이벤트 및 클릭 로그 전송
     try {
         if (window.userId) {
+            // 이벤트 전송
             await fetch('/events/batch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -225,9 +342,14 @@ async function loadNewsDetail(newsId) {
                     }]
                 })
             });
+
+            // 클릭 로그 전송
+            await fetch(`/api/news/${newsId}/click`, {
+                method: 'POST'
+            });
         }
     } catch (e) {
-        console.warn('event send failed', e);
+        console.warn('event/log send failed', e);
     }
 
     // 키워드 태그 클라우드 렌더링
