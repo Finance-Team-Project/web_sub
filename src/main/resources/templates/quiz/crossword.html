@@ -20,10 +20,17 @@
         <div id="crosswordBoard" style="margin-bottom: 30px;"></div>
     </div>
 
-    <!-- 우측: 문제 리스트 -->
+    <!-- 우측: 나의 현황/뱃지 + 문제 리스트 -->
     <div style="flex: 1; padding: 24px 36px; background-color: #fff8fc; overflow-y: auto; box-shadow: -3px 0 8px rgba(0,0,0,0.05); border-radius: 30px 0 0 30px;">
-        <h2 style="color: #ff69b4; font-size: 20px; margin-bottom: 20px;">📜 문제 목록</h2>
+        <div style="padding: 12px 16px; background:#e9f0f8; border-radius:12px; margin-bottom:16px;">
+            <h3 style="margin:0 0 8px 0;">🏅 나의 레벨 현황</h3>
+            <div id="badgeContainer"></div>
+        </div>
+        <h2 style="color: #ff69b4; font-size: 20px; margin: 12px 0 12px;">📜 문제 목록</h2>
         <div id="clueSection" style="width: 100%;"></div>
+        <div style="margin-top: 12px; text-align: right;">
+            <button id="submitAllBtn" style="border:none; background:#ff69b4; color:#fff; border-radius:10px; padding:10px 14px; font-weight:bold;">전체 제출</button>
+        </div>
     </div>
 
     <!-- 나의 뱃지 (비활성화 / 주석 처리) -->
@@ -42,6 +49,63 @@ window.onload = async function () {
         location.href = '/login';
         return;
     }
+
+    // 뱃지 로드 (단답형과 동일 로직 간소화 버전)
+    const badgeContainer = document.getElementById('badgeContainer');
+    async function loadBadges() {
+        badgeContainer.innerHTML = '';
+        try {
+            let totalPoints = 0;
+            const pointsRes = await fetch(`/api/users/${window.userId}/points`);
+            if (pointsRes.ok) {
+                const pointsData = await pointsRes.json();
+                totalPoints = pointsData.totalPoints || 0;
+            }
+            const badgeRes = await fetch(`/api/users/${window.userId}/badges`);
+            if (badgeRes.ok) {
+                const badges = await badgeRes.json();
+                if (badges && badges.length) {
+                    const rankOrder = ['브론즈','실버','골드','플래티넘'];
+                    const currentRank = badges.filter(b=>b.earned && rankOrder.includes(b.name)).sort((a,b)=>rankOrder.indexOf(b.name)-rankOrder.indexOf(a.name))[0];
+                    if (currentRank) {
+                        const header = document.createElement('div');
+                        header.style.cssText = 'margin-bottom:10px; padding:8px 10px; background:#fff; border:1px solid #eee; border-radius:8px; display:flex; align-items:center; gap:10px;';
+                        const img = document.createElement('img');
+                        img.src = currentRank.imageUrl; img.alt = currentRank.name; img.style.cssText = 'width:36px; height:36px; object-fit:contain;';
+                        const title = document.createElement('div');
+                        title.innerHTML = `<strong>현재 등급:</strong> ${currentRank.name}`;
+                        header.appendChild(img); header.appendChild(title);
+                        badgeContainer.appendChild(header);
+                    }
+                    const earned = badges.filter(b=>b.earned);
+                    earned.forEach(badge=>{
+                        const div = document.createElement('div');
+                        div.style.cssText = 'display:inline-block; margin:5px; text-align:center; padding:10px; border-radius:8px; background:#fff; border:1px solid #eee; box-shadow:0 2px 4px rgba(0,0,0,0.12)';
+                        const img = document.createElement('img');
+                        img.src = badge.imageUrl; img.alt = badge.name; img.style.cssText = 'width:120px; height:120px; object-fit:contain; margin-bottom:8px;';
+                        const name = document.createElement('div'); name.textContent = badge.name; name.style.cssText = 'font-weight:bold;';
+                        div.appendChild(img); div.appendChild(name); badgeContainer.appendChild(div);
+                    });
+
+                    // 다음 단계 진행률 표시: 가장 낮은 미획득 상위 등급을 기준으로 1개 표시
+                    const next = badges.filter(b => !b.earned).sort((a,b)=>a.conditionValue-b.conditionValue)[0];
+                    if (next) {
+                        const progressWrap = document.createElement('div');
+                        progressWrap.style.cssText = 'margin-top:8px; background:#fff; border:1px solid #eee; border-radius:8px; padding:10px;';
+                        const progress = Math.min(100, (totalPoints / next.conditionValue) * 100);
+                        progressWrap.innerHTML = `
+                            <div style="font-size: 12px; margin-bottom: 3px; color:#333;">다음 단계: ${next.name}</div>
+                            <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${next.conditionValue}점 (현재: ${totalPoints}점)</div>
+                            <div class="progress-bar" data-target-points="${next.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
+                                <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
+                            </div>`;
+                        badgeContainer.appendChild(progressWrap);
+                    }
+                }
+            }
+        } catch (e) { console.warn('뱃지 로드 실패', e); }
+    }
+    await loadBadges();
 
     const response = await fetch(`/api/quiz/crossword?userId=${window.userId}`);
     const quiz = await response.json();
@@ -224,6 +288,28 @@ window.onload = async function () {
             document.getElementById(`hintText_${idx}`).style.display = "inline";
         };
     });
+    // 전체 제출 버튼: 서버로 점수 제출 후 뱃지/포인트 갱신
+    document.getElementById('submitAllBtn').onclick = async function() {
+        const answers = {};
+        quiz.items.forEach((item, idx) => {
+            const val = (document.getElementById(`answerInput_${idx}`)?.value || '').trim();
+            answers[item.term] = val;
+        });
+        try {
+            const res = await fetch('/api/quiz/submit-crossword', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answers })
+            });
+            if (!res.ok) { alert('제출 실패. 잠시 후 다시 시도해주세요.'); return; }
+            const result = await res.json();
+            if (typeof result.totalPoints === 'number') {
+                await loadBadges();
+            }
+            alert(`총점: ${result.score || 0}점`);
+        } catch (e) {
+            console.error('제출 중 오류', e);
+        }
+    };
 };
 </script>
 </body>

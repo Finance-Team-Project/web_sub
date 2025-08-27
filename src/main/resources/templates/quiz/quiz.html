@@ -109,24 +109,24 @@
                         nameDiv.style.cssText = 'font-size: 16px; font-weight: bold; margin-bottom: 5px;';
                         badgeDiv.appendChild(nameDiv);
                         
-                        // 다음 단계 현황 추가
-                        const nextBadge = badges.find(b => b.conditionValue > badge.conditionValue);
-                        if (nextBadge) {
-                            console.log('[badge:init] next for', badge.name, '→', nextBadge.name, 'target:', nextBadge.conditionValue);
-                            const progressDiv = document.createElement('div');
-                            const progress = Math.min(100, (userPoints / nextBadge.conditionValue) * 100);
-                            progressDiv.innerHTML = `
-                                <div style="font-size: 12px; margin-bottom: 3px;">다음 단계: ${nextBadge.name}</div>
-                                <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${nextBadge.conditionValue}점 (현재: ${userPoints}점)</div>
-                                <div class="progress-bar" data-target-points="${nextBadge.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
-                                    <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
-                                </div>
-                            `;
-                            badgeDiv.appendChild(progressDiv);
-                        }
+                        // 개별 뱃지에는 진행률 표시하지 않음 (아래에서 통합 표시)
                         
                         badgeContainer.appendChild(badgeDiv);
                     });
+                    // 통합 다음 단계 진행률 표시
+                    const next = badges.filter(b => !b.earned).sort((a,b)=>a.conditionValue-b.conditionValue)[0];
+                    if (next) {
+                        const wrap = document.createElement('div');
+                        wrap.style.cssText = 'margin-top:8px; background:#fff; border:1px solid #eee; border-radius:8px; padding:10px;';
+                        const progress = Math.min(100, (userPoints / next.conditionValue) * 100);
+                        wrap.innerHTML = `
+                            <div style="font-size: 12px; margin-bottom: 3px; color: #333;">다음 단계: ${next.name}</div>
+                            <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${next.conditionValue}점 (현재: ${userPoints}점)</div>
+                            <div class="progress-bar" data-target-points="${next.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
+                                <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
+                            </div>`;
+                        badgeContainer.appendChild(wrap);
+                    }
                 } else {
                     // 기본 브론즈 뱃지 표시
                     showDefaultBronzeBadge(badgeContainer, userPoints);
@@ -266,10 +266,10 @@
                                 const progress = Math.min(100, (totalPoints / higher.conditionValue) * 100);
                                 console.log('[badge:reload] next for', badge.name, '→', higher.name, 'target:', higher.conditionValue, 'progress:', Math.round(progress),'%');
                                 progressDiv.innerHTML = `
-                                    <div style="font-size: 12px; margin-bottom: 3px;">다음 단계: ${higher.name}</div>
-                                    <div class="points-text" style="font-size: 10px; color: #e8f5e8;">목표: ${higher.conditionValue}점 (현재: ${totalPoints}점)</div>
-                                    <div class="progress-bar" data-target-points="${higher.conditionValue}" style="width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; margin-top: 5px;">
-                                        <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #fff; border-radius: 3px;"></div>
+                                    <div style="font-size: 12px; margin-bottom: 3px; color: #333;">다음 단계: ${higher.name}</div>
+                                    <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${higher.conditionValue}점 (현재: ${totalPoints}점)</div>
+                                    <div class="progress-bar" data-target-points="${higher.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
+                                        <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
                                     </div>
                                 `;
                                 badgeDiv.appendChild(progressDiv);

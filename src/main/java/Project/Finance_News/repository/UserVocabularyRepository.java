@@ -27,4 +27,7 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
     List<UserVocabulary> findTop5ByUserIdOrderByCreatedAtDesc(Long userId);
 
     UserVocabulary findTopByUserIdOrderByCreatedAtDesc(Long userId);
+
+    // 정답 처리 시 단어장을 비우기 위해 사용자와 용어로 삭제
+    void deleteByUserAndTerm(User user, Term term);
 }
