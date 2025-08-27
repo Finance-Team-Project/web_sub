@@ -539,6 +539,10 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new IllegalArgumentException("Quiz not found"));
 
+        // 현재 진행 중인 사용자 조회 (정답 처리 시 단어장 삭제에 사용)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
         int score = 0;
         Map<Long, Boolean> correctMap = new HashMap<>();
         if (answers == null) {
@@ -559,7 +563,15 @@ public class QuizService {
             boolean correct = userAnswer != null && !userAnswer.isEmpty() && normalizedUser.equals(normalizedCorrect);
 
             int level = qt.getTerm().getFrequency() != null ? qt.getTerm().getFrequency() : 1;
-            if (correct) score += level * 10;
+            if (correct) {
+                score += level * 10;
+                try {
+                    // 정답인 단어는 단어장에서 제거하여 다음 퀴즈에 나오지 않도록 처리
+                    userVocabularyRepository.deleteByUserAndTerm(user, qt.getTerm());
+                } catch (Exception e) {
+                    System.err.println("[submitQuiz] uservoca 삭제 실패: userId=" + userId + ", termId=" + termId + ", error=" + e.getMessage());
+                }
+            }
             correctMap.put(termId, correct); // 여기 주의! qt.getId()가 아니라 termId
             int earned = correct ? level * 10 : 0;
             System.out.println("[submitQuiz] termId=" + termId + ", term='" + correctAnswer + "', level=" + level + 
@@ -570,9 +582,6 @@ public class QuizService {
         // 결과 저장
         QuizResult result = new QuizResult();
         result.setQuiz(quiz);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         result.setUser(user);
         result.setScore(score);
         result.setTakenAt(LocalDateTime.now());
@@ -628,4 +637,63 @@ public class QuizService {
     }
 
 
+    // 3) 가로세로 퀴즈 채점 & 포인트/뱃지 업데이트
+    @Transactional
+    public Project.Finance_News.dto.CrosswordResultDto submitCrossword(Long userId, Map<String, String> answers) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        int score = 0;
+        if (answers == null) answers = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : answers.entrySet()) {
+            String termText = entry.getKey();
+            String userAnswer = entry.getValue();
+            if (termText == null || termText.isBlank()) continue;
+
+            // 정답 단어 조회
+            Term term = termRepository.findByTerm(termText).orElse(null);
+            if (term == null) continue;
+
+            String normalizedUser = Normalizer.normalize(userAnswer == null ? "" : userAnswer);
+            String normalizedCorrect = Normalizer.normalize(term.getTerm());
+            boolean correct = userAnswer != null && !userAnswer.isEmpty() && normalizedUser.equals(normalizedCorrect);
+            if (correct) {
+                int level = term.getFrequency() != null ? term.getFrequency() : 1;
+                score += level * 10;
+            }
+        }
+
+        int latestTotalPoints = 0;
+        if (score > 0) {
+            UserPoint userPoint = userPointRepository.findByUser(user);
+            if (userPoint == null) {
+                userPoint = new UserPoint();
+                userPoint.setUser(user);
+                userPoint.setTotalPoint(score);
+                userPoint.setAmount(score);
+                userPoint.setReason("가로세로 퀴즈 정답");
+                userPoint.setTimestamp(LocalDateTime.now());
+            } else {
+                int newTotal = userPoint.getTotalPoint() + score;
+                userPoint.setTotalPoint(newTotal);
+                userPoint.setAmount(score);
+                userPoint.setReason("가로세로 퀴즈 정답");
+                userPoint.setTimestamp(LocalDateTime.now());
+            }
+            userPointRepository.save(userPoint);
+            latestTotalPoints = userPoint.getTotalPoint();
+
+            try {
+                badgeGrantService.evaluateAndGrantBadges(user.getId());
+            } catch (Exception e) {
+                System.err.println("[submitCrossword] 뱃지 평가 중 오류: " + e.getMessage());
+            }
+        }
+
+        Project.Finance_News.dto.CrosswordResultDto dto = new Project.Finance_News.dto.CrosswordResultDto();
+        dto.setScore(score);
+        dto.setTotalPoints(latestTotalPoints);
+        return dto;
+    }
 }
