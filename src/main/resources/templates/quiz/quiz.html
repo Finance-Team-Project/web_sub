@@ -325,6 +325,10 @@
         <div id="hint_${index}" class="hint" style="display: none;">
             <em>초성 힌트:</em> ${item.initialHint}
         </div>
+        <button type="button" id="reveal_${index}" style="display: none; margin-top: 8px;">정답 보기</button>
+        <div id="correct_${index}" class="correct-answer" style="display: none; margin-top: 6px; color: #333;">
+            정답: ${item.term}
+        </div>
     `;
             quizList.appendChild(div);
         });
@@ -368,6 +372,20 @@
                             card.classList.add(isCorrect ? "correct" : "incorrect");
                             icon.innerText = isCorrect ? "✔" : "✖";
                             icon.style.color = isCorrect ? "#007bff" : "#ff4d4f";
+                            // 오답인 경우만 정답 보기 버튼 제공
+                            const cardId = card ? card.id : '';
+                            const idx = cardId.startsWith('quiz_card_') ? cardId.substring('quiz_card_'.length) : null;
+                            if (!isCorrect && idx !== null) {
+                                const revealBtn = document.getElementById(`reveal_${idx}`);
+                                const correctDiv = document.getElementById(`correct_${idx}`);
+                                if (revealBtn && correctDiv) {
+                                    revealBtn.style.display = 'inline-block';
+                                    revealBtn.onclick = function() {
+                                        correctDiv.style.display = 'block';
+                                        revealBtn.disabled = true;
+                                    };
+                                }
+                            }
                         }
                     });
                 } else {
