@@ -6,12 +6,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class PythonCrawlingRestService {
+    private final String pythonApiUrl;
+    private final String crawlEndpoint;
+    private final RestTemplate restTemplate;
+
+    public PythonCrawlingRestService(
+            @Value("${python.api.url}") String pythonApiUrl,
+            @Value("${python.api.endpoints.crawl}") String crawlEndpoint,
+            RestTemplate restTemplate) {
+        this.pythonApiUrl = pythonApiUrl;
+        this.crawlEndpoint = crawlEndpoint;
+        this.restTemplate = restTemplate;
+    }
+
     public String crawlNewsViaRest() {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:5000/crawl";
+        String url = pythonApiUrl + crawlEndpoint;
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
         HttpEntity<String> request = new HttpEntity<>("{}", headers);
@@ -20,7 +33,7 @@ public class PythonCrawlingRestService {
         return response.getBody(); // JSON 결과
     }
 
-    @Scheduled(cron = "0 0 * * * *") // 매시 정각마다 실행
+    @Scheduled(fixedRate = 120000) // 2분(120000ms)마다 실행
     public void scheduledCrawling() {
         try {
             String result = crawlNewsViaRest();
