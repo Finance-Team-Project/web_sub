@@ -37,8 +37,9 @@
 </div>
 
 <script>
-    // 현재 획득한 뱃지 이름들을 기억하여 새로 획득한 뱃지를 감지
+    // 현재 획득한 뱃지 이름들 기록
     let earnedBadgeNames = new Set();
+
     window.onload = async function () {
         if (!window.userId) {
             alert('로그인 후 이용해주세요.');
@@ -46,29 +47,25 @@
             return;
         }
 
-                // 뱃지 로드 - 기본값으로 브론즈 뱃지 표시
         const badgeContainer = document.getElementById('badgeContainer');
-        
+
+        // --- 초기 뱃지 로드 ---
         try {
-            // 사용자 포인트 정보 가져오기
             const pointsResponse = await fetch(`/api/users/${window.userId}/points`);
             let userPoints = 0;
             if (pointsResponse.ok) {
                 const pointsData = await pointsResponse.json();
                 userPoints = pointsData.totalPoints || 0;
-                console.log('[badge:init] totalPoints:', userPoints);
             }
-            
+
             const badgeResponse = await fetch(`/api/users/${window.userId}/badges`);
             if (badgeResponse.ok) {
                 const badges = await badgeResponse.json();
-                const earnedBadges = badges.filter(badge => badge.earned);
-                // 초기 보유 뱃지 목록 기록
+                const earnedBadges = badges.filter(b => b.earned);
                 earnedBadgeNames = new Set(earnedBadges.map(b => b.name));
-                console.log('[badge:init] earned badges:', Array.from(earnedBadgeNames));
 
-                // 현재 등급 헤더 (최고 랭크)
                 if (earnedBadges.length > 0) {
+                    // 현재 등급 헤더
                     const rankOrder = ['브론즈','실버','골드','플래티넘'];
                     const currentRank = earnedBadges
                         .filter(b => rankOrder.includes(b.name))
@@ -82,8 +79,9 @@
                         title.innerHTML = `<strong>현재 등급:</strong> ${currentRank.name}`;
                         header.appendChild(img); header.appendChild(title);
                         badgeContainer.appendChild(header);
-                        console.log('[badge:init] currentRank:', currentRank.name);
                     }
+
+                    // 뱃지 표시
                     earnedBadges.forEach(badge => {
                         const badgeDiv = document.createElement('div');
                         badgeDiv.style.cssText = `
@@ -97,23 +95,19 @@
                             box-shadow: 0 2px 4px rgba(0,0,0,0.12);
                             border: 1px solid #eee;
                         `;
-                        
                         const img = document.createElement('img');
                         img.src = badge.imageUrl;
                         img.alt = badge.name;
                         img.style.cssText = 'width: 160px; height: 160px; margin-bottom: 12px; filter: none; object-fit: contain;';
                         badgeDiv.appendChild(img);
-                        
                         const nameDiv = document.createElement('div');
                         nameDiv.textContent = badge.name;
                         nameDiv.style.cssText = 'font-size: 16px; font-weight: bold; margin-bottom: 5px;';
                         badgeDiv.appendChild(nameDiv);
-                        
-                        // 개별 뱃지에는 진행률 표시하지 않음 (아래에서 통합 표시)
-                        
                         badgeContainer.appendChild(badgeDiv);
                     });
-                    // 통합 다음 단계 진행률 표시
+
+                    // ✅ 다음 단계 진행률 표시
                     const next = badges.filter(b => !b.earned).sort((a,b)=>a.conditionValue-b.conditionValue)[0];
                     if (next) {
                         const wrap = document.createElement('div');
@@ -127,184 +121,21 @@
                             </div>`;
                         badgeContainer.appendChild(wrap);
                     }
+
                 } else {
-                    // 기본 브론즈 뱃지 표시
+                    // 기본 브론즈 뱃지
                     showDefaultBronzeBadge(badgeContainer, userPoints);
                 }
-            } else {
-                // API 오류 시 기본 브론즈 뱃지 표시
-                showDefaultBronzeBadge(badgeContainer, userPoints);
             }
         } catch (error) {
             console.error('뱃지 로드 실패:', error);
-            // 오류 시에도 기본 브론즈 뱃지 표시
-            showDefaultBronzeBadge(badgeContainer, 0);
-        }
-        
-        function showDefaultBronzeBadge(container, userPoints) {
-            const badgeDiv = document.createElement('div');
-            badgeDiv.style.cssText = `
-                display: inline-block;
-                margin: 5px;
-                text-align: center;
-                padding: 10px;
-                border-radius: 8px;
-                background: #ffffff;
-                color: #333;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-                border: 1px solid #eee;
-            `;
-            
-            const img = document.createElement('img');
-            img.src = '/img/bronze.png';
-            img.alt = '브론즈';
-            img.style.cssText = 'width: 160px; height: 160px; margin-bottom: 12px; filter: none; object-fit: contain;';
-            badgeDiv.appendChild(img);
-            
-            const nameDiv = document.createElement('div');
-            nameDiv.textContent = '브론즈';
-            nameDiv.style.cssText = 'font-size: 16px; font-weight: bold; margin-bottom: 5px;';
-            badgeDiv.appendChild(nameDiv);
-            
-            const statusDiv = document.createElement('div');
-            statusDiv.textContent = '기본 뱃지';
-            statusDiv.style.cssText = 'font-size: 12px; opacity: 0.8; margin-bottom: 5px;';
-            badgeDiv.appendChild(statusDiv);
-            
-            // 다음 단계 현황 추가
-            const progressDiv = document.createElement('div');
-            const progress = Math.min(100, (userPoints / 500) * 100);
-            progressDiv.innerHTML = `
-                <div style="font-size: 12px; margin-bottom: 3px;">다음 단계: 실버</div>
-                <div class="points-text" style="font-size: 10px; color: #ccc;">목표: 100점 (현재: ${userPoints}점)</div>
-                <div class="progress-bar" data-target-points="500" style="width: 100%; height: 6px; background: #ddd; border-radius: 3px; margin-top: 5px;">
-                    <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #cd7f32; border-radius: 3px;"></div>
-                </div>
-            `;
-            badgeDiv.appendChild(progressDiv);
-            
-            container.appendChild(badgeDiv);
         }
 
-        // 뱃지 패널 즉시 갱신
-        async function reloadBadges(totalOverride) {
-            const badgeContainer = document.getElementById('badgeContainer');
-            // 최신 포인트 (override가 있으면 그것을 우선 사용)
-            let totalPoints = typeof totalOverride === 'number' ? totalOverride : 0;
-            if (typeof totalOverride !== 'number') {
-                try {
-                    const pointsRes = await fetch(`/api/users/${window.userId}/points`);
-                    if (pointsRes.ok) {
-                        const pointsData = await pointsRes.json();
-                        totalPoints = pointsData.totalPoints || 0;
-                    }
-                } catch (e) {
-                    console.error('포인트 재조회 실패:', e);
-                }
-            }
-            console.log('[badge:reload] totalPoints:', totalPoints, '(override:', typeof totalOverride === 'number', ')');
-
-            // 최신 뱃지
-            try {
-                const badgeRes = await fetch(`/api/users/${window.userId}/badges`);
-                if (badgeRes.ok) {
-                    const badges = await badgeRes.json();
-                    const earnedBadges = badges.filter(b => b.earned);
-                    console.log('[badge:reload] earned badges:', earnedBadges.map(b=>b.name));
-                    const earnedSet = new Set(earnedBadges.map(b => b.name));
-
-                    badgeContainer.innerHTML = '';
-
-                    if (earnedBadges.length > 0) {
-                        // 현재 등급 헤더
-                        const rankOrder = ['브론즈','실버','골드','플래티넘'];
-                        const currentRank = earnedBadges
-                            .filter(b => rankOrder.includes(b.name))
-                            .sort((a,b) => rankOrder.indexOf(b.name) - rankOrder.indexOf(a.name))[0];
-                        if (currentRank) {
-                            const header = document.createElement('div');
-                            header.style.cssText = 'margin-bottom:10px; padding:8px 10px; background:#fff; border:1px solid #eee; border-radius:8px; display:flex; align-items:center; gap:10px;';
-                            const img = document.createElement('img');
-                            img.src = currentRank.imageUrl; img.alt = currentRank.name; img.style.cssText = 'width:36px; height:36px; object-fit:contain;';
-                            const title = document.createElement('div');
-                            title.innerHTML = `<strong>현재 등급:</strong> ${currentRank.name}`;
-                            header.appendChild(img); header.appendChild(title);
-                            badgeContainer.appendChild(header);
-                            console.log('[badge:reload] currentRank:', currentRank.name);
-                        }
-                        earnedBadges.forEach(badge => {
-                            const badgeDiv = document.createElement('div');
-                            badgeDiv.style.cssText = `
-                                display: inline-block;
-                                margin: 5px;
-                                text-align: center;
-                                padding: 10px;
-                                border-radius: 8px;
-                                background: #ffffff;
-                                color: #333;
-                                box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-                                border: 1px solid #eee;
-                            `;
-
-                            const img = document.createElement('img');
-                            img.src = badge.imageUrl;
-                            img.alt = badge.name;
-                            img.style.cssText = 'width: 160px; height: 160px; margin-bottom: 12px; filter: none; object-fit: contain;';
-                            badgeDiv.appendChild(img);
-
-                            const nameDiv = document.createElement('div');
-                            nameDiv.textContent = badge.name;
-                            nameDiv.style.cssText = 'font-size: 16px; font-weight: bold; margin-bottom: 5px;';
-                            badgeDiv.appendChild(nameDiv);
-
-                            // 다음 단계 표시 (가능 시)
-                            const higher = badges
-                                .filter(b => b.conditionValue > (badge.conditionValue || 0) && !earnedSet.has(b.name))
-                                .sort((a,b) => a.conditionValue - b.conditionValue)[0];
-                            if (higher) {
-                                const progressDiv = document.createElement('div');
-                                const progress = Math.min(100, (totalPoints / higher.conditionValue) * 100);
-                                console.log('[badge:reload] next for', badge.name, '→', higher.name, 'target:', higher.conditionValue, 'progress:', Math.round(progress),'%');
-                                progressDiv.innerHTML = `
-                                    <div style="font-size: 12px; margin-bottom: 3px; color: #333;">다음 단계: ${higher.name}</div>
-                                    <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${higher.conditionValue}점 (현재: ${totalPoints}점)</div>
-                                    <div class="progress-bar" data-target-points="${higher.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
-                                        <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
-                                    </div>
-                                `;
-                                badgeDiv.appendChild(progressDiv);
-                            }
-
-                            badgeContainer.appendChild(badgeDiv);
-                        });
-                    } else {
-                        showDefaultBronzeBadge(badgeContainer, totalPoints);
-                    }
-
-                    // 새로 획득한 뱃지 감지 및 알림
-                    try {
-                        const currentEarned = new Set(earnedBadges.map(b => b.name));
-                        const newlyEarned = [...currentEarned].filter(n => !earnedBadgeNames.has(n));
-                        if (newlyEarned.length > 0) {
-                            showBadgeNotification(newlyEarned);
-                        }
-                        earnedBadgeNames = currentEarned;
-                    } catch (e) { console.warn('뱃지 비교 중 오류', e); }
-
-                    // 막대/텍스트 최신 포인트 반영
-                    updateBadgeProgress(totalPoints);
-                }
-            } catch (e) {
-                console.error('뱃지 재조회 실패:', e);
-            }
-        }
-
+        // --- 퀴즈 문제 로드 ---
         const response = await fetch(`/api/quiz/short-answer?userId=${window.userId}`);
         const quiz = await response.json();
-        console.log("서버로부터 받은 퀴즈 데이터:", quiz);  // 👈 추가
-
-
         const quizList = document.getElementById("quizList");
+
         quiz.items.forEach((item, index) => {
             const div = document.createElement("div");
             div.className = "quiz-card";
@@ -312,27 +143,25 @@
             div.setAttribute("data-term-id", item.termId);
 
             div.innerHTML = `
-        <div class="quiz-level-box">
-            <span class="level-text">Lv.${item.level}</span>
-            <span class="result-icon" id="result_${item.termId}"></span>
-        </div>
-        <p><strong>Q${index + 1}. 해설:</strong> ${item.question.replace(/\n/g, '<br>')}</p>
-        <input type="text" name="answer_${item.termId}" placeholder="정답 입력">
-        <button type="button" onclick="
-            document.getElementById('hint_${index}').style.display = 'block';
-            this.style.display = 'none';
-        ">초성 힌트 보기</button>
-        <div id="hint_${index}" class="hint" style="display: none;">
-            <em>초성 힌트:</em> ${item.initialHint}
-        </div>
-        <button type="button" id="reveal_${index}" style="display: none; margin-top: 8px;">정답 보기</button>
-        <div id="correct_${index}" class="correct-answer" style="display: none; margin-top: 6px; color: #333;">
-            정답: ${item.term}
-        </div>
-    `;
+                <div class="quiz-level-box">
+                    <span class="level-text">Lv.${item.level}</span>
+                    <span class="result-icon" id="result_${item.termId}"></span>
+                </div>
+                <p><strong>Q${index + 1}. 해설:</strong> ${item.question.replace(/\n/g, '<br>')}</p>
+                <input type="text" id="answer_${index}" name="answer_${item.termId}" placeholder="정답 입력">
+                <button type="button" onclick="
+                    document.getElementById('hint_${index}').style.display = 'block';
+                    this.style.display = 'none';
+                ">초성 힌트 보기</button>
+                <div id="hint_${index}" class="hint" style="display: none;">
+                    <em>초성 힌트:</em> ${item.initialHint}
+                </div>
+                <!-- 정답보기 버튼 (초기에는 숨김, 제출 후 오답일 때 표시) -->
+                <button type="button" id="reveal_${index}" style="display:none; margin-top: 8px;">정답 보기</button>
+            `;
             quizList.appendChild(div);
         });
-
+        // ✅ 제출 이벤트
         document.getElementById("quizForm").addEventListener("submit", async function (e) {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -354,7 +183,6 @@
                     alert(`제출 실패 (status ${res.status}). 잠시 후 다시 시도해주세요.`);
                     return;
                 }
-                // JSON 파싱 시도
                 result = await res.json();
             } catch (err) {
                 console.error('제출 요청 중 오류:', err);
@@ -362,102 +190,247 @@
                 return;
             }
 
-            // 제출 후 채점 결과 적용 (가드 추가)
+            // ✅ 채점 결과 반영 (정답보기 버튼은 오답일 때만 노출, 클릭 시 입력창에 빨간 글씨로 정답 표기)
             try {
                 if (result && result.correctMap) {
                     Object.entries(result.correctMap).forEach(([termId, isCorrect]) => {
                         const card = document.querySelector(`.quiz-card[data-term-id="${termId}"]`);
                         const icon = document.getElementById(`result_${termId}`);
-                        if (card && icon) {
+                        const inputEl = card ? card.querySelector("input[type='text']") : null;
+                        if (card && icon && inputEl) {
                             card.classList.add(isCorrect ? "correct" : "incorrect");
                             icon.innerText = isCorrect ? "✔" : "✖";
                             icon.style.color = isCorrect ? "#007bff" : "#ff4d4f";
-                            // 오답인 경우만 정답 보기 버튼 제공
-                            const cardId = card ? card.id : '';
-                            const idx = cardId.startsWith('quiz_card_') ? cardId.substring('quiz_card_'.length) : null;
-                            if (!isCorrect && idx !== null) {
+
+                            if (!isCorrect) {
+                                const idx = card.id.replace("quiz_card_", "");
                                 const revealBtn = document.getElementById(`reveal_${idx}`);
-                                const correctDiv = document.getElementById(`correct_${idx}`);
-                                if (revealBtn && correctDiv) {
+                                if (revealBtn) {
                                     revealBtn.style.display = 'inline-block';
                                     revealBtn.onclick = function() {
-                                        correctDiv.style.display = 'block';
+                                        inputEl.value = quiz.items[idx].term;
+                                        inputEl.style.color = "#ff0000";  // 빨간 글씨
+                                        inputEl.style.fontWeight = "bold";
                                         revealBtn.disabled = true;
                                     };
                                 }
                             }
                         }
                     });
-                } else {
-                    console.warn('correctMap 없음 또는 비정상 응답:', result);
                 }
             } catch (e) {
                 console.error('채점 결과 반영 중 오류:', e, result);
             }
 
-            // 포인트 업데이트 및 진행률 바 갱신
-            console.log('퀴즈 결과:', result);
-            console.log('점수:', result.score);
-            
-            if (result.score > 0) {
-                console.log('포인트 업데이트 시작...');
+            // ✅ 포인트 갱신 & 게이지 업데이트
+            if (result && result.score > 0) {
                 try {
-                    // 현재 총 포인트 가져오기
                     const pointsRes = await fetch(`/api/users/${window.userId}/points`);
-                    
                     if (pointsRes.ok) {
                         const pointsData = await pointsRes.json();
-                        console.log('현재 포인트 정보:', pointsData);
-                        
-                        // 이번 제출로 획득한 점수 : 서버에서 계산한 result.score 사용
                         const earned = result.score || 0;
-                        
-                        // 서버가 반환한 최신 총 포인트 우선 사용, 없으면 현재 + 획득분
                         const latestTotal = (typeof result.totalPoints === 'number' && result.totalPoints > 0)
                             ? result.totalPoints
                             : (pointsData.totalPoints || 0) + earned;
-                        
+
                         updateBadgeProgress(latestTotal);
                         showPointsNotification(earned, latestTotal);
                         await reloadBadges(latestTotal);
                         setTimeout(() => reloadBadges().catch(()=>{}), 200);
-                    } else {
-                        console.error('포인트 정보 가져오기 실패 - 응답 상태:', pointsRes.status);
                     }
                 } catch (error) {
-                    console.error('포인트 정보 가져오기 실패:', error);
+                    console.error('포인트 갱신 실패:', error);
                 }
-            } else {
-                console.log('점수가 0이므로 포인트 업데이트를 건너뜁니다.');
             }
 
-            try {
-                alert(`퀴즈 결과: ${result && typeof result.score === 'number' ? result.score : 0}점\n틀린 문제를 확인해보세요!`);
-            } catch(_) {}
+            alert(`퀴즈 결과: ${result && typeof result.score === 'number' ? result.score : 0}점\n틀린 문제를 확인해보세요!`);
         });
-        
-        // 진행률 바 업데이트 함수
+
+        // --- 함수들 ---
+
+        // 기본 브론즈 뱃지 노출 (함수 선언은 호이스팅되어 상단 호출과 호환)
+        function showDefaultBronzeBadge(container, userPoints) {
+            const badgeDiv = document.createElement('div');
+            badgeDiv.style.cssText = `
+                display: inline-block;
+                margin: 5px;
+                text-align: center;
+                padding: 10px;
+                border-radius: 8px;
+                background: #ffffff;
+                color: #333;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+                border: 1px solid #eee;
+            `;
+            const img = document.createElement('img');
+            img.src = '/img/bronze.png';
+            img.alt = '브론즈';
+            img.style.cssText = 'width: 160px; height: 160px; margin-bottom: 12px; object-fit: contain;';
+            badgeDiv.appendChild(img);
+            const nameDiv = document.createElement('div');
+            nameDiv.textContent = '브론즈';
+            nameDiv.style.cssText = 'font-size: 16px; font-weight: bold; margin-bottom: 5px;';
+            badgeDiv.appendChild(nameDiv);
+            // 다음 단계(예: 실버) 간단 안내 게이지
+            const progressDiv = document.createElement('div');
+            const target = 500; // 예시 값 (백엔드 조건에 맞게 조정)
+            const progress = Math.min(100, (userPoints / target) * 100);
+            progressDiv.innerHTML = `
+                <div style="font-size: 12px; margin-bottom: 3px;">다음 단계: 실버</div>
+                <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${target}점 (현재: ${userPoints}점)</div>
+                <div class="progress-bar" data-target-points="${target}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
+                    <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
+                </div>
+            `;
+            badgeDiv.appendChild(progressDiv);
+            container.appendChild(badgeDiv);
+        }
+
+        // 진행률 바 값만 업데이트 (DOM 재구성 없이)
         function updateBadgeProgress(totalPoints) {
             const badgeContainer = document.getElementById('badgeContainer');
             const progressBars = badgeContainer.querySelectorAll('.progress-bar');
-            
             progressBars.forEach(bar => {
                 const targetPoints = parseInt(bar.dataset.targetPoints);
                 const progress = Math.min(100, (totalPoints / targetPoints) * 100);
                 const progressFill = bar.querySelector('.progress-fill');
-                // points-text는 progress-bar의 형제 요소이므로 컨테이너에서 찾는다
                 const pointsText = bar.parentElement ? bar.parentElement.querySelector('.points-text') : null;
-                
-                if (progressFill) {
-                    progressFill.style.width = progress + '%';
-                }
-                if (pointsText) {
-                    pointsText.textContent = `목표: ${targetPoints}점 (현재: ${totalPoints}점)`;
-                }
+                if (progressFill) progressFill.style.width = progress + '%';
+                if (pointsText) pointsText.textContent = `목표: ${targetPoints}점 (현재: ${totalPoints}점)`;
             });
         }
-        
-        // 포인트 획득 알림 함수
+
+        // 전체 뱃지 패널 재구성 (다음 단계 게이지 포함)
+        async function reloadBadges(totalOverride) {
+            const badgeContainer = document.getElementById('badgeContainer');
+            // 최신 포인트
+            let totalPoints = typeof totalOverride === 'number' ? totalOverride : 0;
+            if (typeof totalOverride !== 'number') {
+                try {
+                    const pointsRes = await fetch(`/api/users/${window.userId}/points`);
+                    if (pointsRes.ok) {
+                        const pointsData = await res.json();
+                        totalPoints = pointsData.totalPoints || 0;
+                    }
+                } catch (e) {
+                    console.error('포인트 재조회 실패:', e);
+                }
+            }
+
+            try {
+                const badgeRes = await fetch(`/api/users/${window.userId}/badges`);
+                if (!badgeRes.ok) {
+                    console.warn('뱃지 API 응답 오류:', badgeRes.status);
+                    return;
+                }
+                const badges = await badgeRes.json();
+                const earnedBadges = badges.filter(b => b.earned);
+                const earnedSet = new Set(earnedBadges.map(b => b.name));
+
+                // 패널 초기화
+                badgeContainer.innerHTML = '';
+
+                if (earnedBadges.length > 0) {
+                    // 현재 등급 헤더
+                    const rankOrder = ['브론즈','실버','골드','플래티넘'];
+                    const currentRank = earnedBadges
+                        .filter(b => rankOrder.includes(b.name))
+                        .sort((a,b) => rankOrder.indexOf(b.name) - rankOrder.indexOf(a.name))[0];
+                    if (currentRank) {
+                        const header = document.createElement('div');
+                        header.style.cssText = 'margin-bottom:10px; padding:8px 10px; background:#fff; border:1px solid #eee; border-radius:8px; display:flex; align-items:center; gap:10px;';
+                        const img = document.createElement('img');
+                        img.src = currentRank.imageUrl; img.alt = currentRank.name; img.style.cssText = 'width:36px; height:36px; object-fit:contain;';
+                        const title = document.createElement('div');
+                        title.innerHTML = `<strong>현재 등급:</strong> ${currentRank.name}`;
+                        header.appendChild(img); header.appendChild(title);
+                        badgeContainer.appendChild(header);
+                    }
+
+                    // 보유 뱃지 카드
+                    earnedBadges.forEach(badge => {
+                        const badgeDiv = document.createElement('div');
+                        badgeDiv.style.cssText = `
+                            display: inline-block;
+                            margin: 5px;
+                            text-align: center;
+                            padding: 10px;
+                            border-radius: 8px;
+                            background: #ffffff;
+                            color: #333;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+                            border: 1px solid #eee;
+                        `;
+                        const img = document.createElement('img');
+                        img.src = badge.imageUrl;
+                        img.alt = badge.name;
+                        img.style.cssText = 'width: 160px; height: 160px; margin-bottom: 12px; object-fit: contain;';
+                        badgeDiv.appendChild(img);
+                        const nameDiv = document.createElement('div');
+                        nameDiv.textContent = badge.name;
+                        nameDiv.style.cssText = 'font-size: 16px; font-weight: bold; margin-bottom: 5px;';
+                        badgeDiv.appendChild(nameDiv);
+
+                        // ✅ 이 뱃지 다음 단계 게이지 (가능할 때)
+                        const higher = badges
+                            .filter(b => b.conditionValue > (badge.conditionValue || 0) && !earnedSet.has(b.name))
+                            .sort((a,b) => a.conditionValue - b.conditionValue)[0];
+                        if (higher) {
+                            const progressDiv = document.createElement('div');
+                            const progress = Math.min(100, (totalPoints / higher.conditionValue) * 100);
+                            progressDiv.innerHTML = `
+                                <div style="font-size: 12px; margin-bottom: 3px; color: #333;">다음 단계: ${higher.name}</div>
+                                <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${higher.conditionValue}점 (현재: ${totalPoints}점)</div>
+                                <div class="progress-bar" data-target-points="${higher.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
+                                    <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
+                                </div>
+                            `;
+                            badgeDiv.appendChild(progressDiv);
+                        }
+
+                        badgeContainer.appendChild(badgeDiv);
+                    });
+
+                    // ✅ 보유하지 않은 다음 단계가 따로 있을 경우(상단 공통 진행률)
+                    const next = badges.filter(b => !b.earned).sort((a,b)=>a.conditionValue-b.conditionValue)[0];
+                    if (next) {
+                        const wrap = document.createElement('div');
+                        wrap.style.cssText = 'margin-top:8px; background:#fff; border:1px solid #eee; border-radius:8px; padding:10px;';
+                        const progress = Math.min(100, (totalPoints / next.conditionValue) * 100);
+                        wrap.innerHTML = `
+                            <div style="font-size: 12px; margin-bottom: 3px; color: #333;">다음 단계(공통): ${next.name}</div>
+                            <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${next.conditionValue}점 (현재: ${totalPoints}점)</div>
+                            <div class="progress-bar" data-target-points="${next.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
+                                <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
+                            </div>`;
+                        badgeContainer.appendChild(wrap);
+                    }
+
+                } else {
+                    showDefaultBronzeBadge(badgeContainer, totalPoints);
+                }
+
+                // 새로 획득한 뱃지 감지 (간단 비교)
+                try {
+                    const currentEarned = new Set(earnedBadges.map(b => b.name));
+                    const newlyEarned = [...currentEarned].filter(n => !earnedBadgeNames.has(n));
+                    if (newlyEarned.length > 0) {
+                        showBadgeNotification(newlyEarned);
+                    }
+                    earnedBadgeNames = currentEarned;
+                } catch (e) {
+                    console.warn('뱃지 비교 중 오류', e);
+                }
+
+                // 최종 진행률 텍스트/게이지 최신화
+                updateBadgeProgress(totalPoints);
+
+            } catch (e) {
+                console.error('뱃지 재조회 실패:', e);
+            }
+        }
+
+        // 포인트 획득 알림
         function showPointsNotification(earnedPoints, totalPoints) {
             const notification = document.createElement('div');
             notification.style.cssText = `
@@ -477,17 +450,10 @@
                 <div>+${earnedPoints}점 획득</div>
                 <div style="font-size: 12px; opacity: 0.8;">총 ${totalPoints}점</div>
             `;
-            
             document.body.appendChild(notification);
-            
-            // 3초 후 알림 제거
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.5s ease-in';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 500);
+                setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 500);
             }, 3000);
         }
 
@@ -518,8 +484,8 @@
                 setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 500);
             }, 3500);
         }
-        
-        // CSS 애니메이션 추가
+
+        // CSS 애니메이션
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -532,7 +498,6 @@
             }
         `;
         document.head.appendChild(style);
-
     };
 </script>
 </body>
