@@ -14,7 +14,6 @@
 </head>
 <body style="margin: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #f5f5f5;">
 <div style="display: flex; height: 100vh;">
-
     <!-- 좌측: 가로세로 보드 -->
     <div style="flex: 1.5; padding: 40px; display: flex; flex-direction: column; align-items: center;">
         <h1 style="margin-bottom: 24px; font-size: 28px;">🧩 가로세로 낱말 퀴즈</h1>
@@ -140,7 +139,7 @@
                     input.style.borderRadius = "8px";
                     input.dataset.row = r;
                     input.dataset.col = c;
-                    input.readOnly = true;
+                    input.readOnly = false;
                     td.appendChild(input);
                 }
 
@@ -152,29 +151,32 @@
 
         const clueSection = document.getElementById("clueSection");
         clueSection.innerHTML = quiz.items.map((item, idx) => {
-            // clueText에서 정답을 □로 치환
-            const clueText = (item.clue || item.question)
-                .replace(new RegExp(item.term, "g"), "□".repeat(item.term.length))
-                .replace(/\n/g, "<br>");
-            return `
-            <div class="crossword-quiz-row" id="quizRow_${idx}"
-                style="display: flex; align-items: center; margin-bottom: 16px; background: ${item.direction === 'across' ? '#e6f3ff' : '#fff0fa'};
-                       border-radius: 16px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
-                <span style="font-weight:bold; color:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'}; min-width:60px;">
-                    ${item.number}. ${item.direction === 'across' ? '가로' : '세로'}
-                </span>
-                <span style="margin-left:10px; flex:1; font-size:14px; color:#333;"> ${clueText} </span>
-                <input type="text" id="answerInput_${idx}" maxlength="${item.length}"
-                       style="font-size:16px; width:90px; border-radius: 8px; border: 1px solid #ccc; padding: 4px 6px;">
-                <button id="submitBtn_${idx}" style="margin-left:6px; border:none; background:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'};
-                            color:white; border-radius:8px; padding:5px 8px;"> 제출 </button>
-                <button id="hintBtn_${idx}" style="margin-left:6px; border:none; background:${item.direction === 'across' ? '#b3d9ff' : '#ffccdc'};
-                            color:#333; border-radius:8px; padding:5px 8px;"> 초성 힌트 </button>
-                <span id="hintText_${idx}" style="display:none; margin-left:10px; color:#888;"> ${item.initialHint} </span>
-                <span id="resultIcon_${idx}" style="margin-left:12px; font-size:22px;"></span>
-            </div>
-            `;
-        }).join("");
+    const clueText = (item.clue || item.question)
+        .replace(new RegExp(item.term, "g"), "□".repeat(item.term.length))
+        .replace(/\n/g, "<br>");
+    return `
+    <div class="crossword-quiz-row" id="quizRow_${idx}"
+        style="display: flex; align-items: center; margin-bottom: 16px;
+               background: ${item.direction === 'across' ? '#e6f3ff' : '#fff0fa'};
+               border-radius: 16px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+        <span style="font-weight:bold; color:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'};
+                     min-width:60px;">${item.number}. ${item.direction === 'across' ? '가로' : '세로'}</span>
+        <span style="margin-left:10px; flex:1; font-size:14px; color:#333;"> ${clueText} </span>
+        <button id="submitBtn_${idx}"
+            style="margin-left:6px; border:none;
+                   background:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'};
+                   color:white; border-radius:8px; padding:5px 8px;">제출</button>
+        <button id="hintBtn_${idx}"
+            style="margin-left:6px; border:none;
+                   background:${item.direction === 'across' ? '#b3d9ff' : '#ffccdc'};
+                   color:#333; border-radius:8px; padding:5px 8px;">초성 힌트</button>
+        <span id="hintText_${idx}" style="display:none; margin-left:10px; color:#888;">
+            ${item.initialHint}
+        </span>
+        <span id="resultIcon_${idx}" style="margin-left:12px; font-size:22px;"></span>
+    </div>`;
+}).join("");
+
 
         const cellToItems = {};
         quiz.items.forEach((item, idx) => {
@@ -190,11 +192,19 @@
 
         quiz.items.forEach((item, idx) => {
             document.getElementById(`submitBtn_${idx}`).onclick = function() {
-                const val = document.getElementById(`answerInput_${idx}`).value.trim();
-                const quizRow = document.getElementById(`quizRow_${idx}`);
-                const icon = document.getElementById(`resultIcon_${idx}`);
-                let isCorrect = (val === item.term);
-                correctMap[idx] = isCorrect;
+    let userAnswer = "";
+    let r = item.row, c = item.col;
+    for (let i = 0; i < item.length; i++) {
+        const rr = item.direction === "across" ? r : r + i;
+        const cc = item.direction === "across" ? c + i : c;
+        const input = table.rows[rr].cells[cc].querySelector("input");
+        userAnswer += (input && input.value ? input.value.trim() : "");
+    }
+
+    const quizRow = document.getElementById(`quizRow_${idx}`);
+    const icon = document.getElementById(`resultIcon_${idx}`);
+    const isCorrect = (userAnswer === item.term);
+    correctMap[idx] = isCorrect;
 
                 let r = item.row, c = item.col;
                 for (let i = 0; i < item.length; i++) {
