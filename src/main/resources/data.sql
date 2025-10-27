@@ -571,7 +571,7 @@ VALUES ('경제위기', '경제활동이 급격히 위축되어 실업과 파산
 
 -- 66. 경제성장의 glossaries
 INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
-SELECT term_id, '실질GDP 증가와 생산능력 확대', NOW() FROM terms WHERE term = '경제성장';
+SELECT term_id, '경제성장 실질GDP 증가와 생산능력 확대', NOW() FROM terms WHERE term = '경제성장';
 INSERT IGNORE INTO glossaries (term_id, short_def, created_at)
 SELECT term_id, '자본축적과 기술진보가 핵심', NOW() FROM terms WHERE term = '경제성장';
 

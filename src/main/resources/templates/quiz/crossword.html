@@ -14,23 +14,17 @@
 </head>
 <body style="margin: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #f5f5f5;">
 <div style="display: flex; height: 100vh;">
+
     <!-- 좌측: 가로세로 보드 -->
     <div style="flex: 1.5; padding: 40px; display: flex; flex-direction: column; align-items: center;">
         <h1 style="margin-bottom: 24px; font-size: 28px;">🧩 가로세로 낱말 퀴즈</h1>
         <div id="crosswordBoard" style="margin-bottom: 30px;"></div>
     </div>
 
-    <!-- 우측: 나의 현황/뱃지 + 문제 리스트 -->
+    <!-- 우측: 문제 리스트 -->
     <div style="flex: 1; padding: 24px 36px; background-color: #fff8fc; overflow-y: auto; box-shadow: -3px 0 8px rgba(0,0,0,0.05); border-radius: 30px 0 0 30px;">
-        <div style="padding: 12px 16px; background:#e9f0f8; border-radius:12px; margin-bottom:16px;">
-            <h3 style="margin:0 0 8px 0;">🏅 나의 레벨 현황</h3>
-            <div id="badgeContainer"></div>
-        </div>
-        <h2 style="color: #ff69b4; font-size: 20px; margin: 12px 0 12px;">📜 문제 목록</h2>
+        <h2 style="color: #ff69b4; font-size: 20px; margin-bottom: 20px;">📜 문제 목록</h2>
         <div id="clueSection" style="width: 100%;"></div>
-        <div style="margin-top: 12px; text-align: right;">
-            <button id="submitAllBtn" style="border:none; background:#ff69b4; color:#fff; border-radius:10px; padding:10px 14px; font-weight:bold;">전체 제출</button>
-        </div>
     </div>
 
     <!-- 나의 뱃지 (비활성화 / 주석 처리) -->
@@ -43,274 +37,251 @@
 </div>
 
 <script>
-window.onload = async function () {
-    if (!window.userId) {
-        alert('로그인 후 이용해주세요.');
-        location.href = '/login';
-        return;
-    }
-
-    // 뱃지 로드 (단답형과 동일 로직 간소화 버전)
-    const badgeContainer = document.getElementById('badgeContainer');
-    async function loadBadges() {
-        badgeContainer.innerHTML = '';
-        try {
-            let totalPoints = 0;
-            const pointsRes = await fetch(`/api/users/${window.userId}/points`);
-            if (pointsRes.ok) {
-                const pointsData = await pointsRes.json();
-                totalPoints = pointsData.totalPoints || 0;
-            }
-            const badgeRes = await fetch(`/api/users/${window.userId}/badges`);
-            if (badgeRes.ok) {
-                const badges = await badgeRes.json();
-                if (badges && badges.length) {
-                    const rankOrder = ['브론즈','실버','골드','플래티넘'];
-                    const currentRank = badges.filter(b=>b.earned && rankOrder.includes(b.name)).sort((a,b)=>rankOrder.indexOf(b.name)-rankOrder.indexOf(a.name))[0];
-                    if (currentRank) {
-                        const header = document.createElement('div');
-                        header.style.cssText = 'margin-bottom:10px; padding:8px 10px; background:#fff; border:1px solid #eee; border-radius:8px; display:flex; align-items:center; gap:10px;';
-                        const img = document.createElement('img');
-                        img.src = currentRank.imageUrl; img.alt = currentRank.name; img.style.cssText = 'width:36px; height:36px; object-fit:contain;';
-                        const title = document.createElement('div');
-                        title.innerHTML = `<strong>현재 등급:</strong> ${currentRank.name}`;
-                        header.appendChild(img); header.appendChild(title);
-                        badgeContainer.appendChild(header);
-                    }
-                    const earned = badges.filter(b=>b.earned);
-                    earned.forEach(badge=>{
-                        const div = document.createElement('div');
-                        div.style.cssText = 'display:inline-block; margin:5px; text-align:center; padding:10px; border-radius:8px; background:#fff; border:1px solid #eee; box-shadow:0 2px 4px rgba(0,0,0,0.12)';
-                        const img = document.createElement('img');
-                        img.src = badge.imageUrl; img.alt = badge.name; img.style.cssText = 'width:120px; height:120px; object-fit:contain; margin-bottom:8px;';
-                        const name = document.createElement('div'); name.textContent = badge.name; name.style.cssText = 'font-weight:bold;';
-                        div.appendChild(img); div.appendChild(name); badgeContainer.appendChild(div);
-                    });
-
-                    // 다음 단계 진행률 표시: 가장 낮은 미획득 상위 등급을 기준으로 1개 표시
-                    const next = badges.filter(b => !b.earned).sort((a,b)=>a.conditionValue-b.conditionValue)[0];
-                    if (next) {
-                        const progressWrap = document.createElement('div');
-                        progressWrap.style.cssText = 'margin-top:8px; background:#fff; border:1px solid #eee; border-radius:8px; padding:10px;';
-                        const progress = Math.min(100, (totalPoints / next.conditionValue) * 100);
-                        progressWrap.innerHTML = `
-                            <div style="font-size: 12px; margin-bottom: 3px; color:#333;">다음 단계: ${next.name}</div>
-                            <div class="points-text" style="font-size: 12px; color: #333; font-weight: 600;">목표: ${next.conditionValue}점 (현재: ${totalPoints}점)</div>
-                            <div class="progress-bar" data-target-points="${next.conditionValue}" style="width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-top: 6px;">
-                                <div class="progress-fill" style="width: ${progress}%; height: 100%; background: #4a90e2; border-radius: 4px;"></div>
-                            </div>`;
-                        badgeContainer.appendChild(progressWrap);
-                    }
-                }
-            }
-        } catch (e) { console.warn('뱃지 로드 실패', e); }
-    }
-    await loadBadges();
-
-    const response = await fetch(`/api/quiz/crossword?userId=${window.userId}`);
-    const quiz = await response.json();
-
-    const width = 21, height = 21;
-    const board = Array.from({length: height}, () => Array(width).fill(null));
-    const numberMap = Array.from({length: height}, () => Array(width).fill(null));
-
-    quiz.items.forEach(item => {
-        let r = item.row, c = item.col;
-        for (let i = 0; i < item.length; i++) {
-            if (item.direction === "across") {
-                board[r][c+i] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item) };
-                if (i === 0) numberMap[r][c+i] = item.number;
-            } else {
-                board[r+i][c] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item) };
-                if (i === 0) numberMap[r+i][c] = item.number;
-            }
+    window.onload = async function () {
+        if (!window.userId) {
+            alert('로그인 후 이용해주세요.');
+            location.href = '/login';
+            return;
         }
-    });
 
-    const boardDiv = document.getElementById("crosswordBoard");
-    const table = document.createElement("table");
-    table.style.borderCollapse = "collapse";
-    table.style.margin = "0 auto";
-    table.style.background = "#fffafc";
-    table.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
-    table.style.borderRadius = "20px";
-    
-    // 번호 매핑을 위한 2D 배열 (가로, 세로 각각)
-    const acrossNumbers = Array.from({length: height}, () => Array(width).fill(null));
-    const downNumbers = Array.from({length: height}, () => Array(width).fill(null));
-    
-    quiz.items.forEach(item => {
-        let r = item.row, c = item.col;
-        for (let i = 0; i < item.length; i++) {
-            if (item.direction === "across") {
-                board[r][c+i] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item), direction: "across" };
-                if (i === 0) acrossNumbers[r][c+i] = item.number;
-            } else {
-                board[r+i][c] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item), direction: "down" };
-                if (i === 0) downNumbers[r+i][c] = item.number;
-            }
-        }
-    });
-    
-    for (let r = 0; r < height; r++) {
-        const tr = document.createElement("tr");
-        for (let c = 0; c < width; c++) {
-            const td = document.createElement("td");
-            td.style.width = td.style.height = "36px";
-            td.style.border = "1.5px solid #d0d0d0";
-            td.style.background = board[r][c] ? "#fff" : "#f0f0f0";
-            td.style.position = "relative";
-            td.style.borderRadius = "8px";
-            
-            if (board[r][c]) {
-                td.className = "crossword-cell";
-                td.dataset.row = r;
-                td.dataset.col = c;
+        const response = await fetch(`/api/quiz/crossword?userId=${window.userId}`);
+        const quiz = await response.json();
 
-                // 번호 표시 (가로/세로 모두 표시)
-                if (acrossNumbers[r][c] || downNumbers[r][c]) {
-                    const numberDiv = document.createElement("div");
-                    numberDiv.style.position = "absolute";
-                    numberDiv.style.top = "2px";
-                    numberDiv.style.left = "4px";
-                    numberDiv.style.fontSize = "8px";
-                    numberDiv.style.lineHeight = "1";
-                    
-                    if (acrossNumbers[r][c] && downNumbers[r][c]) {
-                        // 겹치는 경우
-                        numberDiv.innerHTML = `<span style="color:#4a90e2;">${acrossNumbers[r][c]}</span><br><span style="color:#ff69b4;">${downNumbers[r][c]}</span>`;
-                    } else if (acrossNumbers[r][c]) {
-                        // 가로만
-                        numberDiv.innerHTML = `<span style="color:#4a90e2;">${acrossNumbers[r][c]}</span>`;
-                    } else {
-                        // 세로만
-                        numberDiv.innerHTML = `<span style="color:#ff69b4;">${downNumbers[r][c]}</span>`;
-                    }
-                    td.appendChild(numberDiv);
-                }
+        const width = 21, height = 21;
+        const board = Array.from({length: height}, () => Array(width).fill(null));
+        const numberMap = Array.from({length: height}, () => Array(width).fill(null));
 
-                const input = document.createElement("input");
-                input.type = "text";
-                input.maxLength = 1;
-                input.style.width = "100%";
-                input.style.height = "100%";
-                input.style.textAlign = "center";
-                input.style.fontSize = "18px";
-                input.style.border = "none";
-                input.style.background = "transparent";
-                input.style.caretColor = board[r][c].direction === "across" ? "#4a90e2" : "#ff69b4";
-                input.style.borderRadius = "8px";
-                input.dataset.row = r;
-                input.dataset.col = c;
-                input.readOnly = true;
-                td.appendChild(input);
-            }
-            tr.appendChild(td);
-        }
-        table.appendChild(tr);
-    }
-    boardDiv.appendChild(table);
-
-    const clueSection = document.getElementById("clueSection");
-    clueSection.innerHTML = quiz.items.map((item, idx) => `
-        <div class="crossword-quiz-row" id="quizRow_${idx}" style="display: flex; align-items: center; margin-bottom: 16px; background: ${item.direction === 'across' ? '#e6f3ff' : '#fff0fa'}; border-radius: 16px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
-            <span style="font-weight:bold; color:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'}; min-width:60px;">${item.number}. ${item.direction === 'across' ? '가로' : '세로'}</span>
-            <span style="margin-left:10px; flex:1; font-size:14px; color:#333;">${(item.clue || item.question).replace(/\n/g, '<br>')}</span>
-            <input type="text" id="answerInput_${idx}" maxlength="${item.length}" style="font-size:16px; width:90px; border-radius: 8px; border: 1px solid #ccc; padding: 4px 6px;">
-            <button id="submitBtn_${idx}" style="margin-left:6px; border:none; background:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'}; color:white; border-radius:8px; padding:5px 8px;">제출</button>
-            <button id="hintBtn_${idx}" style="margin-left:6px; border:none; background:${item.direction === 'across' ? '#b3d9ff' : '#ffccdc'}; color:#333; border-radius:8px; padding:5px 8px;">초성 힌트</button>
-            <span id="hintText_${idx}" style="display:none; margin-left:10px; color:#888;">${item.initialHint}</span>
-            <span id="resultIcon_${idx}" style="margin-left:12px; font-size:22px;"></span>
-        </div>
-    `).join("");
-
-    const cellToItems = {};
-    quiz.items.forEach((item, idx) => {
-        let r = item.row, c = item.col;
-        for (let i = 0; i < item.length; i++) {
-            let key = item.direction === "across" ? `${r},${c+i}` : `${r+i},${c}`;
-            if (!cellToItems[key]) cellToItems[key] = [];
-            cellToItems[key].push({itemIdx: idx, char: item.term[i]});
-        }
-    });
-
-    const correctMap = Array(quiz.items.length).fill(false);
-    quiz.items.forEach((item, idx) => {
-        document.getElementById(`submitBtn_${idx}`).onclick = function() {
-            const val = document.getElementById(`answerInput_${idx}`).value.trim();
-            const quizRow = document.getElementById(`quizRow_${idx}`);
-            const icon = document.getElementById(`resultIcon_${idx}`);
-            let isCorrect = (val === item.term);
-            correctMap[idx] = isCorrect;
-
+        quiz.items.forEach(item => {
             let r = item.row, c = item.col;
             for (let i = 0; i < item.length; i++) {
-                let rr = item.direction === "across" ? r : r+i;
-                let cc = item.direction === "across" ? c+i : c;
-                const input = table.rows[rr].cells[cc].querySelector("input");
-                const key = `${rr},${cc}`;
-                const isCross = cellToItems[key].length > 1;
-                const hasCorrect = cellToItems[key].some(ci => correctMap[ci.itemIdx]);
-
-                if (input) {
-                    if (isCorrect) {
-                        input.value = item.term[i];
-                        input.style.background = item.direction === "across" ? "#e6f3ff" : "#fff0fa";
-                        input.style.color = item.direction === "across" ? "#4a90e2" : "#ff69b4";
-                        input.style.fontWeight = "bold";
-                    } else {
-                        if (hasCorrect) {
-                            let correctChar = cellToItems[key].find(ci => correctMap[ci.itemIdx]).char;
-                            input.value = correctChar;
-                            // 겹치는 셀의 경우 방향에 따라 색상 결정
-                            let cellDirection = board[rr][cc].direction;
-                            input.style.background = cellDirection === "across" ? "#e6f3ff" : "#fff0fa";
-                            input.style.color = cellDirection === "across" ? "#4a90e2" : "#ff69b4";
-                        } else {
-                            input.value = '';
-                            input.style.background = "#ffe0e0";
-                            input.style.color = "#ff4d4f";
-                        }
-                        input.style.fontWeight = "bold";
-                    }
-                    input.disabled = true;
+                if (item.direction === "across") {
+                    board[r][c+i] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item) };
+                    if (i === 0) numberMap[r][c+i] = item.number;
+                } else {
+                    board[r+i][c] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item) };
+                    if (i === 0) numberMap[r+i][c] = item.number;
                 }
             }
-
-            quizRow.style.background = isCorrect ? (item.direction === "across" ? "#e6f3ff" : "#fff0fa") : "#ffe0e0";
-            quizRow.style.border = isCorrect ? (item.direction === "across" ? "2px solid #4a90e2" : "2px solid #ff69b4") : "2px solid #ff4d4f";
-            icon.innerHTML = isCorrect ? `<span style="color:${item.direction === "across" ? "#4a90e2" : "#ff69b4"};">✔</span>` : '<span style="color:#ff4d4f;">✖</span>';
-            document.getElementById(`answerInput_${idx}`).disabled = true;
-            document.getElementById(`submitBtn_${idx}`).disabled = true;
-        };
-
-        document.getElementById(`hintBtn_${idx}`).onclick = function() {
-            document.getElementById(`hintText_${idx}`).style.display = "inline";
-        };
-    });
-    // 전체 제출 버튼: 서버로 점수 제출 후 뱃지/포인트 갱신
-    document.getElementById('submitAllBtn').onclick = async function() {
-        const answers = {};
-        quiz.items.forEach((item, idx) => {
-            const val = (document.getElementById(`answerInput_${idx}`)?.value || '').trim();
-            answers[item.term] = val;
         });
-        try {
-            const res = await fetch('/api/quiz/submit-crossword', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ answers })
-            });
-            if (!res.ok) { alert('제출 실패. 잠시 후 다시 시도해주세요.'); return; }
-            const result = await res.json();
-            if (typeof result.totalPoints === 'number') {
-                await loadBadges();
+
+        const boardDiv = document.getElementById("crosswordBoard");
+        const table = document.createElement("table");
+        table.style.borderCollapse = "collapse";
+        table.style.margin = "0 auto";
+        table.style.background = "#fffafc";
+        table.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
+        table.style.borderRadius = "20px";
+
+        // 번호 매핑을 위한 2D 배열 (가로, 세로 각각)
+        const acrossNumbers = Array.from({length: height}, () => Array(width).fill(null));
+        const downNumbers = Array.from({length: height}, () => Array(width).fill(null));
+
+        quiz.items.forEach(item => {
+            let r = item.row, c = item.col;
+            for (let i = 0; i < item.length; i++) {
+                if (item.direction === "across") {
+                    board[r][c+i] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item), direction: "across" };
+                    if (i === 0) acrossNumbers[r][c+i] = item.number;
+                } else {
+                    board[r+i][c] = { term: item.term, idx: i, number: i === 0 ? item.number : null, itemIdx: quiz.items.indexOf(item), direction: "down" };
+                    if (i === 0) downNumbers[r+i][c] = item.number;
+                }
             }
-            alert(`총점: ${result.score || 0}점`);
-        } catch (e) {
-            console.error('제출 중 오류', e);
+        });
+
+        for (let r = 0; r < height; r++) {
+            const tr = document.createElement("tr");
+            for (let c = 0; c < width; c++) {
+                const td = document.createElement("td");
+                td.style.width = td.style.height = "36px";
+                td.style.border = "1.5px solid #d0d0d0";
+                td.style.background = board[r][c] ? "#fff" : "#f0f0f0";
+                td.style.position = "relative";
+                td.style.borderRadius = "8px";
+
+                if (board[r][c]) {
+                    td.className = "crossword-cell";
+                    td.dataset.row = r;
+                    td.dataset.col = c;
+
+                    // 번호 표시 (가로/세로 모두 표시)
+                    if (acrossNumbers[r][c] || downNumbers[r][c]) {
+                        const numberDiv = document.createElement("div");
+                        numberDiv.style.position = "absolute";
+                        numberDiv.style.top = "2px";
+                        numberDiv.style.left = "4px";
+                        numberDiv.style.fontSize = "8px";
+                        numberDiv.style.lineHeight = "1";
+
+                        if (acrossNumbers[r][c] && downNumbers[r][c]) {
+                            // 겹치는 경우
+                            numberDiv.innerHTML = `<span style="color:#4a90e2;">${acrossNumbers[r][c]}</span><br><span style="color:#ff69b4;">${downNumbers[r][c]}</span>`;
+                        } else if (acrossNumbers[r][c]) {
+                            // 가로만
+                            numberDiv.innerHTML = `<span style="color:#4a90e2;">${acrossNumbers[r][c]}</span>`;
+                        } else {
+                            // 세로만
+                            numberDiv.innerHTML = `<span style="color:#ff69b4;">${downNumbers[r][c]}</span>`;
+                        }
+
+                        td.appendChild(numberDiv);
+                    }
+
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.maxLength = 1;
+                    input.style.width = "100%";
+                    input.style.height = "100%";
+                    input.style.textAlign = "center";
+                    input.style.fontSize = "18px";
+                    input.style.border = "none";
+                    input.style.background = "transparent";
+                    input.style.caretColor = board[r][c].direction === "across" ? "#4a90e2" : "#ff69b4";
+                    input.style.borderRadius = "8px";
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    input.readOnly = true;
+                    td.appendChild(input);
+                }
+
+                tr.appendChild(td);
+            }
+            table.appendChild(tr);
         }
-    };
+        boardDiv.appendChild(table);
+
+        const clueSection = document.getElementById("clueSection");
+        clueSection.innerHTML = quiz.items.map((item, idx) => {
+            // clueText에서 정답을 □로 치환
+            const clueText = (item.clue || item.question)
+                .replace(new RegExp(item.term, "g"), "□".repeat(item.term.length))
+                .replace(/\n/g, "<br>");
+            return `
+            <div class="crossword-quiz-row" id="quizRow_${idx}"
+                style="display: flex; align-items: center; margin-bottom: 16px; background: ${item.direction === 'across' ? '#e6f3ff' : '#fff0fa'};
+                       border-radius: 16px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+                <span style="font-weight:bold; color:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'}; min-width:60px;">
+                    ${item.number}. ${item.direction === 'across' ? '가로' : '세로'}
+                </span>
+                <span style="margin-left:10px; flex:1; font-size:14px; color:#333;"> ${clueText} </span>
+                <input type="text" id="answerInput_${idx}" maxlength="${item.length}"
+                       style="font-size:16px; width:90px; border-radius: 8px; border: 1px solid #ccc; padding: 4px 6px;">
+                <button id="submitBtn_${idx}" style="margin-left:6px; border:none; background:${item.direction === 'across' ? '#4a90e2' : '#ff69b4'};
+                            color:white; border-radius:8px; padding:5px 8px;"> 제출 </button>
+                <button id="hintBtn_${idx}" style="margin-left:6px; border:none; background:${item.direction === 'across' ? '#b3d9ff' : '#ffccdc'};
+                            color:#333; border-radius:8px; padding:5px 8px;"> 초성 힌트 </button>
+                <span id="hintText_${idx}" style="display:none; margin-left:10px; color:#888;"> ${item.initialHint} </span>
+                <span id="resultIcon_${idx}" style="margin-left:12px; font-size:22px;"></span>
+            </div>
+            `;
+        }).join("");
+
+        const cellToItems = {};
+        quiz.items.forEach((item, idx) => {
+            let r = item.row, c = item.col;
+            for (let i = 0; i < item.length; i++) {
+                let key = item.direction === "across" ? `${r},${c+i}` : `${r+i},${c}`;
+                if (!cellToItems[key]) cellToItems[key] = [];
+                cellToItems[key].push({itemIdx: idx, char: item.term[i]});
+            }
+        });
+
+        const correctMap = Array(quiz.items.length).fill(false);
+
+        quiz.items.forEach((item, idx) => {
+            document.getElementById(`submitBtn_${idx}`).onclick = function() {
+                const val = document.getElementById(`answerInput_${idx}`).value.trim();
+                const quizRow = document.getElementById(`quizRow_${idx}`);
+                const icon = document.getElementById(`resultIcon_${idx}`);
+                let isCorrect = (val === item.term);
+                correctMap[idx] = isCorrect;
+
+                let r = item.row, c = item.col;
+                for (let i = 0; i < item.length; i++) {
+                    let rr = item.direction === "across" ? r : r+i;
+                    let cc = item.direction === "across" ? c+i : c;
+                    const input = table.rows[rr].cells[cc].querySelector("input");
+                    const key = `${rr},${cc}`;
+                    const isCross = cellToItems[key].length > 1;
+                    const hasCorrect = cellToItems[key].some(ci => correctMap[ci.itemIdx]);
+
+                    if (input) {
+                        if (isCorrect) {
+                            // ✅ 정답일 때
+                            input.value = item.term[i];
+                            input.style.background = item.direction === "across" ? "#f2f8ff" : "#fff6fb";
+                            input.style.color = "#000000";
+                            input.style.fontWeight = "bold";
+                        } else {
+                            // ❌ 오답일 때
+                            if (hasCorrect) {
+                                let correctChar = cellToItems[key].find(ci => correctMap[ci.itemIdx]).char;
+                                input.value = correctChar;
+                                let cellDirection = board[rr][cc].direction;
+                                input.style.background = cellDirection === "across" ? "#e6f3ff" : "#fff0fa";
+                                input.style.color = cellDirection === "across" ? "#4a90e2" : "#ff69b4";
+                            } else {
+                                input.value = '';
+                                input.style.background = "#ffe0e0";
+                                input.style.color = "#ff4d4f";
+                            }
+                            input.style.fontWeight = "bold";
+                        }
+                        input.disabled = true;
+                    }
+                }
+
+                quizRow.style.background = isCorrect ? (item.direction === "across" ? "#e6f3ff" : "#fff0fa") : "#ffe0e0";
+                quizRow.style.border = isCorrect ? (item.direction === "across" ? "2px solid #4a90e2" : "2px solid #ff69b4") : "2px solid #ff4d4f";
+                icon.innerHTML = isCorrect ? `<span style="color:${item.direction === "across" ? "#4a90e2" : "#ff69b4"};">✔</span>` : '<span style="color:#ff4d4f;">✖</span>';
+
+                if (isCorrect) {
+                    // ✅ 정답이면 입력/버튼 막기
+                    document.getElementById(`answerInput_${idx}`).disabled = true;
+                    document.getElementById(`submitBtn_${idx}`).disabled = true;
+                } else {
+                    // ❌ 오답이면 버튼을 "정답" 버튼으로 전환
+                    const btn = document.getElementById(`submitBtn_${idx}`);
+                    btn.disabled = false;
+                    btn.textContent = "정답";
+                    btn.style.background = "#ff4d4f";
+                    btn.onclick = function() {
+    const inputBox = document.getElementById(`answerInput_${idx}`);
+    inputBox.value = "";
+    inputBox.style.display = "none";
+    const answerSpan = document.createElement("span");
+    answerSpan.textContent = item.term;
+    answerSpan.style.color = "#ff0000"; // 리스트에서도 빨강 표시
+    answerSpan.style.fontWeight = "bold";
+    answerSpan.style.marginLeft = "10px";
+    inputBox.parentNode.insertBefore(answerSpan, btn);
+    btn.disabled = true;
+
+    // === 보드판 셀 색상만 업데이트 (테두리 제거) ===
+    let r = item.row, c = item.col;
+    for (let i = 0; i < item.length; i++) {
+        let rr = item.direction === "across" ? r : r+i;
+        let cc = item.direction === "across" ? c+i : c;
+        const cell = table.rows[rr].cells[cc];
+        const input = cell.querySelector("input");
+        if (input) {
+            input.value = item.term[i];
+            input.style.background = "#ffe0e0"; // 연한 빨강 배경
+            input.style.color = "#ff0000";      // 글자만 빨강
+            input.style.fontWeight = "bold";
+            input.style.border = "none";        // 테두리 완전히 제거
+        }
+    }
 };
+
+                }
+            };
+
+            document.getElementById(`hintBtn_${idx}`).onclick = function() {
+                document.getElementById(`hintText_${idx}`).style.display = "inline";
+            };
+        });
+    };
 </script>
 </body>
 </html>

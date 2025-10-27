@@ -125,6 +125,8 @@ public class QuizService {
             item.setQuestion(questionBuilder.toString());
             item.setTermId(qt.getTerm().getId());
             item.setInitialHint(qt.getInitialHint());
+            // 정답 보기 기능을 위해 정답 단어 포함 (클라이언트에서 제출 후 오답만 노출)
+            item.setTerm(answer);
             item.setLevel(qt.getTerm().getFrequency() != null ? qt.getTerm().getFrequency() : 1);
             return item;
         }).toList();
