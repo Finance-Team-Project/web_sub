@@ -16,7 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import Project.Finance_News.domain.Badge;
 import Project.Finance_News.domain.UserBadge;
 import Project.Finance_News.domain.UserPoint;
@@ -31,6 +38,9 @@ public class UserController {
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
     private final UserPointRepository userPointRepository;
+    
+    @PersistenceContext
+    private EntityManager em;
 
     // BadgeDisplayDto 내부 클래스
     public static class BadgeDisplayDto {
@@ -197,5 +207,53 @@ public class UserController {
             e.printStackTrace();
             throw e;
         }
+    }
+    
+    // 랭킹 DTO
+    public static class RankingDto {
+        public Long userId;
+        public String nickname;
+        public int totalPoints;
+        public int rank;
+        
+        public RankingDto(Long userId, String nickname, int totalPoints, int rank) {
+            this.userId = userId;
+            this.nickname = nickname;
+            this.totalPoints = totalPoints;
+            this.rank = rank;
+        }
+    }
+    
+    // 랭킹 페이지
+    @GetMapping("/ranking")
+    public String rankingPage(Model model) {
+        return "ranking";
+    }
+    
+    // 랭킹 API
+    @GetMapping("/api/ranking")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public List<RankingDto> getRanking() {
+        List<User> allUsers = userRepository.findAll();
+        
+        List<RankingDto> ranking = new ArrayList<>();
+        
+        for (User user : allUsers) {
+            UserPoint userPoint = userPointRepository.findByUser(user);
+            int totalPoints = userPoint != null ? userPoint.getTotalPoint() : 0;
+            ranking.add(new RankingDto(user.getId(), user.getNickname(), totalPoints, 0));
+        }
+        
+        // 포인트 기준으로 내림차순 정렬
+        ranking = ranking.stream()
+                .sorted(Comparator.comparingInt((RankingDto r) -> r.totalPoints).reversed())
+                .collect(Collectors.toList());
+        
+        // 순위 설정
+        for (int i = 0; i < ranking.size(); i++) {
+            ranking.get(i).rank = i + 1;
+        }
+        
+        return ranking;
     }
 }

@@ -9,5 +9,4 @@ class FinanceNewsApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

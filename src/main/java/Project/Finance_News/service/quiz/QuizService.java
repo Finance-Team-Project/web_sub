@@ -646,6 +646,7 @@ public class QuizService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         int score = 0;
+        Map<String, Boolean> results = new HashMap<>();
         if (answers == null) answers = new HashMap<>();
 
         for (Map.Entry<String, String> entry : answers.entrySet()) {
@@ -660,9 +661,18 @@ public class QuizService {
             String normalizedUser = Normalizer.normalize(userAnswer == null ? "" : userAnswer);
             String normalizedCorrect = Normalizer.normalize(term.getTerm());
             boolean correct = userAnswer != null && !userAnswer.isEmpty() && normalizedUser.equals(normalizedCorrect);
+            results.put(termText, correct);
+            
             if (correct) {
                 int level = term.getFrequency() != null ? term.getFrequency() : 1;
                 score += level * 10;
+                
+                // 정답 처리 시 단어장에서 해당 단어 삭제
+                try {
+                    userVocabularyRepository.deleteByUserAndTerm(user, term);
+                } catch (Exception e) {
+                    System.err.println("[submitCrossword] 단어장 삭제 중 오류: " + e.getMessage());
+                }
             }
         }
 
@@ -696,6 +706,7 @@ public class QuizService {
         Project.Finance_News.dto.CrosswordResultDto dto = new Project.Finance_News.dto.CrosswordResultDto();
         dto.setScore(score);
         dto.setTotalPoints(latestTotalPoints);
+        dto.setResults(results);
         return dto;
     }
 }
