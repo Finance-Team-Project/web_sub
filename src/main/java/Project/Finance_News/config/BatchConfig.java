@@ -56,14 +56,14 @@ public class BatchConfig {
                 .build();
     }
 
-        @Bean
-        public Step crawlNewsStep() {
-            return new StepBuilder("crawlNewsStep", jobRepository)
-                    .<NewsApiResponse, NewsApiResponse>chunk(1, transactionManager)
-                    .reader(restApiReader())
-                    .writer(newsCollectionWriter())
-                    .build();
-        }
+    @Bean
+    public Step crawlNewsStep() {
+        return new StepBuilder("crawlNewsStep", jobRepository)
+                .<NewsApiResponse, NewsApiResponse>chunk(1, transactionManager)
+                .reader(restApiReader())
+                .writer(newsCollectionWriter())
+                .build();
+    }
 
     @Bean
     public Step processNewsStep() {

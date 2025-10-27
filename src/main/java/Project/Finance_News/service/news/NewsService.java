@@ -268,7 +268,7 @@ public class NewsService {
                         .id(news.getId())
                         .title(news.getTitle())
                         .content(news.getContent())
-                        .publisher(news.getPublisher())
+                        .press(news.getPress())
                         .publishedAt(news.getPublishedAt())
                         .imageUrl(news.getImageUrl())
                         .url(news.getUrl())

@@ -12,6 +12,8 @@ public class NewsDto {
     private String content;
     private String url;
     private String imageUrl;
+    @com.fasterxml.jackson.annotation.JsonProperty(value = "press")
+    @com.fasterxml.jackson.annotation.JsonAlias({"publisher", "source"})
     private String press;
     private LocalDateTime publishedAt;
     private List<String> keywords;

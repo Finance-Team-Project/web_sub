@@ -33,8 +33,6 @@ public class News {
     @Column(columnDefinition = "TEXT")
     private String processedContent;  // 하이라이팅이 적용된 HTML 컨텐츠
 
-    private String publisher;
-
     @Column(name = "press")
     private String press;
 

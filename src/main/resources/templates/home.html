@@ -375,7 +375,7 @@
                 card.className = 'issue-card';
                 card.innerHTML = `
                     <h3 onclick="loadNewsDetail(${news.id})">${news.title}</h3>
-                    <p>${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
+                    <p>${news.press || '미상'} | ${new Date(news.publishedAt).toLocaleDateString()}</p>
                 `;
                 container.appendChild(card);
             });
@@ -390,7 +390,7 @@
               <div class="modal-content news-style">
                 <button class="close-btn" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
                 <h2>${news.title}</h2>
-                <div class="news-meta">${news.publisher} | ${new Date(news.publishedAt).toLocaleDateString()}</div>
+                <div class="news-meta">${news.press || '미상'} | ${new Date(news.publishedAt).toLocaleDateString()}</div>
                 <div class="news-body">${news.content}</div>
               </div>
             `;

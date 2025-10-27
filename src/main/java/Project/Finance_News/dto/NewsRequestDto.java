@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 public class NewsRequestDto {
     private String title;
     private String content;
-    private String publisher;
+    private String press;
     
     @JsonFormat(pattern = "yyyy.MM.dd. a h:mm", locale = "ko")
     private LocalDateTime publishedAt;

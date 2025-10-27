@@ -22,12 +22,19 @@ public class NewsProcessor implements ItemProcessor<NewsDto, News> {
             }
 
             // DTO → Entity 변환
+            // DTO에서 언론사 정보 가져오기 (이미 우선순위가 적용된 값)
+            String pressValue = dto.getPress();
+            
+            // 로깅 추가
+            log.info("Processing news with press info - Original press: {}, Final press: {}, URL: {}", 
+                    dto.getPress(), pressValue, dto.getUrl());
+
             News news = News.builder()
                     .title(dto.getTitle())
                     .content(dto.getContent())
                     .url(dto.getUrl())
                     .imageUrl(dto.getImageUrl())
-                    .press(dto.getPress())
+                    .press(pressValue != null && !pressValue.trim().isEmpty() ? pressValue : "미상")
                     .publishedAt(dto.getPublishedAt())
                     .build();
 
