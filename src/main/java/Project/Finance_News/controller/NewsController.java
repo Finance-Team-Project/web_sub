@@ -66,7 +66,7 @@ public class NewsController {
         News news = new News();
         news.setTitle(newsRequest.getTitle());
         news.setContent(newsRequest.getContent());
-        news.setPublisher(newsRequest.getPublisher());
+        news.setPress(newsRequest.getPress());
         
         // 날짜 처리: String이 있으면 String에서 변환, 없으면 LocalDateTime 사용
         LocalDateTime publishedAt = newsRequest.getPublishedAtFromString();
@@ -93,9 +93,8 @@ public class NewsController {
                 .id(news.getId())
                 .title(news.getTitle())
                 .content(news.getContent())
-                .publisher(news.getPublisher())
-                .publishedAt(news.getPublishedAt())
                 .press(news.getPress())
+                .publishedAt(news.getPublishedAt())
                 .imageUrl(news.getImageUrl())
                 .url(news.getUrl())
                 .build());
@@ -112,11 +111,10 @@ public class NewsController {
                     .id(news.getId())
                     .title(news.getTitle())
                     .content(news.getContent()) // 강조된 콘텐츠 포함
-                    .publisher(news.getPublisher())
+                    .press(news.getPress())
                     .publishedAt(news.getPublishedAt())
                     .imageUrl(news.getImageUrl())
                     .url(news.getUrl())
-                    .press(news.getPress())
                     .build();
 
             return ResponseEntity.ok(responseDto);
@@ -161,7 +159,7 @@ public class NewsController {
         news.setContent(request.getContent());
         news.setUrl(request.getUrl());
         news.setImageUrl(request.getEffectiveImageUrl());
-        news.setPress(request.getEffectivePress());
+        news.setPress(request.getPress());
         
         // 날짜 처리: String이 있으면 String에서 변환, 없으면 LocalDateTime 사용
         LocalDateTime publishedAt = request.getPublishedAtFromString();
@@ -245,7 +243,7 @@ public class NewsController {
                 .id(news.getId())
                 .title(news.getTitle())
                 .content(news.getContent())
-                .publisher(news.getPublisher())
+                .press(news.getPress())
                 .publishedAt(news.getPublishedAt())
                 .imageUrl(news.getImageUrl())
                 .url(news.getUrl())

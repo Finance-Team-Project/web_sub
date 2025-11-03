@@ -125,6 +125,8 @@ public class QuizService {
             item.setQuestion(questionBuilder.toString());
             item.setTermId(qt.getTerm().getId());
             item.setInitialHint(qt.getInitialHint());
+            // 정답 보기 기능을 위해 정답 단어 포함 (클라이언트에서 제출 후 오답만 노출)
+            item.setTerm(answer);
             item.setLevel(qt.getTerm().getFrequency() != null ? qt.getTerm().getFrequency() : 1);
             return item;
         }).toList();
@@ -644,6 +646,7 @@ public class QuizService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         int score = 0;
+        Map<String, Boolean> results = new HashMap<>();
         if (answers == null) answers = new HashMap<>();
 
         for (Map.Entry<String, String> entry : answers.entrySet()) {
@@ -658,9 +661,18 @@ public class QuizService {
             String normalizedUser = Normalizer.normalize(userAnswer == null ? "" : userAnswer);
             String normalizedCorrect = Normalizer.normalize(term.getTerm());
             boolean correct = userAnswer != null && !userAnswer.isEmpty() && normalizedUser.equals(normalizedCorrect);
+            results.put(termText, correct);
+            
             if (correct) {
                 int level = term.getFrequency() != null ? term.getFrequency() : 1;
                 score += level * 10;
+                
+                // 정답 처리 시 단어장에서 해당 단어 삭제
+                try {
+                    userVocabularyRepository.deleteByUserAndTerm(user, term);
+                } catch (Exception e) {
+                    System.err.println("[submitCrossword] 단어장 삭제 중 오류: " + e.getMessage());
+                }
             }
         }
 
@@ -694,6 +706,7 @@ public class QuizService {
         Project.Finance_News.dto.CrosswordResultDto dto = new Project.Finance_News.dto.CrosswordResultDto();
         dto.setScore(score);
         dto.setTotalPoints(latestTotalPoints);
+        dto.setResults(results);
         return dto;
     }
 }

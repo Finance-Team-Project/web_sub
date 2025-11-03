@@ -22,11 +22,8 @@ public class NewsUploadRequestDto {
 
     private String url;
 
-    // 매체명 호환: press, publisher, source
+    // 매체명
     private String press;
-    private String publisher;
-    @JsonProperty("source")
-    private String source;
 
     // 다양한 날짜 입력 포맷 수용
     @JsonProperty("date")
@@ -54,13 +51,6 @@ public class NewsUploadRequestDto {
         return null;
     }
 
-    // 수신된 필드 중 사용 가능한 press/publisher/source 해석
-    public String getEffectivePress() {
-        if (press != null && !press.isBlank()) return press;
-        if (publisher != null && !publisher.isBlank()) return publisher;
-        if (source != null && !source.isBlank()) return source;
-        return null;
-    }
 
     // 다양한 입력을 LocalDateTime으로 변환하는 메서드
     public LocalDateTime getPublishedAtFromString() {

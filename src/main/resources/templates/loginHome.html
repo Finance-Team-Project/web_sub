@@ -357,6 +357,13 @@
             color: #fff;
             font-size: 1.1rem;
         }
+        .welcome-message a {
+            transition: opacity 0.2s;
+        }
+        .welcome-message a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
         .auth-buttons button {
             background: #003675;
             color: white;
@@ -611,47 +618,19 @@
         <div class="logo">STJ</div>
         <div class="menu">
             <div class="menu-item">
-                <a href="#">뉴스 보기</a>
-                <div class="dropdown">
-                    <h4>뉴스 보기</h4>
-                    <ul>
-                        <li><a href="#">최신 뉴스</a></li>
-                        <li><a href="#">오늘의 이슈</a></li>
-                        <li><a href="/keyword-cloud">오늘의 키워드</a></li>
-                        <li><a href="#">뉴스 상세 검색</a></li>
-                    </ul>
-                </div>
+                <a href="/keyword-cloud">오늘의 키워드</a>
             </div>
             <div class="menu-item">
-                <a href="#">AI 해설</a>
-                <div class="dropdown">
-                    <h4>AI 요약 / 해설</h4>
-                    <ul>
-                        <li><a href="#">뉴스 요약 보기</a></li>
-                        <li><a href="#">경제 용어 해설</a></li>
-                        <li><a href="#">문맥 기반 해설</a></li>
-                    </ul>
-                </div>
+                <a href="/vocabulary">단어장</a>
             </div>
             <div class="menu-item">
                 <a href="#">단어 학습</a>
-                <div class="dropdown">
-                    <h4>금융 단어 학습</h4>
-                    <ul>
-                        <li><a href="/vocabulary">단어장</a></li>
-                        <li><a href="#">자주 나오는 키워드</a></li>
-                        <li><a href="#">단어 랭킹</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="menu-item">
-                <a href="#">퀴즈</a>
                 <div class="dropdown">
                     <h4>금융 퀴즈</h4>
                     <ul>
                         <li><a href="/quiz/short-answer">단어 퀴즈</a></li>
                         <li><a href="#" onclick="openCrosswordQuiz()">가로세로 낱말 퀴즈</a></li>
-                        <li><a href="#">랭킹</a></li>
+                        <li><a href="/ranking">랭킹</a></li>
                     </ul>
                 </div>
             </div>
@@ -668,7 +647,11 @@
             </div>
         </div>
         <div class="auth-buttons">
-            <span class="welcome-message"><span th:text="${user.nickname}"></span>님 환영합니다!</span>
+            <span class="welcome-message">
+                <a href="/mypage" style="color: white; text-decoration: none; cursor: pointer;">
+                    <span th:text="${user.nickname}"></span>님 환영합니다!
+                </a>
+            </span>
             <form action="/logout" method="post" style="display:inline;">
                 <button type="submit">로그아웃</button>
             </form>

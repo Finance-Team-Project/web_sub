@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STJ 랭킹</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: 'Noto Sans KR', sans-serif;
+          background: linear-gradient(135deg, #003675 0%, #2563eb 100%);
+          min-height: 100vh;
+          color: #333;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 60px 20px;
+        }
+
+        .header {
+          text-align: center;
+          color: #fff;
+          margin-bottom: 40px;
+          animation: fadeIn 0.8s ease;
+        }
+
+        .header h1 {
+          font-size: 2.8rem;
+          font-weight: 700;
+          margin-bottom: 10px;
+        }
+
+        .header p {
+          font-size: 1.1rem;
+          opacity: 0.85;
+        }
+
+        .ranking-list {
+          background: #ffffff;
+          border-radius: 16px;
+          width: 100%;
+          max-width: 850px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          padding: 28px 24px;
+          animation: fadeUp 0.8s ease;
+        }
+
+        .ranking-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 20px;
+          border-radius: 12px;
+          background: #f8f9fc;
+          margin-bottom: 10px;
+          transition: all 0.25s ease;
+        }
+
+        .ranking-item:hover {
+          background: #eef3ff;
+          transform: translateY(-2px);
+        }
+
+        .ranking-item.top-1 {
+          background: linear-gradient(90deg, #ffcc33, #ffb703);
+          color: #fff;
+          font-weight: 700;
+        }
+        .ranking-item.top-2 {
+          background: linear-gradient(90deg, #cfd4da, #b0b6bd);
+          color: #fff;
+          font-weight: 700;
+        }
+        .ranking-item.top-3 {
+          background: linear-gradient(90deg, #cd7f32, #b36b26);
+          color: #fff;
+          font-weight: 700;
+        }
+
+        .rank-left {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .rank-number {
+          font-size: 1.8rem;
+          font-weight: 700;
+          min-width: 40px;
+          text-align: center;
+        }
+
+        .medal {
+          font-size: 2rem;
+        }
+
+        .user-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .user-name {
+          font-size: 1.15rem;
+          font-weight: 700;
+        }
+
+        .user-points {
+          font-size: 0.95rem;
+          color: #555;
+        }
+
+        .back-btn {
+          margin-top: 40px;
+          display: inline-block;
+          background: #fff;
+          color: #003675;
+          border: 2px solid #003675;
+          padding: 12px 32px;
+          border-radius: 30px;
+          font-weight: 700;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .back-btn:hover {
+          background: #003675;
+          color: #fff;
+          transform: translateY(-2px);
+        }
+
+        .loading, .error {
+          text-align: center;
+          padding: 40px;
+          font-size: 1.1rem;
+          color: #003675;
+          animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+          .ranking-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+          .rank-number {
+            font-size: 1.5rem;
+          }
+          .user-name {
+            font-size: 1rem;
+          }
+          .header h1 {
+            font-size: 2.2rem;
+          }
+        }
+    </style>
+</head>
+
+<body>
+<div class="header">
+    <h1>🏆 STJ 랭킹</h1>
+    <p>누가 가장 높은 포인트를 획득했을까요?</p>
+</div>
+
+<div class="ranking-list" id="rankingList">
+    <div class="loading">랭킹을 불러오는 중...</div>
+</div>
+
+<a href="/" class="back-btn">🏠 홈으로 돌아가기</a>
+
+<script>
+    window.onload = async function() {
+      const rankingList = document.getElementById('rankingList');
+      try {
+        const response = await fetch('/api/ranking');
+        const ranking = await response.json();
+
+        rankingList.innerHTML = '';
+
+        if (!ranking || ranking.length === 0) {
+          rankingList.innerHTML = '<div class="loading">아직 랭킹 데이터가 없습니다.</div>';
+          return;
+        }
+
+        ranking.forEach((user, i) => {
+          const item = document.createElement('div');
+          const topClass = i === 0 ? 'top-1' : i === 1 ? 'top-2' : i === 2 ? 'top-3' : '';
+          item.className = `ranking-item ${topClass}`;
+          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+
+          item.innerHTML = `
+            <div class="rank-left">
+              <div class="rank-number">${user.rank}</div>
+              <div class="medal">${medal}</div>
+              <div class="user-info">
+                <div class="user-name">${user.nickname}</div>
+                <div class="user-points">${user.totalPoints}점</div>
+              </div>
+            </div>
+          `;
+          rankingList.appendChild(item);
+        });
+      } catch (err) {
+        console.error(err);
+        rankingList.innerHTML = '<div class="error">⚠️ 랭킹 정보를 불러오는데 실패했습니다.</div>';
+      }
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - STJ 금융뉴스 이해 플랫폼</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            font-family: 'Noto Sans KR', 'Poppins', sans-serif;
+            background-color: #F5F7FB;
+        }
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #0F1C7C;
+            padding: 0 40px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            background-color: rgba(255,255,255,0.15);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 40px;
+        }
+        
+        /* Page Title */
+        .page-title {
+            font-size: 2rem;
+            color: #0F1C7C;
+            margin-bottom: 40px;
+            text-align: center;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Section Cards */
+        .section {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .section:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F1C7C;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #E0E6F0;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2B5CF1, #0F1C7C);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(43, 92, 241, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .profile-avatar .avatar-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-size: 1.8rem;
+            color: #0F1C7C;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .profile-meta {
+            color: #666666;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .profile-id {
+            color: #999999;
+            font-size: 14px;
+        }
+        
+        .motivational-msg {
+            color: #444444;
+            font-size: 16px;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+        
+        .points-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #F8F9FF, #F0F2F8);
+            border-radius: 12px;
+            border: 2px solid #E8EDF5;
+        }
+        
+        .points-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .points-label {
+            color: #666666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .points-value {
+            font-size: 1.8rem;
+            color: #2B5CF1;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .progress-container {
+            margin-top: 16px;
+        }
+        
+        .progress-label {
+            font-size: 14px;
+            color: #444444;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .progress-bar-wrapper {
+            background: #E8EDF5;
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2B5CF1, #4A7AFF);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            color: #666666;
+            margin-top: 6px;
+        }
+        
+        /* Circular Progress */
+        .progress-circle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .progress-circle {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-circle-bg {
+            fill: none;
+            stroke: #E8EDF5;
+            stroke-width: 8;
+        }
+        
+        .progress-circle-progress {
+            fill: none;
+            stroke: #2B5CF1;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 289;
+            stroke-dashoffset: 289;
+            transition: stroke-dashoffset 0.8s ease;
+        }
+        
+        .progress-circle-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2B5CF1;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .progress-circle-label {
+            font-size: 14px;
+            color: #444444;
+            font-weight: 500;
+        }
+        
+        /* Top Keywords */
+        .top-keywords {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .keyword-badge {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #E8EDF5, #F0F2F8);
+            border-radius: 20px;
+            font-size: 14px;
+            color: #2B5CF1;
+            font-weight: 600;
+            border: 1px solid #D0D8E8;
+        }
+        
+        /* News Section */
+        .news-filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: #FFFFFF;
+            border: 2px solid #E0E6F0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #444444;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover {
+            border-color: #2B5CF1;
+            color: #2B5CF1;
+        }
+        
+        .filter-btn.active {
+            background: #2B5CF1;
+            color: white;
+            border-color: #2B5CF1;
+        }
+        
+        .news-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        
+        .news-item {
+            border: 1px solid #E0E6F0;
+            border-radius: 12px;
+            padding: 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            background: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .news-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            border-color: #2B5CF1;
+        }
+        
+        .news-thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #E8EDF5, #F0F2F8);
+            flex-shrink: 0;
+        }
+        
+        .news-content {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .news-title {
+            font-size: 16px;
+            color: #0F1C7C;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        
+        .news-summary {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+        
+        .news-keywords-preview {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .news-keyword-tag {
+            padding: 4px 10px;
+            background: #F0F2F8;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #2B5CF1;
+        }
+        
+        .news-meta {
+            font-size: 12px;
+            color: #999999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .news-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 12px;
+        }
+        
+        .news-action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: #F5F7FB;
+            border: 1px solid #E0E6F0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #444444;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .news-action-btn:hover {
+            background: #2B5CF1;
+            color: white;
+            border-color: #2B5CF1;
+        }
+        
+        .no-news {
+            text-align: center;
+            color: #999999;
+            padding: 60px 20px;
+            font-size: 16px;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 32px;
+            padding: 20px 0;
+        }
+        
+        .pagination-btn {
+            padding: 10px 16px;
+            background: #FFFFFF;
+            border: 2px solid #E0E6F0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #444444;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #2B5CF1;
+            color: #2B5CF1;
+            background: #F8F9FF;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-btn.active {
+            background: #2B5CF1;
+            color: white;
+            border-color: #2B5CF1;
+        }
+        
+        .pagination-info {
+            color: #666666;
+            font-size: 14px;
+            margin: 0 16px;
+        }
+        
+        /* Account Management */
+        .tab-container {
+            display: flex;
+            gap: 0;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #E0E6F0;
+        }
+        
+        .tab-button {
+            padding: 14px 28px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #666666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .tab-button:hover {
+            color: #2B5CF1;
+        }
+        
+        .tab-button.active {
+            color: #2B5CF1;
+            border-bottom-color: #2B5CF1;
+            font-weight: 700;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .account-form {
+            max-width: 600px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #0F1C7C;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #E0E6F0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2B5CF1;
+        }
+        
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #E0E6F0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        
+        .password-strength-weak {
+            background: #FF4444;
+        }
+        
+        .password-strength-medium {
+            background: #FFB800;
+        }
+        
+        .password-strength-strong {
+            background: #2B5CF1;
+        }
+        
+        .form-button {
+            background: #2B5CF1;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .form-button:hover {
+            background: #1A47D9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(43, 92, 241, 0.3);
+        }
+        
+        .form-button:disabled {
+            background: #CCCCCC;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .form-button.delete {
+            background: #FF4444;
+            margin-top: 32px;
+        }
+        
+        .form-button.delete:hover {
+            background: #DD2222;
+        }
+        
+        .preferences {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 2px solid #E0E6F0;
+        }
+        
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #E8EDF5;
+        }
+        
+        .preference-item:last-child {
+            border-bottom: none;
+        }
+        
+        .preference-label {
+            font-size: 16px;
+            color: #444444;
+            font-weight: 500;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #CCCCCC;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #2B5CF1;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            background: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        .toast.show {
+            display: flex;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .toast-icon {
+            font-size: 24px;
+        }
+        
+        .toast.success .toast-icon {
+            color: #2B5CF1;
+        }
+        
+        .toast.error .toast-icon {
+            color: #FF4444;
+        }
+        
+        .toast-message {
+            flex: 1;
+            font-size: 15px;
+            color: #444444;
+            font-weight: 500;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            animation: scaleIn 0.2s ease;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0F1C7C;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999999;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #F5F7FB;
+            color: #444444;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 90px 16px 32px;
+            }
+            
+            .profile-section {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .news-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="navbar">
+        <div class="logo">STJ</div>
+        <a href="/" class="back-link">← 홈으로</a>
+    </div>
+</header>
+
+<div class="container">
+    <h1 class="page-title">마이페이지</h1>
+    
+    <!-- 프로필 섹션 -->
+    <div class="section">
+        <h2 class="section-title">프로필</h2>
+        <div class="profile-section">
+            <div class="profile-avatar">
+                <img th:if="${profileBadgeImageUrl != null}" 
+                     th:src="${profileBadgeImageUrl}" 
+                     alt="프로필 뱃지"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div th:classappend="${profileBadgeImageUrl != null} ? 'avatar-text' : 'avatar-text'"
+                     th:style="${profileBadgeImageUrl != null} ? 'display: none;' : 'display: flex;'"
+                     class="avatar-text" 
+                     th:text="${#strings.substring(user.nickname, 0, 1)}">U</div>
+            </div>
+            <div class="profile-info">
+                <div class="profile-name" th:text="${user.nickname}">사용자 닉네임</div>
+                <div class="profile-meta" th:text="${user.email}">user@example.com</div>
+                <div class="profile-id">아이디: <span th:text="${user.loginId}">loginId</span></div>
+                <div class="motivational-msg" th:text="'시스님, 오늘도 금융 한 걸음 💡'">시스님, 오늘도 금융 한 걸음 💡</div>
+            </div>
+        </div>
+        
+        <div class="points-info">
+            <div class="points-row">
+                <div class="points-label">보유 포인트</div>
+                <div class="points-value" th:text="${totalPoints} + ' P'">0 P</div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-circle-wrapper">
+                    <div class="progress-circle">
+                        <svg width="100" height="100">
+                            <circle class="progress-circle-bg" cx="50" cy="50" r="46"></circle>
+                            <circle class="progress-circle-progress" cx="50" cy="50" r="46" 
+                                    th:style="'stroke-dashoffset: ' + (289 - (289 * ${weeklyProgress} / 100)) + ';'"></circle>
+                        </svg>
+                        <div class="progress-circle-text" th:text="${weeklyProgress} + '%'">75%</div>
+                    </div>
+                    <div class="progress-circle-label">
+                        <div style="font-size: 16px; font-weight: 600; color: #0F1C7C; margin-bottom: 4px;">이번 주 학습률</div>
+                        <div style="font-size: 14px; color: #666;">목표: 10개 뉴스</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${!#lists.isEmpty(topKeywords)}" class="top-keywords">
+                <span style="color: #666; font-weight: 500;">가장 많이 본 키워드:</span>
+                <span th:each="keyword : ${topKeywords}" class="keyword-badge" th:text="'#' + ${keyword}">#금리</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 내가 본 뉴스 섹션 -->
+    <div class="section" id="news-section">
+        <h2 class="section-title">내가 본 뉴스</h2>
+        <div class="news-filter-bar">
+            <button class="filter-btn active" onclick="filterNews('recent')">최근 본 순</button>
+        </div>
+        
+        <div class="news-list" id="news-list" th:if="${!#lists.isEmpty(recentNews)}">
+            <div class="news-item" th:each="news : ${recentNews}" 
+                 th:attr="data-id=${news.id}, data-date=${#temporals.format(news.publishedAt, 'yyyy-MM-dd HH:mm:ss')}, data-url=${news.url}"
+                 onclick="goToNewsFromElement(this, event)">
+                <img th:if="${news.imageUrl}" th:src="${news.imageUrl}" class="news-thumbnail" alt="뉴스 썸네일">
+                <div class="news-thumbnail" th:unless="${news.imageUrl}" style="display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px;">이미지 없음</div>
+                <div class="news-content">
+                    <div class="news-title" th:text="${news.title}">뉴스 제목</div>
+                    <div class="news-summary" th:if="${newsSummaries != null and newsSummaries.containsKey(news.id)}" 
+                         th:text="${#strings.abbreviate(newsSummaries.get(news.id), 100)}">뉴스 요약 내용이 여기에 표시됩니다...</div>
+                    <div class="news-keywords-preview" th:if="${newsKeywords != null and newsKeywords.containsKey(news.id) and !#lists.isEmpty(newsKeywords.get(news.id))}">
+                        <span th:each="keyword : ${newsKeywords.get(news.id)}" class="news-keyword-tag" th:text="${keyword}">#키워드</span>
+                    </div>
+                    <div class="news-meta">
+                        <span th:text="${news.press}">언론사</span>
+                        <span th:text="${#temporals.format(news.publishedAt, 'yyyy.MM.dd')}">2024.01.01</span>
+                    </div>
+                    <div class="news-actions">
+                        <button class="news-action-btn" th:onclick="'deleteNews(' + ${news.id} + ', event)'">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="no-news" th:if="${#lists.isEmpty(recentNews)}">
+            아직 본 뉴스가 없습니다. 뉴스를 읽어보세요! 📰
+        </div>
+        
+        <!-- Pagination -->
+        <div id="pagination-container" th:if="${totalPages > 1}" class="pagination"
+             th:attr="data-current-page=${currentPage}, data-total-pages=${totalPages}">
+            <button id="prev-btn" class="pagination-btn" 
+                    th:disabled="${currentPage == 0}"
+                    th:style="${currentPage == 0} ? 'pointer-events: none; opacity: 0.5;' : ''">‹ 이전</button>
+            
+            <span id="pagination-info" th:if="${totalPages > 0}" class="pagination-info">
+                <span id="current-page-num" th:text="${currentPage + 1}">1</span> / <span id="total-pages-num" th:text="${totalPages}">1</span> 페이지
+                (<span id="total-news-num" th:text="${totalNews}">0</span>개)
+            </span>
+            
+            <button id="next-btn" class="pagination-btn" 
+                    th:disabled="${currentPage >= totalPages - 1}"
+                    th:style="${currentPage >= totalPages - 1} ? 'pointer-events: none; opacity: 0.5;' : ''">다음 ›</button>
+        </div>
+    </div>
+    
+    <!-- 계정관리 섹션 -->
+    <div class="section">
+        <h2 class="section-title">계정관리</h2>
+        <div class="tab-container">
+            <button class="tab-button active" onclick="showTab('nickname')">닉네임 변경</button>
+            <button class="tab-button" onclick="showTab('password')">비밀번호 변경</button>
+        </div>
+        
+        <!-- 닉네임 변경 탭 -->
+        <div id="nickname-tab" class="tab-content active">
+            <form class="account-form" onsubmit="updateNickname(event)">
+                <div class="form-group">
+                    <label class="form-label">현재 닉네임</label>
+                    <input type="text" class="form-input" th:value="${user.nickname}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">새 닉네임</label>
+                    <input type="text" id="newNickname" class="form-input" placeholder="새 닉네임을 입력하세요" required>
+                </div>
+                <button type="submit" class="form-button">저장</button>
+            </form>
+        </div>
+        
+        <!-- 비밀번호 변경 탭 -->
+        <div id="password-tab" class="tab-content">
+            <form class="account-form" onsubmit="updatePassword(event)">
+                <div class="form-group">
+                    <label class="form-label">현재 비밀번호</label>
+                    <input type="password" id="currentPassword" class="form-input" placeholder="현재 비밀번호를 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">새 비밀번호</label>
+                    <input type="password" id="newPassword" class="form-input" placeholder="새 비밀번호를 입력하세요" required onkeyup="checkPasswordStrength(this.value)">
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">새 비밀번호 확인</label>
+                    <input type="password" id="newPasswordConfirm" class="form-input" placeholder="새 비밀번호를 다시 입력하세요" required>
+                </div>
+                <button type="submit" class="form-button">비밀번호 변경</button>
+            </form>
+            
+            <div class="preferences">
+                <div class="preference-item">
+                    <span class="preference-label">뉴스 요약 알림</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="preference-item">
+                    <span class="preference-label">단어 퀴즈 리마인더</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="form-button delete" onclick="showDeleteConfirm()">회원 탈퇴</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+    <div class="toast-icon">✓</div>
+    <div class="toast-message"></div>
+</div>
+
+
+<!-- Delete Confirm Modal -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">회원 탈퇴 확인</h3>
+            <button class="modal-close" onclick="closeDeleteModal()">×</button>
+        </div>
+        <div style="padding: 20px 0;">
+            <p style="color: #444; line-height: 1.8; margin-bottom: 24px;">
+                정말로 회원 탈퇴를 하시겠습니까?<br>
+                탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.
+            </p>
+            <div style="display: flex; gap: 12px;">
+                <button class="form-button" onclick="closeDeleteModal()" style="background: #CCCCCC; flex: 1;">취소</button>
+                <button class="form-button delete" onclick="deleteAccount()" style="flex: 1;">탈퇴하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const userId = /*[[${user.id}]]*/ null;
+    const newsKeywords = /*[[${newsKeywords}]]*/ {};
+    let currentFilter = 'recent';
+    
+    // Tab switching
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(tabName + '-tab').classList.add('active');
+    }
+    
+    // Toast notification
+    function showToast(message, isSuccess = true) {
+        const toast = document.getElementById('toast');
+        toast.className = 'toast ' + (isSuccess ? 'success' : 'error');
+        toast.querySelector('.toast-icon').textContent = isSuccess ? '✓' : '✗';
+        toast.querySelector('.toast-message').textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // Update nickname
+    function updateNickname(event) {
+        event.preventDefault();
+        const newNickname = document.getElementById('newNickname').value.trim();
+        
+        if (!newNickname) {
+            showToast('닉네임을 입력해주세요.', false);
+            return;
+        }
+        
+        fetch('/api/users/' + userId + '/nickname', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nickname: newNickname })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('✅ 닉네임이 변경되었습니다.');
+                document.querySelector('.profile-name').textContent = data.nickname;
+                document.getElementById('newNickname').value = '';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast(data.message || '닉네임 변경에 실패했습니다.', false);
+            }
+        })
+        .catch(error => {
+            showToast('오류가 발생했습니다.', false);
+            console.error('Error:', error);
+        });
+    }
+    
+    // Update password
+    function updatePassword(event) {
+        event.preventDefault();
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const newPasswordConfirm = document.getElementById('newPasswordConfirm').value;
+        
+        if (!currentPassword || !newPassword || !newPasswordConfirm) {
+            showToast('모든 항목을 입력해주세요.', false);
+            return;
+        }
+        
+        if (newPassword !== newPasswordConfirm) {
+            showToast('새 비밀번호가 일치하지 않습니다.', false);
+            return;
+        }
+        
+        fetch('/api/users/' + userId + '/password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                currentPassword: currentPassword,
+                newPassword: newPassword
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('🔒 비밀번호가 안전하게 수정되었습니다.');
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('newPasswordConfirm').value = '';
+                document.getElementById('passwordStrengthBar').style.width = '0%';
+            } else {
+                showToast(data.message || '비밀번호 변경에 실패했습니다.', false);
+            }
+        })
+        .catch(error => {
+            showToast('오류가 발생했습니다.', false);
+            console.error('Error:', error);
+        });
+    }
+    
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        let strength = 0;
+        
+        if (password.length >= 8) strength += 33;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 33;
+        if (password.match(/[0-9]/) && password.match(/[^a-zA-Z0-9]/)) strength += 34;
+        
+        strengthBar.style.width = strength + '%';
+        
+        if (strength < 33) {
+            strengthBar.className = 'password-strength-bar password-strength-weak';
+        } else if (strength < 66) {
+            strengthBar.className = 'password-strength-bar password-strength-medium';
+        } else {
+            strengthBar.className = 'password-strength-bar password-strength-strong';
+        }
+    }
+    
+    // Filter news
+    function filterNews(filter) {
+        currentFilter = filter;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        const newsItems = document.querySelectorAll('.news-item');
+        const sortedItems = Array.from(newsItems);
+        
+        if (filter === 'recent') {
+            sortedItems.sort((a, b) => {
+                const dateA = new Date(a.getAttribute('data-date'));
+                const dateB = new Date(b.getAttribute('data-date'));
+                return dateB - dateA;
+            });
+        }
+        
+        const newsList = document.getElementById('news-list');
+        newsList.innerHTML = '';
+        sortedItems.forEach(item => {
+                newsList.appendChild(item);
+        });
+    }
+    
+    // Go to news URL
+    function goToNewsFromElement(element, event) {
+        // 버튼 클릭 시에는 원문으로 이동하지 않음
+        if (event.target.closest('.news-actions') || event.target.closest('.news-action-btn')) {
+            return;
+        }
+        const url = element.getAttribute('data-url');
+        if (url) {
+            window.open(url, '_blank');
+        }
+    }
+    
+    // Load news page via AJAX
+    function loadNewsPage(page) {
+        // 현재 스크롤 위치 저장
+        const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // 로딩 표시
+        const newsList = document.getElementById('news-list');
+        if (newsList) {
+            newsList.style.opacity = '0.5';
+        }
+        
+        fetch('/api/mypage/news?page=' + page)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateNewsList(data.news);
+                    updatePagination(data.currentPage, data.totalPages, data.totalNews);
+                    
+                    // URL 업데이트 (새로고침 없이)
+                    const newUrl = '/mypage?page=' + page;
+                    window.history.pushState({ page: page }, '', newUrl);
+                    
+                    // 뉴스 섹션으로 스크롤 (부드럽게)
+                    const newsSection = document.getElementById('news-section');
+                    if (newsSection) {
+                        setTimeout(() => {
+                            newsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+        } else {
+                        // 뉴스 섹션을 찾지 못한 경우 원래 스크롤 위치로
+                        setTimeout(() => window.scrollTo(0, scrollPosition), 100);
+                    }
+                } else {
+                    showToast(data.message || '뉴스를 불러오는데 실패했습니다.', false);
+                }
+                
+                if (newsList) {
+                    newsList.style.opacity = '1';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('오류가 발생했습니다.', false);
+                if (newsList) {
+                    newsList.style.opacity = '1';
+                }
+            });
+    }
+    
+    // Update news list HTML
+    function updateNewsList(newsArray) {
+        const newsList = document.getElementById('news-list');
+        if (!newsList) return;
+        
+        if (newsArray.length === 0) {
+            newsList.innerHTML = '<div class="no-news">아직 본 뉴스가 없습니다. 뉴스를 읽어보세요! 📰</div>';
+            return;
+        }
+        
+        let html = '';
+        newsArray.forEach(news => {
+            let date;
+            try {
+                // Java LocalDateTime은 ISO 형식으로 직렬화됨: "2024-01-01T12:00:00"
+                date = new Date(news.publishedAt);
+                if (isNaN(date.getTime())) {
+                    // ISO 형식 파싱 시도
+                    date = new Date(news.publishedAt.replace(' ', 'T'));
+                }
+            } catch (e) {
+                date = new Date();
+            }
+            
+            const formattedDate = date.getFullYear() + '.' + 
+                                 String(date.getMonth() + 1).padStart(2, '0') + '.' + 
+                                 String(date.getDate()).padStart(2, '0');
+            const dateStr = date.getFullYear() + '-' + 
+                           String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(date.getDate()).padStart(2, '0') + ' ' +
+                           String(date.getHours()).padStart(2, '0') + ':' +
+                           String(date.getMinutes()).padStart(2, '0') + ':' +
+                           String(date.getSeconds()).padStart(2, '0');
+            
+            html += '<div class="news-item" ' +
+                   'data-id="' + news.id + '" ' +
+                   'data-date="' + dateStr + '" ' +
+                   'data-url="' + (news.url || '') + '" ' +
+                   'onclick="goToNewsFromElement(this, event)">';
+            
+            if (news.imageUrl) {
+                html += '<img src="' + news.imageUrl + '" class="news-thumbnail" alt="뉴스 썸네일">';
+            } else {
+                html += '<div class="news-thumbnail" style="display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px;">이미지 없음</div>';
+            }
+            
+            html += '<div class="news-content">';
+            html += '<div class="news-title">' + escapeHtml(news.title) + '</div>';
+            
+            if (news.summary) {
+                const summaryText = news.summary.length > 100 ? news.summary.substring(0, 100) + '...' : news.summary;
+                html += '<div class="news-summary">' + escapeHtml(summaryText) + '</div>';
+            }
+            
+            if (news.keywords && news.keywords.length > 0) {
+                html += '<div class="news-keywords-preview">';
+                news.keywords.forEach(keyword => {
+                    html += '<span class="news-keyword-tag">' + escapeHtml(keyword) + '</span>';
+                });
+                html += '</div>';
+            }
+            
+            html += '<div class="news-meta">';
+            html += '<span>' + escapeHtml(news.press || '') + '</span>';
+            html += '<span>' + formattedDate + '</span>';
+            html += '</div>';
+            
+            html += '<div class="news-actions">';
+            html += '<button class="news-action-btn" onclick="deleteNews(' + news.id + ', event)">🗑️</button>';
+            html += '</div>';
+            html += '</div></div>';
+        });
+        
+        newsList.innerHTML = html;
+    }
+    
+    // Update pagination UI
+    function updatePagination(currentPage, totalPages, totalNews) {
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentPageNum = document.getElementById('current-page-num');
+        const totalPagesNum = document.getElementById('total-pages-num');
+        const totalNewsNum = document.getElementById('total-news-num');
+        const paginationContainer = document.getElementById('pagination-container');
+        
+        if (currentPageNum) currentPageNum.textContent = currentPage + 1;
+        if (totalPagesNum) totalPagesNum.textContent = totalPages;
+        if (totalNewsNum) totalNewsNum.textContent = totalNews;
+        
+        if (prevBtn) {
+            prevBtn.disabled = currentPage === 0;
+            prevBtn.style.pointerEvents = currentPage === 0 ? 'none' : 'auto';
+            prevBtn.style.opacity = currentPage === 0 ? '0.5' : '1';
+            prevBtn.setAttribute('onclick', 'loadNewsPage(' + (currentPage - 1) + ')');
+        }
+        
+        if (nextBtn) {
+            nextBtn.disabled = currentPage >= totalPages - 1;
+            nextBtn.style.pointerEvents = currentPage >= totalPages - 1 ? 'none' : 'auto';
+            nextBtn.style.opacity = currentPage >= totalPages - 1 ? '0.5' : '1';
+            nextBtn.setAttribute('onclick', 'loadNewsPage(' + (currentPage + 1) + ')');
+        }
+        
+        // 페이지네이션 컨테이너 표시/숨김
+        if (paginationContainer) {
+            if (totalPages <= 1) {
+                paginationContainer.style.display = 'none';
+            } else {
+                paginationContainer.style.display = 'flex';
+            }
+        }
+    }
+    
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+    
+    // Delete news
+    function deleteNews(newsId, event) {
+        event.stopPropagation();
+        if (confirm('이 뉴스를 목록에서 제거하시겠습니까?')) {
+            const newsItem = event.target.closest('.news-item');
+            newsItem.style.opacity = '0';
+            newsItem.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                newsItem.remove();
+                showToast('뉴스가 제거되었습니다.');
+                // 뉴스 삭제 후 현재 페이지 다시 로드
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentPage = parseInt(urlParams.get('page') || '0');
+                loadNewsPage(currentPage);
+            }, 300);
+        }
+    }
+    
+    // Delete account
+    function showDeleteConfirm() {
+        document.getElementById('deleteModal').classList.add('show');
+    }
+    
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('show');
+    }
+    
+    function deleteAccount() {
+        if (confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+            showToast('회원 탈퇴 기능은 준비 중입니다.', false);
+            closeDeleteModal();
+        }
+    }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate progress circle
+            const weeklyProgress = /*[[${weeklyProgress}]]*/ 0;
+            const progressCircle = document.querySelector('.progress-circle-progress');
+            if (progressCircle) {
+                const circumference = 2 * Math.PI * 46;
+                const offset = circumference - (weeklyProgress / 100) * circumference;
+                progressCircle.style.strokeDasharray = circumference;
+                setTimeout(() => {
+                    progressCircle.style.strokeDashoffset = offset;
+                }, 300);
+            }
+            
+            // 페이지네이션 버튼 이벤트 리스너 등록
+            const paginationContainer = document.getElementById('pagination-container');
+            if (paginationContainer) {
+                const currentPage = parseInt(paginationContainer.getAttribute('data-current-page') || '0');
+                const totalPages = parseInt(paginationContainer.getAttribute('data-total-pages') || '1');
+                
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (currentPage > 0) {
+                            loadNewsPage(currentPage - 1);
+                        }
+                    });
+                }
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (currentPage < totalPages - 1) {
+                            loadNewsPage(currentPage + 1);
+                        }
+                    });
+                }
+            }
+        });
+</script>
+</body>
+</html>
