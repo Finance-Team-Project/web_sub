@@ -46,7 +46,9 @@ public class FastApiService {
                 newsKeywords.size(),
                 url);
             
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, cacheRequest, Map.class);
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) 
+                (ResponseEntity<?>) restTemplate.postForEntity(url, cacheRequest, Map.class);
             
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("FastAPI 캐시 업데이트 성공 - 뉴스 ID: {}, 응답: {}", 
@@ -57,11 +59,15 @@ public class FastApiService {
                     news.getId(), 
                     response.getStatusCode());
             }
+        } catch (org.springframework.web.client.ResourceAccessException e) {
+            // FastAPI 서버가 실행되지 않은 경우 - 로그만 출력하고 계속 진행
+            log.warn("FastAPI 서버에 연결할 수 없습니다 (서버가 실행 중이지 않을 수 있음). 뉴스 ID: {}, URL: {}", 
+                news.getId(), url);
         } catch (Exception e) {
+            // 기타 예외는 로그만 출력하고 계속 진행 (애플리케이션 중단 방지)
             log.error("FastAPI 캐시 업데이트 실패 - 뉴스 ID: {}, 에러: {}", 
                 news.getId(), 
                 e.getMessage());
-            throw new RuntimeException("뉴스 캐시 업데이트 실패", e);
         }
     }
 
@@ -91,9 +97,15 @@ public class FastApiService {
             
             return response;
             
+        } catch (org.springframework.web.client.ResourceAccessException e) {
+            // FastAPI 서버가 실행되지 않은 경우 - 빈 응답 반환
+            log.warn("FastAPI 서버에 연결할 수 없습니다 (서버가 실행 중이지 않을 수 있음). userId: {}, URL: {}", 
+                user.getId(), url);
+            return new RecommendResponseDto(); // 빈 응답 반환
         } catch (Exception e) {
+            // 기타 예외는 로그만 출력하고 빈 응답 반환
             log.error("추천 요청 실패 (userId={}): {}", user.getId(), e.getMessage());
-            throw new RuntimeException("뉴스 추천 요청 실패", e);
+            return new RecommendResponseDto(); // 빈 응답 반환
         }
     }
 }
