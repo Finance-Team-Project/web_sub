@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.security.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -24,5 +24,5 @@ public class UserNewsLog {
     private News news;
 
     @Column(name = "viewed_at")
-    private Timestamp viewedAt;
+    private LocalDateTime viewedAt;
 }

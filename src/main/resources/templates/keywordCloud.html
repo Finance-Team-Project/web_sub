@@ -93,7 +93,6 @@
             padding: 8px 0;
             border-bottom: 1px solid #e3e8f0;
             font-size: 1.08em;
-            cursor: pointer;
             transition: background 0.13s;
         }
         .top-keywords-list li:last-child {
@@ -101,6 +100,21 @@
         }
         .top-keywords-list li:hover {
             background: #eaf2ff;
+        }
+        .kw-link {
+            cursor: pointer;
+            color: #2563eb;
+            transition: all 0.2s;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .kw-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+            background-color: #eaf2ff;
+        }
+        .kw-link:active {
+            transform: scale(0.98);
         }
         .trend-up { color: #1db954; font-size: 1.1em; margin-left: 6px; }
         .trend-down { color: #e74c3c; font-size: 1.1em; margin-left: 6px; }
@@ -120,13 +134,108 @@
             background: rgba(0,0,0,0.25); z-index: 9999; display: flex; align-items: center; justify-content: center;
         }
         .modal-box {
-            background: #fff; border-radius: 16px; padding: 32px 36px 24px 36px; min-width: 320px; max-width: 90vw;
-            box-shadow: 0 8px 32px #223a5e22; position: relative;
+            background: #fff; border-radius: 16px; padding: 32px 36px 24px 36px; min-width: 320px; max-width: 90vw; max-height: 80vh;
+            box-shadow: 0 8px 32px #223a5e22; position: relative; overflow-y: auto;
         }
         .modal-close {
             position: absolute; top: 18px; right: 24px; border: none; background: none; font-size: 1.5em; color: #aaa; cursor: pointer;
         }
         .modal-close:hover { color: #003675; }
+        
+        /* 뉴스 목록 스타일 */
+        .news-list {
+            margin-top: 20px;
+        }
+        .news-item {
+            border: 1px solid #e3e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        .news-item:hover {
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+        .news-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .news-content {
+            color: #64748b;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+            color: #94a3b8;
+        }
+        .news-publisher {
+            font-weight: 500;
+            color: #2563eb;
+        }
+        .news-date {
+            color: #64748b;
+        }
+        .news-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .news-link:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+        .no-news {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-style: italic;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #e3e8f0;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pagination button:hover {
+            background: #f1f5f9;
+            border-color: #2563eb;
+        }
+        .pagination button.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         @media (max-width: 900px) {
             .container { flex-direction: column; gap: 24px; padding: 18px 6vw; }
             .cloud-section, .side-section { min-width: 0; }
@@ -137,7 +246,7 @@
 <div class="container">
     <div class="cloud-section">
         <div class="section-title">오늘의 키워드</div>
-        <div class="desc">최근 뉴스에서 많이 등장한 키워드를 워드클라우드로 시각화합니다.<br>키워드를 클릭하면 상세 설명을 볼 수 있습니다.</div>
+        <div class="desc">최근 뉴스에서 많이 등장한 키워드를 워드클라우드로 시각화합니다.<br>키워드를 클릭하면 해당 키워드가 포함된 뉴스 기사들을 볼 수 있습니다.</div>
         <div id="keyword-cloud"></div>
     </div>
     <div class="side-section">
@@ -154,6 +263,7 @@
         </div>
         <div class="top-keywords">
             <div class="top-keywords-title">인기 키워드 TOP 10</div>
+            <div style="font-size: 0.9em; color: #64748b; margin-bottom: 10px;">키워드를 클릭하면 관련 뉴스를 볼 수 있습니다</div>
             <ul class="top-keywords-list" id="topKeywordsList"></ul>
         </div>
     </div>
@@ -173,7 +283,7 @@
             tooltip: {
                 show: true,
                 formatter: function(params) {
-                    return params.name + ': ' + params.value;
+                    return params.name + ': ' + params.value + '회';
                 }
             },
             series: [{
@@ -204,8 +314,18 @@
         topList.innerHTML = '';
         data.slice(0, 10).forEach((item, idx) => {
             const li = document.createElement('li');
-            li.innerHTML = `<span><b>${idx+1}.</b> <span class="kw-link">${item.name}</span></span> <span>${item.value}</span>`;
-            li.querySelector('.kw-link').onclick = () => showKeywordDetail(item.name);
+            li.innerHTML = `<span><b>${idx+1}.</b> <span class="kw-link">${item.name}</span></span> <span>${item.value}회</span>`;
+            
+            // 키워드 링크에 클릭 이벤트 추가
+            const keywordLink = li.querySelector('.kw-link');
+            if (keywordLink) {
+                keywordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showKeywordNews(item.name);
+                });
+            }
+            
             topList.appendChild(li);
         });
     }
@@ -215,16 +335,88 @@
         document.getElementById('total-frequency').textContent = totalFrequency;
     }
 
-    function showKeywordDetail(keyword) {
-        // 키워드 설명 API 호출 (예시: /api/terms/{keyword})
-        fetch(`/api/terms/${encodeURIComponent(keyword)}`)
-            .then(res => res.ok ? res.json() : null)
+    function showKeywordNews(keyword, page = 0) {
+        const modalBg = document.createElement('div');
+        modalBg.className = 'modal-bg';
+        const modalBox = document.createElement('div');
+        modalBox.className = 'modal-box';
+        
+        // 로딩 상태 표시
+        modalBox.innerHTML = `
+            <button class="modal-close" onclick="document.body.removeChild(this.parentNode.parentNode)">&times;</button>
+            <h3>📰 "${keyword}" 관련 뉴스</h3>
+            <div class="loading">뉴스를 불러오는 중...</div>
+        `;
+        
+        modalBg.appendChild(modalBox);
+        document.body.appendChild(modalBg);
+
+        // 뉴스 데이터 가져오기
+        fetch(`/api/news?keyword=${encodeURIComponent(keyword)}&page=${page}&size=5`)
+            .then(res => res.json())
             .then(data => {
-                let desc = data && data.description ? data.description : '설명이 없습니다.';
-                showModal(`<h3>🔍 ${keyword}</h3><div style='margin-top:12px;'>${desc}</div>`);
+                let newsHtml = '';
+                
+                if (data.content && data.content.length > 0) {
+                    newsHtml = '<div class="news-list">';
+                    data.content.forEach(news => {
+                        const date = new Date(news.publishedAt).toLocaleDateString('ko-KR');
+                        const content = news.content ? news.content.substring(0, 100) + '...' : '';
+                        
+                        newsHtml += `
+                            <div class="news-item">
+                                <div class="news-title">${news.title}</div>
+                                <div class="news-content">${content}</div>
+                                <div class="news-meta">
+                                    <span class="news-publisher">${news.press || '미상'}</span>
+                                    <span class="news-date">${date}</span>
+                                </div>
+                                ${news.url ? `<a href="${news.url}" target="_blank" class="news-link">기사 보기 →</a>` : ''}
+                            </div>
+                        `;
+                    });
+                    newsHtml += '</div>';
+                    
+                    // 페이지네이션 추가
+                    if (data.totalPages > 1) {
+                        newsHtml += '<div class="pagination">';
+                        if (data.first) {
+                            newsHtml += '<button disabled>이전</button>';
+                        } else {
+                            newsHtml += `<button onclick="showKeywordNews('${keyword}', ${page - 1})">이전</button>`;
+                        }
+                        
+                        for (let i = 0; i < data.totalPages; i++) {
+                            if (i === page) {
+                                newsHtml += `<button class="active">${i + 1}</button>`;
+                            } else {
+                                newsHtml += `<button onclick="showKeywordNews('${keyword}', ${i})">${i + 1}</button>`;
+                            }
+                        }
+                        
+                        if (data.last) {
+                            newsHtml += '<button disabled>다음</button>';
+                        } else {
+                            newsHtml += `<button onclick="showKeywordNews('${keyword}', ${page + 1})">다음</button>`;
+                        }
+                        newsHtml += '</div>';
+                    }
+                } else {
+                    newsHtml = '<div class="no-news">해당 키워드와 관련된 뉴스를 찾을 수 없습니다.</div>';
+                }
+                
+                modalBox.innerHTML = `
+                    <button class="modal-close" onclick="document.body.removeChild(this.parentNode.parentNode)">&times;</button>
+                    <h3>📰 "${keyword}" 관련 뉴스</h3>
+                    ${newsHtml}
+                `;
             })
-            .catch(() => {
-                showModal(`<h3>🔍 ${keyword}</h3><div style='margin-top:12px;'>설명을 불러올 수 없습니다.</div>`);
+            .catch(error => {
+                modalBox.innerHTML = `
+                    <button class="modal-close" onclick="document.body.removeChild(this.parentNode.parentNode)">&times;</button>
+                    <h3>📰 "${keyword}" 관련 뉴스</h3>
+                    <div class="no-news">뉴스를 불러오는 중 오류가 발생했습니다.</div>
+                `;
             });
     }
 
@@ -238,9 +430,9 @@
         document.body.appendChild(modalBg);
     }
 
-    // 워드클라우드 클릭 시 설명
+    // 워드클라우드 클릭 시 뉴스 보기
     myChart.on('click', function(params) {
-        showKeywordDetail(params.name);
+        showKeywordNews(params.name);
     });
 
     // 키워드 검색 기능
@@ -257,13 +449,27 @@
     });
 
     fetch('/api/keyword-frequency')
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('키워드 데이터를 불러올 수 없습니다.');
+            }
+            return res.json();
+        })
         .then(json => {
-            allKeywords = json.data.map(k => ({ name: k.name, value: k.value }));
-            totalFrequency = allKeywords.reduce((sum, k) => sum + k.value, 0);
-            renderWordCloud(allKeywords);
-            renderTopKeywords(allKeywords);
-            updateStats(allKeywords);
+            if (json.data && Array.isArray(json.data)) {
+                allKeywords = json.data.map(k => ({ name: k.name, value: k.value }));
+                totalFrequency = allKeywords.reduce((sum, k) => sum + k.value, 0);
+                renderWordCloud(allKeywords);
+                renderTopKeywords(allKeywords);
+                updateStats(allKeywords);
+            } else {
+                console.error('키워드 데이터 형식이 올바르지 않습니다:', json);
+                showModal('<h3>⚠️ 오류</h3><div>키워드 데이터를 불러올 수 없습니다.</div>');
+            }
+        })
+        .catch(error => {
+            console.error('키워드 데이터 로드 오류:', error);
+            showModal('<h3>⚠️ 오류</h3><div>키워드 데이터를 불러올 수 없습니다.</div>');
         });
     window.addEventListener('resize', function() {
         myChart.resize();

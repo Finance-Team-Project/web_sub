@@ -14,7 +14,9 @@ import Project.Finance_News.domain.News;
 import Project.Finance_News.domain.NewsKeyword;
 import Project.Finance_News.domain.Term;
 import Project.Finance_News.domain.User;
+import Project.Finance_News.domain.UserNewsLog;
 import Project.Finance_News.domain.KeywordFrequency;
+import java.time.LocalDateTime;
 import Project.Finance_News.repository.GlossaryRepository;
 import Project.Finance_News.repository.NewsKeywordRepository;
 import Project.Finance_News.repository.NewsRepository;
@@ -22,6 +24,8 @@ import Project.Finance_News.repository.TermRepository;
 import Project.Finance_News.repository.UserNewsLogRepository;
 import Project.Finance_News.repository.KeywordFrequencyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,10 +36,12 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import Project.Finance_News.dto.TermDto;
+import Project.Finance_News.dto.NewsResponseDto;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class NewsService {
 
     private final NewsRepository newsRepository;
@@ -46,10 +52,11 @@ public class NewsService {
     private final KeywordFrequencyRepository keywordFrequencyRepository;
 
     public Long saveNews(News news) {
-        // 중복 뉴스 체크: url이 같은 뉴스가 있으면 저장하지 않음
+        // 중복 뉴스 체크: url이 같은 뉴스가 있으면 기존 엔티티 ID 반환(멱등성)
         if (newsRepository.existsByUrl(news.getUrl())) {
-            // 이미 존재하면 null 또는 -1 등으로 반환 (원하는 방식으로 처리 가능)
-            return null;
+            return newsRepository.findByUrl(news.getUrl())
+                    .map(News::getId)
+                    .orElse(null);
         }
         News savedNews = newsRepository.save(news);
         return savedNews.getId();
@@ -217,6 +224,24 @@ public class NewsService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public Optional<News> findById(Long id) {
+        return newsRepository.findById(id);
+    }
+
+    /**
+     * 사용자의 뉴스 클릭을 로그에 기록
+     */
+    @Transactional
+    public void logNewsClick(User user, News news) {
+        UserNewsLog newsLog = new UserNewsLog();
+        newsLog.setUser(user);
+        newsLog.setNews(news);
+        newsLog.setViewedAt(LocalDateTime.now());
+        userNewsLogRepository.save(newsLog);
+        log.info("뉴스 클릭 로그 저장 - 사용자: {}, 뉴스: {}", user.getId(), news.getId());
+    }
+
     public void decreaseKeywordFrequency(List<String> keywords) {
         for (String keyword : keywords) {
             keywordFrequencyRepository.findById(keyword).ifPresent(kf -> {
@@ -228,6 +253,26 @@ public class NewsService {
 
     public List<KeywordFrequency> getTopKeywords(int n) {
         return keywordFrequencyRepository.findAll(org.springframework.data.domain.PageRequest.of(0, n, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "frequency"))).getContent();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getTopKeywords(Long newsId) {
+        return newsKeywordRepository.findKeywordsByNewsId(newsId)
+                .stream().limit(5).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NewsResponseDto> findByKeyword(String keyword, Pageable pageable) {
+        return newsRepository.findByKeyword(keyword, pageable)
+                .map(news -> NewsResponseDto.builder()
+                        .id(news.getId())
+                        .title(news.getTitle())
+                        .content(news.getContent())
+                        .press(news.getPress())
+                        .publishedAt(news.getPublishedAt())
+                        .imageUrl(news.getImageUrl())
+                        .url(news.getUrl())
+                        .build());
     }
 
 }

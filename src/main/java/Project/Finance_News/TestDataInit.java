@@ -9,6 +9,7 @@ import Project.Finance_News.repository.BadgeRepository;
 import Project.Finance_News.repository.TermRepository;
 import Project.Finance_News.repository.UserRepository;
 import Project.Finance_News.repository.UserVocabularyRepository;
+import Project.Finance_News.service.quiz.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -41,6 +42,7 @@ public class TestDataInit {
         user1.setName("김준원");
         user1.setJob("학생");
         user1.setGoal("경제 지식이 부족해 이 부분을 함양하기 위한 목적이 있습니다.");
+
 
         User user2 = new User();
         user2.setLoginId("1111");

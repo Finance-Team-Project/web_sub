@@ -26,6 +26,7 @@ public class KeywordFrequencyController {
         int total = entities.stream().mapToInt(KeywordFrequency::getFrequency).sum();
         List<KeywordFrequencyDto> data = entities.stream()
                 .map(e -> new KeywordFrequencyDto(e.getKeyword(), e.getFrequency()))
+                .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue())) // 빈도순 내림차순 정렬
                 .collect(Collectors.toList());
         Map<String, Object> result = new HashMap<>();
         result.put("total", total);

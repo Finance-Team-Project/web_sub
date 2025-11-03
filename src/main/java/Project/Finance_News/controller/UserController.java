@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import jakarta.persistence.EntityManager;
@@ -30,6 +28,12 @@ import Project.Finance_News.domain.UserPoint;
 import Project.Finance_News.repository.UserBadgeRepository;
 import Project.Finance_News.repository.BadgeRepository;
 import Project.Finance_News.repository.UserPointRepository;
+import Project.Finance_News.repository.UserNewsLogRepository;
+import jakarta.servlet.http.HttpSession;
+import Project.Finance_News.domain.session.SessionConst;
+import Project.Finance_News.domain.UserNewsLog;
+import Project.Finance_News.domain.News;
+import Project.Finance_News.repository.NewsKeywordRepository;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,6 +42,8 @@ public class UserController {
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
     private final UserPointRepository userPointRepository;
+    private final UserNewsLogRepository userNewsLogRepository;
+    private final NewsKeywordRepository newsKeywordRepository;
     
     @PersistenceContext
     private EntityManager em;
@@ -255,5 +261,312 @@ public class UserController {
         }
         
         return ranking;
+    }
+    
+    // 마이페이지 메인
+    @GetMapping("/mypage")
+    public String myPage(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            HttpSession session, 
+            Model model) {
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+        
+        // 사용자 정보
+        User user = userRepository.findById(loginUser.getId()).orElseThrow();
+        
+        // 프로필 정보
+        UserPoint userPoint = userPointRepository.findByUser(user);
+        int totalPoints = userPoint != null ? userPoint.getTotalPoint() : 0;
+        
+        // 티어 계산 (포인트 기반)
+        String tier = calculateTier(totalPoints);
+        
+        // 최근 본 뉴스 (중복 제거)
+        List<UserNewsLog> recentLogs = userNewsLogRepository.findByUserOrderByViewedAtDesc(user);
+        List<News> allRecentNews = recentLogs.stream()
+                .map(UserNewsLog::getNews)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        // 페이지네이션 (페이지당 3개)
+        int pageSize = 3;
+        int totalNews = allRecentNews.size();
+        int totalPages = totalNews > 0 ? (int) Math.ceil((double) totalNews / pageSize) : 0;
+        
+        List<News> recentNews;
+        if (totalNews == 0) {
+            recentNews = new ArrayList<>();
+        } else {
+            int startIndex = Math.min(page * pageSize, totalNews);
+            int endIndex = Math.min(startIndex + pageSize, totalNews);
+            recentNews = allRecentNews.subList(startIndex, endIndex);
+        }
+        
+        // 뉴스별 요약 및 키워드 정보 준비
+        Map<Long, String> newsSummaries = recentNews.stream()
+                .filter(n -> n.getNewsSummary() != null)
+                .collect(Collectors.toMap(
+                    News::getId,
+                    n -> n.getNewsSummary().getSummary() != null ? n.getNewsSummary().getSummary() : ""
+                ));
+        
+        Map<Long, List<String>> newsKeywords = recentNews.stream()
+                .collect(Collectors.toMap(
+                    News::getId,
+                    n -> newsKeywordRepository.findKeywordsByNewsId(n.getId())
+                            .stream()
+                            .distinct()
+                            .collect(Collectors.toList())
+                ));
+        
+        // 가장 많이 본 키워드 TOP 3 (전체 뉴스 로그에서)
+        Map<String, Long> keywordCounts = recentLogs.stream()
+                .flatMap(log -> newsKeywordRepository.findKeywordsByNewsId(log.getNews().getId()).stream())
+                .distinct()
+                .collect(Collectors.groupingBy(k -> k, Collectors.counting()));
+        
+        List<String> topKeywords = keywordCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        
+        // 이번 주 학습률 계산 (최근 7일간 본 뉴스 수 / 목표 10개)
+        long thisWeekNewsCount = recentLogs.stream()
+                .filter(log -> log.getViewedAt() != null && 
+                        log.getViewedAt().isAfter(java.time.LocalDateTime.now().minusDays(7)))
+                .map(log -> log.getNews().getId())
+                .distinct()
+                .count();
+        int weeklyProgress = Math.min(100, (int)(thisWeekNewsCount * 10)); // 최대 100%
+        
+        // 사용자 레벨 계산 (포인트 기반)
+        int userLevel = calculateLevel(totalPoints);
+        int pointsToNextLevel = calculatePointsToNextLevel(totalPoints);
+        
+        // 사용자가 획득한 뱃지 중 가장 최근에 획득한 뱃지 이미지 가져오기
+        List<UserBadge> earnedBadges = userBadgeRepository.findByUser(user);
+        String profileBadgeImageUrl = null;
+        if (!earnedBadges.isEmpty()) {
+            // 가장 최근에 획득한 뱃지 찾기
+            UserBadge latestBadge = earnedBadges.stream()
+                    .filter(ub -> ub.getGrantedAt() != null)
+                    .max(java.util.Comparator.comparing(UserBadge::getGrantedAt))
+                    .orElse(earnedBadges.get(0)); // grantedAt이 null인 경우도 있으므로 첫 번째 뱃지 사용
+            
+            if (latestBadge != null && latestBadge.getBadge() != null) {
+                profileBadgeImageUrl = latestBadge.getBadge().getImageUrl();
+            }
+        }
+        
+        model.addAttribute("user", user);
+        model.addAttribute("totalPoints", totalPoints);
+        model.addAttribute("tier", tier);
+        model.addAttribute("recentNews", recentNews);
+        model.addAttribute("newsSummaries", newsSummaries);
+        model.addAttribute("newsKeywords", newsKeywords);
+        model.addAttribute("topKeywords", topKeywords);
+        model.addAttribute("weeklyProgress", weeklyProgress);
+        model.addAttribute("userLevel", userLevel);
+        model.addAttribute("pointsToNextLevel", pointsToNextLevel);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalNews", totalNews);
+        model.addAttribute("profileBadgeImageUrl", profileBadgeImageUrl);
+        
+        return "users/mypage";
+    }
+    
+    // 레벨 계산 (포인트 기반)
+    private int calculateLevel(int totalPoints) {
+        if (totalPoints >= 1000) return 5;
+        if (totalPoints >= 500) return 4;
+        if (totalPoints >= 200) return 3;
+        if (totalPoints >= 100) return 2;
+        return 1;
+    }
+    
+    // 다음 레벨까지 필요한 포인트 계산
+    private int calculatePointsToNextLevel(int totalPoints) {
+        int currentLevel = calculateLevel(totalPoints);
+        int nextLevelThreshold;
+        if (currentLevel == 1) nextLevelThreshold = 100;
+        else if (currentLevel == 2) nextLevelThreshold = 200;
+        else if (currentLevel == 3) nextLevelThreshold = 500;
+        else if (currentLevel == 4) nextLevelThreshold = 1000;
+        else return 0; // 최대 레벨
+        return Math.max(0, nextLevelThreshold - totalPoints);
+    }
+    
+    // 티어 계산 (포인트 기반)
+    private String calculateTier(int totalPoints) {
+        if (totalPoints >= 1000) return "플래티넘";
+        if (totalPoints >= 500) return "골드";
+        if (totalPoints >= 100) return "실버";
+        return "브론즈";
+    }
+    
+    // 닉네임 수정 API
+    @PostMapping("/api/users/{userId}/nickname")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<String, Object> updateNickname(
+            @PathVariable Long userId,
+            @RequestBody Map<String, String> request,
+            HttpSession session) {
+        
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if (loginUser == null || !loginUser.getId().equals(userId)) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "권한이 없습니다.");
+            return error;
+        }
+        
+        String newNickname = request.get("nickname");
+        if (newNickname == null || newNickname.trim().isEmpty()) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "닉네임을 입력해주세요.");
+            return error;
+        }
+        
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setNickname(newNickname.trim());
+        userRepository.save(user);
+        
+        // 세션 업데이트
+        session.setAttribute(SessionConst.LOGIN_USER, user);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("nickname", user.getNickname());
+        return response;
+    }
+    
+    // 비밀번호 수정 API
+    @PostMapping("/api/users/{userId}/password")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<String, Object> updatePassword(
+            @PathVariable Long userId,
+            @RequestBody Map<String, String> request,
+            HttpSession session) {
+        
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if (loginUser == null || !loginUser.getId().equals(userId)) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "권한이 없습니다.");
+            return error;
+        }
+        
+        String currentPassword = request.get("currentPassword");
+        String newPassword = request.get("newPassword");
+        
+        if (currentPassword == null || newPassword == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "현재 비밀번호와 새 비밀번호를 입력해주세요.");
+            return error;
+        }
+        
+        User user = userRepository.findById(userId).orElseThrow();
+        
+        // 현재 비밀번호 확인 (평문 비교 - 현재 시스템과 일치)
+        if (!currentPassword.equals(user.getPassword())) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "현재 비밀번호가 일치하지 않습니다.");
+            return error;
+        }
+        
+        // 새 비밀번호 설정 (평문 저장 - 현재 시스템과 일치)
+        user.setPassword(newPassword);
+        userRepository.save(user);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "비밀번호가 변경되었습니다.");
+        return response;
+    }
+    
+    // 마이페이지 뉴스 목록 API (AJAX용)
+    @GetMapping("/api/mypage/news")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<String, Object> getMyPageNews(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            HttpSession session) {
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if (loginUser == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "로그인이 필요합니다.");
+            return error;
+        }
+        
+        User user = userRepository.findById(loginUser.getId()).orElseThrow();
+        
+        // 최근 본 뉴스 (중복 제거)
+        List<UserNewsLog> recentLogs = userNewsLogRepository.findByUserOrderByViewedAtDesc(user);
+        List<News> allRecentNews = recentLogs.stream()
+                .map(UserNewsLog::getNews)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        // 페이지네이션 (페이지당 3개)
+        int pageSize = 3;
+        int totalNews = allRecentNews.size();
+        int totalPages = totalNews > 0 ? (int) Math.ceil((double) totalNews / pageSize) : 0;
+        
+        List<News> recentNews;
+        if (totalNews == 0) {
+            recentNews = new ArrayList<>();
+        } else {
+            int startIndex = Math.min(page * pageSize, totalNews);
+            int endIndex = Math.min(startIndex + pageSize, totalNews);
+            recentNews = allRecentNews.subList(startIndex, endIndex);
+        }
+        
+        // 뉴스별 요약 및 키워드 정보 준비
+        Map<Long, String> newsSummaries = recentNews.stream()
+                .filter(n -> n.getNewsSummary() != null)
+                .collect(Collectors.toMap(
+                    News::getId,
+                    n -> n.getNewsSummary().getSummary() != null ? n.getNewsSummary().getSummary() : ""
+                ));
+        
+        Map<Long, List<String>> newsKeywords = recentNews.stream()
+                .collect(Collectors.toMap(
+                    News::getId,
+                    n -> newsKeywordRepository.findKeywordsByNewsId(n.getId())
+                            .stream()
+                            .distinct()
+                            .collect(Collectors.toList())
+                ));
+        
+        // 응답 데이터 구성
+        List<Map<String, Object>> newsList = recentNews.stream().map(news -> {
+            Map<String, Object> newsData = new HashMap<>();
+            newsData.put("id", news.getId());
+            newsData.put("title", news.getTitle());
+            newsData.put("press", news.getPress());
+            newsData.put("publishedAt", news.getPublishedAt());
+            newsData.put("imageUrl", news.getImageUrl());
+            newsData.put("url", news.getUrl());
+            newsData.put("summary", newsSummaries.getOrDefault(news.getId(), ""));
+            newsData.put("keywords", newsKeywords.getOrDefault(news.getId(), new ArrayList<>()));
+            return newsData;
+        }).collect(Collectors.toList());
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("news", newsList);
+        response.put("currentPage", page);
+        response.put("totalPages", totalPages);
+        response.put("totalNews", totalNews);
+        
+        return response;
     }
 }

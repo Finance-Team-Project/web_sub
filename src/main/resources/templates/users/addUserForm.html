@@ -180,6 +180,20 @@
                 </div>
                 <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:red; font-size: 0.85rem;"></div>
 
+                <!-- 직업 -->
+                <div class="signup-form-row">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <input type="text" th:field="*{job}" placeholder="직업 (선택) 예: 대학생, 자영업자, 직장인" />
+                </div>
+                <div th:if="${#fields.hasErrors('job')}" th:errors="*{job}" style="color:red; font-size: 0.85rem;"></div>
+
+                <!-- 가입 목적 -->
+                <div class="signup-form-row">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <input type="text" th:field="*{goal}" placeholder="가입 목적 (선택) 예: 금융 취업, 투자 판단, 금융 공부" />
+                </div>
+                <div th:if="${#fields.hasErrors('goal')}" th:errors="*{goal}" style="color:red; font-size: 0.85rem;"></div>
+
                 <!-- 제출 버튼 -->
                 <button type="submit" class="signup-btn">회원가입</button>
             </form>

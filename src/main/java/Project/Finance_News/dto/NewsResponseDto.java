@@ -21,8 +21,8 @@ public class NewsResponseDto {
     private Long id;
     private String title;
     private String content;
-    private String publisher;
     private LocalDateTime publishedAt;
     private String imageUrl;
     private String url;
+    private String press;
 }

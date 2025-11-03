@@ -18,4 +18,8 @@ public interface UserNewsLogRepository extends JpaRepository<UserNewsLog, Long> 
 
     // 특정 사용자+뉴스의 클릭 수
     long countByUserAndNews(User user, News news);
+    
+    // 특정 사용자의 최근 본 뉴스 조회 (최신순, 중복 제거)
+    @Query("SELECT unl FROM UserNewsLog unl WHERE unl.user = :user ORDER BY unl.viewedAt DESC")
+    List<UserNewsLog> findByUserOrderByViewedAtDesc(@Param("user") User user);
 } 
