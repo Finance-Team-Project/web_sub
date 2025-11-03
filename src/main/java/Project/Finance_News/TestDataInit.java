@@ -5,10 +5,13 @@ import Project.Finance_News.domain.BadgeType;
 import Project.Finance_News.domain.Term;
 import Project.Finance_News.domain.User;
 import Project.Finance_News.domain.UserVocabulary;
+import Project.Finance_News.domain.UserPoint;
 import Project.Finance_News.repository.BadgeRepository;
 import Project.Finance_News.repository.TermRepository;
+import Project.Finance_News.repository.UserPointRepository;
 import Project.Finance_News.repository.UserRepository;
 import Project.Finance_News.repository.UserVocabularyRepository;
+import Project.Finance_News.service.badge.BadgeGrantService;
 import Project.Finance_News.service.quiz.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -27,6 +30,8 @@ public class TestDataInit {
     private final TermRepository termRepository;
     private final UserVocabularyRepository userVocabularyRepository;
     private final BadgeRepository badgeRepository;
+    private final UserPointRepository userPointRepository;
+    private final BadgeGrantService badgeGrantService;
 
     /**
      * 테스트용 데이터 추가
@@ -74,6 +79,9 @@ public class TestDataInit {
         if (savedUser1 != null) {
             initUserVocabulary(savedUser1);
         }
+        
+        // 샘플 사용자 생성 (각 등급별)
+        initSampleUsersByBadge();
     }
     
     private void initBadges() {
@@ -165,5 +173,76 @@ public class TestDataInit {
         }
         
         System.out.println("user_vocabulary 데이터 초기화 완료");
+    }
+    
+    private void initSampleUsersByBadge() {
+        // 브론즈 등급 사용자 (30포인트, 진행률 30%)
+        createSampleUser("bronze_user", "브론즈유저", "코딩왕", "학생", "경제 기초를 다지고 싶어요.", 30);
+        
+        // 실버 등급 사용자 (180포인트, 진행률 20%)
+        createSampleUser("silver_user", "실버유저", "코딩좋아", "회사원", "금융 지식을 쌓아 커리어를 발전시키고 싶습니다.", 180);
+        
+        // 골드 등급 사용자 (575포인트, 진행률 15%)
+        createSampleUser("gold_user", "골드유저", "정상을 향해", "투자자", "시장 동향을 파악해 투자에 활용하고 싶어요.", 575);
+        
+        // 플래티넘 등급 사용자 (1100포인트, 진행률 100%)
+        createSampleUser("platinum_user", "플래티넘유저", "kfc좋아", "금융전문가", "최신 경제 뉴스를 분석해 전문성을 높이고 있습니다.", 1100);
+        
+        System.out.println("샘플 사용자 데이터 초기화 완료 (브론즈, 실버, 골드, 플래티넘)");
+    }
+    
+    private User createSampleUser(String loginId, String nickname, String name, String job, String goal, int points) {
+        // 이미 존재하는 사용자인지 확인
+        if (userRepository.existsByLoginId(loginId)) {
+            User existingUser = userRepository.findByLoginId(loginId).orElse(null);
+            if (existingUser != null) {
+                // 포인트 업데이트
+                updateUserPoints(existingUser, points);
+                // 뱃지 재평가
+                badgeGrantService.evaluateAndGrantBadges(existingUser.getId());
+                return existingUser;
+            }
+        }
+        
+        // 새 사용자 생성
+        User user = new User();
+        user.setLoginId(loginId);
+        user.setPassword("1234");
+        user.setNickname(nickname);
+        user.setName(name);
+        user.setJob(job);
+        user.setGoal(goal);
+        
+        User savedUser = userRepository.save(user);
+        
+        // 포인트 설정
+        updateUserPoints(savedUser, points);
+        
+        // 뱃지 평가 및 부여
+        badgeGrantService.evaluateAndGrantBadges(savedUser.getId());
+        
+        return savedUser;
+    }
+    
+    private void updateUserPoints(User user, int totalPoints) {
+        UserPoint userPoint = userPointRepository.findByUser(user);
+        
+        if (userPoint == null) {
+            // 새로운 포인트 레코드 생성
+            userPoint = new UserPoint();
+            userPoint.setUser(user);
+            userPoint.setTotalPoint(totalPoints);
+            userPoint.setAmount(totalPoints);
+            userPoint.setReason("초기 포인트 설정");
+            userPoint.setTimestamp(java.time.LocalDateTime.now());
+        } else {
+            // 기존 포인트 업데이트
+            userPoint.setTotalPoint(totalPoints);
+            userPoint.setAmount(totalPoints);
+            userPoint.setReason("초기 포인트 설정");
+            userPoint.setTimestamp(java.time.LocalDateTime.now());
+        }
+        
+        userPointRepository.save(userPoint);
     }
 }
