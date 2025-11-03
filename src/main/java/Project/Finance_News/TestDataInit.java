@@ -4,12 +4,15 @@ import Project.Finance_News.domain.Badge;
 import Project.Finance_News.domain.BadgeType;
 import Project.Finance_News.domain.Term;
 import Project.Finance_News.domain.User;
+import Project.Finance_News.domain.UserBadge;
+import Project.Finance_News.domain.UserPoint;
 import Project.Finance_News.domain.UserVocabulary;
 import Project.Finance_News.repository.BadgeRepository;
 import Project.Finance_News.repository.TermRepository;
+import Project.Finance_News.repository.UserBadgeRepository;
+import Project.Finance_News.repository.UserPointRepository;
 import Project.Finance_News.repository.UserRepository;
 import Project.Finance_News.repository.UserVocabularyRepository;
-import Project.Finance_News.service.quiz.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -27,6 +30,8 @@ public class TestDataInit {
     private final TermRepository termRepository;
     private final UserVocabularyRepository userVocabularyRepository;
     private final BadgeRepository badgeRepository;
+    private final UserPointRepository userPointRepository;
+    private final UserBadgeRepository userBadgeRepository;
 
     /**
      * 테스트용 데이터 추가
@@ -74,6 +79,9 @@ public class TestDataInit {
         if (savedUser1 != null) {
             initUserVocabulary(savedUser1);
         }
+        
+        // 샘플 사용자 데이터 초기화 (등급별 사용자)
+        initSampleUsers();
     }
     
     private void initBadges() {
@@ -165,5 +173,108 @@ public class TestDataInit {
         }
         
         System.out.println("user_vocabulary 데이터 초기화 완료");
+    }
+    
+    /**
+     * 샘플 사용자 데이터 초기화 (등급별 사용자)
+     * 티어 기준: 브론즈(<100), 실버(≥100), 골드(≥500), 플래티넘(≥1000)
+     */
+    private void initSampleUsers() {
+        // 1. 브론즈 등급 사용자: 코딩좋아 (10% 진행률 = 10점, 실버까지의 10%)
+        User userBronze = createSampleUser("codinglover", "1234", "코딩좋아", "코딩좋아");
+        if (userBronze != null) {
+            createUserPoint(userBronze, 10, "초기 포인트");
+            grantBadgeForUser(userBronze, "브론즈");
+        }
+        
+        // 2. 실버 등급 사용자: 개발자1 (20% 진행률 = 180점, 골드까지의 20%)
+        // 실버(100)에서 골드(500)까지의 20% = 100 + (500-100)*0.2 = 180점
+        User userSilver = createSampleUser("dev1", "1234", "개발자1", "개발자1");
+        if (userSilver != null) {
+            createUserPoint(userSilver, 180, "초기 포인트");
+            grantBadgeForUser(userSilver, "브론즈");
+            grantBadgeForUser(userSilver, "실버");
+        }
+        
+        // 3. 골드 등급 사용자: 플래티넘을향해 (50% 진행률 = 750점, 플래티넘까지의 50%)
+        // 골드(500)에서 플래티넘(1000)까지의 50% = 500 + (1000-500)*0.5 = 750점
+        User userGold = createSampleUser("platinum_seeker", "1234", "플래티넘을향해", "플래티넘을향해");
+        if (userGold != null) {
+            createUserPoint(userGold, 750, "초기 포인트");
+            grantBadgeForUser(userGold, "브론즈");
+            grantBadgeForUser(userGold, "실버");
+            grantBadgeForUser(userGold, "골드");
+        }
+        
+        // 4. 플래티넘 등급 사용자: 마라탕좋아 (2500점)
+        User userPlatinum = createSampleUser("maratang_lover", "1234", "마라탕좋아", "마라탕좋아");
+        if (userPlatinum != null) {
+            createUserPoint(userPlatinum, 2500, "초기 포인트");
+            grantBadgeForUser(userPlatinum, "브론즈");
+            grantBadgeForUser(userPlatinum, "실버");
+            grantBadgeForUser(userPlatinum, "골드");
+            grantBadgeForUser(userPlatinum, "플래티넘");
+        }
+        
+        System.out.println("샘플 사용자 데이터 초기화 완료");
+    }
+    
+    /**
+     * 샘플 사용자 생성
+     */
+    private User createSampleUser(String loginId, String password, String name, String nickname) {
+        // 이미 존재하는지 확인
+        if (userRepository.existsByLoginId(loginId)) {
+            return userRepository.findByLoginId(loginId).orElse(null);
+        }
+        
+        User user = new User();
+        user.setLoginId(loginId);
+        user.setPassword(password);
+        user.setName(name);
+        user.setNickname(nickname);
+        user.setJob("학생");
+        user.setGoal("금융 지식 향상을 위한 학습");
+        
+        return userRepository.save(user);
+    }
+    
+    /**
+     * 사용자 포인트 생성
+     */
+    private void createUserPoint(User user, int totalPoints, String reason) {
+        // 기존 포인트가 있으면 삭제 후 재생성
+        UserPoint existingPoint = userPointRepository.findByUser(user);
+        if (existingPoint != null) {
+            return; // 이미 포인트가 있으면 생성하지 않음
+        }
+        
+        UserPoint userPoint = new UserPoint();
+        userPoint.setUser(user);
+        userPoint.setTotalPoint(totalPoints);
+        userPoint.setAmount(totalPoints);
+        userPoint.setReason(reason);
+        userPoint.setTimestamp(java.time.LocalDateTime.now());
+        
+        userPointRepository.save(userPoint);
+    }
+    
+    /**
+     * 사용자에게 특정 배지 부여
+     */
+    private void grantBadgeForUser(User user, String badgeName) {
+        List<Badge> allBadges = badgeRepository.findAll();
+        Badge badge = allBadges.stream()
+                .filter(b -> badgeName.equals(b.getName()))
+                .findFirst()
+                .orElse(null);
+        
+        if (badge != null && !userBadgeRepository.existsByUserAndBadge(user, badge)) {
+            UserBadge userBadge = new UserBadge();
+            userBadge.setUser(user);
+            userBadge.setBadge(badge);
+            userBadge.setGrantedAt(java.time.LocalDateTime.now());
+            userBadgeRepository.save(userBadge);
+        }
     }
 }
