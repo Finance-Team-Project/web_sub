@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - deploy_v1
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build backend
+        working-directory: backend
+        run: ./gradlew clean build
+
+      - name: Build backend Docker image
+        run: docker build -t finance-news-backend:latest ./backend
+
+      - name: Build crawling Docker image
+        run: docker build -t finance-news-crawling:latest ./crawling
