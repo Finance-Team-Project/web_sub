@@ -34,6 +34,8 @@ import Project.Finance_News.domain.session.SessionConst;
 import Project.Finance_News.domain.UserNewsLog;
 import Project.Finance_News.domain.News;
 import Project.Finance_News.repository.NewsKeywordRepository;
+import Project.Finance_News.repository.NewsRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 @RequiredArgsConstructor
@@ -44,6 +46,7 @@ public class UserController {
     private final UserPointRepository userPointRepository;
     private final UserNewsLogRepository userNewsLogRepository;
     private final NewsKeywordRepository newsKeywordRepository;
+    private final NewsRepository newsRepository;
     
     @PersistenceContext
     private EntityManager em;
@@ -567,6 +570,48 @@ public class UserController {
         response.put("totalPages", totalPages);
         response.put("totalNews", totalNews);
         
+        return response;
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/api/mypage/news/{newsId}")
+    @org.springframework.web.bind.annotation.ResponseBody
+    @Transactional
+    public Map<String, Object> deleteMyPageNews(
+            @PathVariable Long newsId,
+            HttpSession session
+    ) {
+        Map<String, Object> response = new HashMap<>();
+
+        User loginUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
+        if (loginUser == null) {
+            response.put("success", false);
+            response.put("message", "로그인이 필요합니다.");
+            return response;
+        }
+
+        User user = userRepository.findById(loginUser.getId()).orElse(null);
+        if (user == null) {
+            response.put("success", false);
+            response.put("message", "사용자 정보를 찾을 수 없습니다.");
+            return response;
+        }
+
+        News news = newsRepository.findById(newsId).orElse(null);
+        if (news == null) {
+            response.put("success", false);
+            response.put("message", "뉴스 정보를 찾을 수 없습니다.");
+            return response;
+        }
+
+        long deletedCount = userNewsLogRepository.deleteByUserAndNews(user, news);
+        if (deletedCount == 0) {
+            response.put("success", false);
+            response.put("message", "삭제할 뉴스 기록이 없습니다.");
+            return response;
+        }
+
+        response.put("success", true);
+        response.put("deletedCount", deletedCount);
         return response;
     }
 }
