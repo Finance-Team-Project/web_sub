@@ -1213,51 +1213,58 @@
     
     // Load news page via AJAX
     function loadNewsPage(page) {
-        // 현재 스크롤 위치 저장
-        const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // 로딩 표시
-        const newsList = document.getElementById('news-list');
-        if (newsList) {
-            newsList.style.opacity = '0.5';
-        }
-        
-        fetch('/api/mypage/news?page=' + page)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateNewsList(data.news);
-                    updatePagination(data.currentPage, data.totalPages, data.totalNews);
-                    
-                    // URL 업데이트 (새로고침 없이)
-                    const newUrl = '/mypage?page=' + page;
-                    window.history.pushState({ page: page }, '', newUrl);
-                    
-                    // 뉴스 섹션으로 스크롤 (부드럽게)
-                    const newsSection = document.getElementById('news-section');
-                    if (newsSection) {
-                        setTimeout(() => {
-                            newsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 100);
-        } else {
-                        // 뉴스 섹션을 찾지 못한 경우 원래 스크롤 위치로
-                        setTimeout(() => window.scrollTo(0, scrollPosition), 100);
+        return new Promise((resolve, reject) => {
+            // 현재 스크롤 위치 저장
+            const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // 로딩 표시
+            const newsList = document.getElementById('news-list');
+            if (newsList) {
+                newsList.style.opacity = '0.5';
+            }
+            
+            // 캐시 무효화를 위해 타임스탬프 추가
+            fetch('/api/mypage/news?page=' + page + '&_t=' + new Date().getTime())
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateNewsList(data.news);
+                        updatePagination(data.currentPage, data.totalPages, data.totalNews);
+                        
+                        // URL 업데이트 (새로고침 없이)
+                        const newUrl = '/mypage?page=' + page;
+                        window.history.pushState({ page: page }, '', newUrl);
+                        
+                        // 뉴스 섹션으로 스크롤 (부드럽게)
+                        const newsSection = document.getElementById('news-section');
+                        if (newsSection) {
+                            setTimeout(() => {
+                                newsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 100);
+                        } else {
+                            // 뉴스 섹션을 찾지 못한 경우 원래 스크롤 위치로
+                            setTimeout(() => window.scrollTo(0, scrollPosition), 100);
+                        }
+                        
+                        resolve(data);
+                    } else {
+                        showToast(data.message || '뉴스를 불러오는데 실패했습니다.', false);
+                        reject(new Error(data.message || '뉴스를 불러오는데 실패했습니다.'));
                     }
-                } else {
-                    showToast(data.message || '뉴스를 불러오는데 실패했습니다.', false);
-                }
-                
-                if (newsList) {
-                    newsList.style.opacity = '1';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('오류가 발생했습니다.', false);
-                if (newsList) {
-                    newsList.style.opacity = '1';
-                }
-            });
+                    
+                    if (newsList) {
+                        newsList.style.opacity = '1';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('오류가 발생했습니다.', false);
+                    if (newsList) {
+                        newsList.style.opacity = '1';
+                    }
+                    reject(error);
+                });
+        });
     }
     
     // Update news list HTML
@@ -1404,7 +1411,8 @@
             deleteButton.disabled = true;
             deleteButton.style.pointerEvents = 'none';
         }
-        newsItem.classList.add('deleting');
+        newsItem.style.opacity = '0.5';
+        newsItem.style.pointerEvents = 'none';
 
         fetch('/api/mypage/news/' + newsId, {
             method: 'DELETE'
@@ -1412,21 +1420,40 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                newsItem.style.opacity = '0';
-                newsItem.style.transform = 'translateX(-20px)';
+                showToast('뉴스가 제거되었습니다.');
+                // 현재 페이지 정보 가져오기
+                const urlParams = new URLSearchParams(window.location.search);
+                let currentPage = parseInt(urlParams.get('page') || '0');
+                
+                // 삭제 후 약간의 지연을 두고 페이지 다시 로드 (서버 반영 시간 확보)
                 setTimeout(() => {
-                    newsItem.remove();
-                    showToast('뉴스가 제거되었습니다.');
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const currentPage = parseInt(urlParams.get('page') || '0');
-                    loadNewsPage(currentPage);
-                }, 300);
+                    loadNewsPage(currentPage).then(() => {
+                        // 페이지 로드 후 현재 페이지에 뉴스가 없으면 이전 페이지로 이동
+                        const newsList = document.getElementById('news-list');
+                        if (newsList) {
+                            const newsItems = newsList.querySelectorAll('.news-item');
+                            if (newsItems.length === 0 && currentPage > 0) {
+                                // 이전 페이지로 이동
+                                loadNewsPage(currentPage - 1);
+                            } else if (newsItems.length === 0 && currentPage === 0) {
+                                // 첫 페이지이고 뉴스가 없으면 빈 메시지 표시
+                                const noNewsDiv = document.querySelector('.no-news');
+                                if (!noNewsDiv) {
+                                    newsList.innerHTML = '<div class="no-news">아직 본 뉴스가 없습니다. 뉴스를 읽어보세요! 📰</div>';
+                                }
+                            }
+                        }
+                    }).catch(error => {
+                        console.error('페이지 로드 오류:', error);
+                    });
+                }, 200);
             } else {
                 if (deleteButton) {
                     deleteButton.disabled = false;
                     deleteButton.style.pointerEvents = '';
                 }
-                newsItem.classList.remove('deleting');
+                newsItem.style.opacity = '1';
+                newsItem.style.pointerEvents = '';
                 showToast(data.message || '뉴스 삭제에 실패했습니다.', false);
             }
         })
@@ -1436,7 +1463,8 @@
                 deleteButton.disabled = false;
                 deleteButton.style.pointerEvents = '';
             }
-            newsItem.classList.remove('deleting');
+            newsItem.style.opacity = '1';
+            newsItem.style.pointerEvents = '';
             showToast('뉴스 삭제 중 오류가 발생했습니다.', false);
         });
     }

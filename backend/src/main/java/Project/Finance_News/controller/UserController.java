@@ -603,7 +603,16 @@ public class UserController {
             return response;
         }
 
+        // 삭제 전 로그 개수 확인
+        long beforeCount = userNewsLogRepository.countByUserAndNews(user, news);
+        System.out.println("삭제 전 뉴스 로그 개수: " + beforeCount + " (userId: " + user.getId() + ", newsId: " + newsId + ")");
+
         long deletedCount = userNewsLogRepository.deleteByUserAndNews(user, news);
+        
+        // 삭제 후 로그 개수 확인
+        long afterCount = userNewsLogRepository.countByUserAndNews(user, news);
+        System.out.println("삭제 후 뉴스 로그 개수: " + afterCount + ", 삭제된 개수: " + deletedCount);
+        
         if (deletedCount == 0) {
             response.put("success", false);
             response.put("message", "삭제할 뉴스 기록이 없습니다.");
@@ -612,6 +621,8 @@ public class UserController {
 
         response.put("success", true);
         response.put("deletedCount", deletedCount);
+        response.put("beforeCount", beforeCount);
+        response.put("afterCount", afterCount);
         return response;
     }
 }
